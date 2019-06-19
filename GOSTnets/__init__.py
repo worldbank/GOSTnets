@@ -1,0 +1,1 @@
+from GOSTnets.GOSTnet import *
