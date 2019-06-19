@@ -3,9 +3,7 @@ This package contains a library and example notebooks for running network analys
 
 The package contains four folders:
 1. GOSTNets - the library containng the functions for running the network analysis
-2. SampleData - data for running examples found in Notebooks
-3. Notebooks - sample notebooks for runnning analyses
-4. Tutorial - introductory tutorial for getting to grips with the basics of the library. 
+2. Tutorial - Jupyter Notebooks for getting to grips with the basics of the library. 
 
 Every function contains a docstring which can be brought up in use to check the inputs for various functions. For example: 
 
