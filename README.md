@@ -5,9 +5,18 @@ The package contains four folders:
 1. GOSTNets - the library containng the functions for running the network analysis
 2. Tutorial - Jupyter Notebooks for getting to grips with the basics of the library. 
 
+### Installation
+The library is available on both pip and conda (we are hoping to add to conda-forge in the short term). We suggest using conda to install, because the pip install of geopandas and osmnx do not work
+
+```
+conda install -c conda-forge -c bpstewar GOSTnets
+```
+
+### Usage
 Every function contains a docstring which can be brought up in use to check the inputs for various functions. For example: 
 
 ```python
+import GOSTnets as gn
 gn.edge_gdf_from_graph?
 ```
 
