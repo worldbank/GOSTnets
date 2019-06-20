@@ -750,36 +750,28 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
      RETURNS:  a numpy matrix of format OD[o][d] = shortest time possible
     # -------------------------------------------------------------------------#
     """
-
+    #Check to make sure 'weight is present in input graph
+    sampleNode = example_edge(G)
+    if not weight in sampleNode['properties'].keys():
+        raise  ValueError("weight variable not present in Graph. Check out gn.example_edge(G) to see available variables on the Graph")
     if weighted_origins == True:
         print('weighted_origins equals true')
-
         OD = np.zeros((len(origins), len(destinations)))
-
         #dictionary key length
         o = 0
-
         #loop through dictionary
         for key,value in origins.items():
-
             origin = key
-
             for d in range(0,len(destinations)):
-
                 destination = destinations[d]
-
                 #find the shortest distance between the origin and destination
                 distance = nx.dijkstra_path_length(G, origin, destination, weight = weight)
-
                 # calculate weighted distance
                 weighted_distance = distance * float(value)
-
                 OD[o][d] = weighted_distance
-
             o += 1
 
     else:
-
         flip = 0
         if len(origins) > len(destinations):
             flip = 1
@@ -1608,7 +1600,8 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
 
     return G2
 
-def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', add_dist_to_node_col = True):
+def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
+                    add_dist_to_node_col = True):
     """
     ### snaps points to a graph at very high speed ###
      REQUIRED:     G - a graph object

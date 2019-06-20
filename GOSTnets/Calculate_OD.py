@@ -8,15 +8,16 @@ import numpy as np
 
 from shapely.geometry import Point
 
-import GOSTnet as gn
+import GOSTnets as gn
 
-def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time"):
+def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calculate_snap=False):
     ''' Calculate Origin destination matrix from GeoDataframes
     
     Args:
         G (networkx graph): describes the road network. Often extracted using OSMNX
         origins (geopandas dataframe): source locations for calculating access
         destinations (geopandas dataframe): destination locations for calculating access
+        calculate_snap (boolean, optioinal): variable to add snapping distance to travel time, default is false
     Returns:
         numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
     '''
@@ -36,12 +37,20 @@ def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time"):
     # HERE'S HOW MUTHERFUCKER
     origins['OD_O'] = origins['NN'].apply(lambda x: np.where(oNodes==x)[0][0])
     destinations['OD_D'] = destinations['NN'].apply(lambda x: np.where(dNodes==x)[0][0])
-    return(od[origins['OD_O'].values,:][:,destinations['OD_D'].values])    
+    outputMatrix = od[origins['OD_O'].values,:][:,destinations['OD_D'].values]
+    if calculate_snap:
+        originsUTM = gn.pandana_snap(G, origins, target_crs='epsg:3857')
+        destinationsUTM = gn.pandana_snap(G, destinations, target_crs='epsg:3857')
+        originsUTM['tTime_sec'] =      originsUTM['NN_dist']      / 1000 / 5 * 60 * 60 # Convert snap distance to walking time in seconds
+        destinationsUTM['tTime_sec'] = destinationsUTM['NN_dist'] / 1000 / 5 * 60 * 60 # Convert snap distance to walking time in seconds
+        for idx, row in originsUTM.iterrows():
+            outputMatrix_adj[idx,:] = outputMatrix_adj[idx,:] + row['tTime_sec']
+    return()    
     
 def calculateOD_csv(G, originCSV, destinationCSV='', 
         oLat="Lat", oLon="Lon", dLat="Lat", dLon="Lon",
         crs={'init':'epsg:4326'},
-        fail_value=-1, weight='time'):
+        fail_value=-1, weight='time', calculate_snap=False):
     ''' Calculate OD matrix from csv files of points
     Args:
         G (networkx graph): describes the road network. Often extracted using OSMNX
@@ -52,6 +61,7 @@ def calculateOD_csv(G, originCSV, destinationCSV='',
         crs (dictionary, optional): crs of input origins and destinations, defaults to {'init':'epsg:4326'}
         fail-value (integer, optional): value to put in OD matrix if no route found, defaults to -1
         weight (string, optional): variable in G used to define edge impedance, defaults to 'time'
+        calculate_snap (boolean, optioinal): variable to add snapping distance to travel time, default is false
     Returns:
         numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
     '''
@@ -64,7 +74,7 @@ def calculateOD_csv(G, originCSV, destinationCSV='',
         originPts = pd.read_csv(destinationCSV)
         pts = [Point(x) for x in zip(originPts[dLon],originPts[dLat])]
         destinationGDF = gpd.GeoDataFrame(originPts, geometry=pts, crs=crs)
-    OD = calculateOD_gdf(G, originGDF, destinationGDF, fail_value, weight)
+    OD = calculateOD_gdf(G, originGDF, destinationGDF, fail_value, weight, calculate_snap = calculate_snap)
     return(OD)
    
 def calculate_gravity(od, oWeight=[], dWeight=[], decayVals=[0.01,
