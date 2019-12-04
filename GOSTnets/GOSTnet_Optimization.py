@@ -1,32 +1,53 @@
 import os, sys, logging, warnings, time
 
 import pyproj
+
+import peartree as pt
+import peartree.graph as ptg
+print('peartree version: %s ' % pt.__version__)
 import networkx as nx
+print('networkx version: %s ' % nx.__version__)
+import matplotlib as mpl
+print('matplotlib version: %s ' % mpl.__version__)
 import osmnx as ox
+print('osmnx version: %s ' % ox.__version__)
 import pandas as pd
 import geopandas as gpd
 import numpy as np
 
-from scipy import spatial
 from functools import partial
+from shapely.ops import transform, linemerge
 from shapely.wkt import loads
 from shapely.geometry import Point, LineString, MultiLineString, box
-from shapely.ops import linemerge, unary_union, transform
+from shapely.ops import linemerge, unary_union
 from collections import Counter
 
+speed_dict = {
+                'residential': 20,  # kmph
+                'primary': 40, # kmph
+                'primary_link':35,
+                'motorway':45,
+                'motorway_link': 40,
+                'trunk': 40,
+                'trunk_link':35,
+                'secondary': 30, # kmph
+                'secondary_link':25,
+                'tertiary':30,
+                'tertiary_link': 25,
+                'unclassified':20,
+                'road':20,
+                'crossing':20,
+                'living_street':20
+                }
+
 def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', largest_G = False):
-    """
     #### Function for generating a G object from a saved combo .csv ####
-
-     REQUIRED: fpath - path to a .csv containing edges (WARNING: COMBO CSV only)
-     OPTIONAL: u_tag - specify column containing u node ID if not labelled 'u'
-               v_tag - specify column containing u node ID if not labelled 'v'
-               geometry_tag - specify column containing u node ID if not
-               labelled 'Wkt'
-     RETURNS: a multidigraph object
-
+    # REQUIRED: fpath - path to a .csv containing edges (WARNING: COMBO CSV only)
+    # OPTIONAL: u_tag - specify column containing u node ID if not labelled 'u'
+    #           v_tag - specify column containing u node ID if not labelled 'v'
+    #           geometry_tag - specify column containing u node ID if not labelled 'Wkt'
+    # RETURNS: a multidigraph object
     # -------------------------------------------------------------------------#
-    """
 
     edges_1 = pd.read_csv(os.path.join(fpath))
 
@@ -37,7 +58,6 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
     col_list = list(edges.columns)
     drop_cols = [u_tag, v_tag, geometry_tag]
     attr_list = [col_entry for col_entry in col_list if col_entry not in drop_cols]
-
     def convert(x, attr_list):
         u = x[u_tag]
         v = x[v_tag]
@@ -75,20 +95,14 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
     return G
 
 def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_tag = 'endnode', geometry_tag = 'Wkt', largest_G = False):
-
-    """
     #### Function for generating a G object from a saved .csv of edges ####
-     REQUIRED: fpath_nodes - path to a .csv containing nodes
-               fpath_edges - path to a .csv containing edges
-     OPTIONAL: u_tag - specify column containing u node ID if not labelled
-               'stnode'
-               v_tag - specify column containing v node ID if not labelled
-               'endnode'
-               geometry_tag - specify column containing geometry if not labelled
-               'Wkt'
-     RETURNS: a multidigraph object
-    #-------------------------------------------------------------------------#
-    """
+    # REQUIRED: fpath_nodes - path to a .csv containing nodes
+    #           fpath_edges - path to a .csv containing edges
+    # OPTIONAL: u_tag - specify column containing u node ID if not labelled 'stnode'
+    #           v_tag - specify column containing u node ID if not labelled 'endnode'
+    #           geometry_tag - specify column containing u node ID if not labelled 'Wkt'
+    # RETURNS: a multidigraph object
+    # -------------------------------------------------------------------------#
 
     nodes_df = pd.read_csv(fpath_nodes)
     edges_df = pd.read_csv(fpath_edges)
@@ -148,25 +162,15 @@ def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_t
 
     return G
 
-def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geometry_tag = 'geometry', xCol='x', yCol='y'):
-    """
-    #### Function for generating GeoDataFrame from Graph ####
-     REQUIRED: a graph object G
-     OPTIONAL: crs - projection of format {'init' :'epsg:4326'}. Defaults to WGS84.
-               note: here we are defining the crs of the input geometry - we do
-               NOT reproject to this crs. To reproject, consider using
-               geopandas' to_crs method on the returned gdf.
-               attr_list: list of the keys which you want to be moved over to
-               the GeoDataFrame, if not all. Defaults to None, which will move
-               all.
-               geometry_tag: specify geometry attribute of graph, default
-               'geometry'
-               xCol - if no shapely geometry but Longitude present, assign here
-               yCol - if no shapely geometry but Latitude present, assign here
-     RETURNS: a geodataframe of the node objects in the graph
-    #-------------------------------------------------------------------------#
-    """
+def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, xCol='x', yCol='y'):
 
+    #### Function for generating GeoDataFrame from Graph ####
+    # REQUIRED: a graph object G
+    # OPTIONAL: crs - projection of format {'init' :'epsg:4326'}. Defaults to WGS84.
+    #           note: defining crs of the data, does NOT reproject to this crs
+    #           attr_list: list of the keys which you want to be moved over to the GeoDataFrame, if not all
+    # RETURNS: a geodataframe of the node objects in the graph
+    # -------------------------------------------------------------------------#
     nodes = []
     keys = []
 
@@ -174,11 +178,12 @@ def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
         for u, data in G.nodes(data = True):
             keys.append(list(data.keys()))
         flatten = lambda l: [item for sublist in l for item in sublist]
-        attr_list = list(set(flatten(keys)))
+        keys = list(set(flatten(keys)))
+        attr_list = keys
 
-    if geometry_tag in attr_list:
+    if 'geometry' in attr_list:
         non_geom_attr_list = attr_list
-        non_geom_attr_list.remove(geometry_tag)
+        non_geom_attr_list.remove('geometry')
     else:
         non_geom_attr_list = attr_list
 
@@ -186,7 +191,7 @@ def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
 
     for u, data in G.nodes(data=True):
 
-        if geometry_tag not in attr_list and xCol in attr_list and yCol in attr_list :
+        if 'geometry' not in attr_list and xCol in attr_list and yCol in attr_list :
             try:
                 new_column_info = {
                 'node_ID': u,
@@ -194,14 +199,14 @@ def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
                 'x': data[xCol],
                 'y': data[yCol]}
             except:
-                print('Skipped due to missing geometry data:',(u, data))
+                print((u, data))
         else:
             try:
                 new_column_info = {
                 'node_ID': u,
-                'geometry': data[geometry_tag],
-                'x':data[geometry_tag].x,
-                'y':data[geometry_tag].y}
+                'geometry': data['geometry'],
+                'x':data['geometry'].x,
+                'y':data['geometry'].y}
             except:
                 print((u, data))
 
@@ -215,34 +220,22 @@ def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
         z += 1
 
     nodes_df = pd.DataFrame(nodes)
-    nodes_df = nodes_df[['node_ID',*non_geom_attr_list,geometry_tag]]
+    nodes_df = nodes_df[['node_ID',*non_geom_attr_list,'geometry']]
     nodes_df = nodes_df.drop_duplicates(subset=['node_ID'], keep='first')
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=nodes_df.geometry, crs = crs)
 
     return nodes_gdf
 
-def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geometry_tag = 'geometry', xCol='x', yCol = 'y'):
-    """
-    #### Function for generating a GeoDataFrame from a networkx Graph object ###
-     REQUIRED: a graph object G
-     OPTIONAL: crs - projection of format {'init' :'epsg:4326'}. Defaults to
-               WGS84. Note: here we are defining the crs of the input geometry -
-               we do NOT reproject to this crs. To reproject, consider using
-               geopandas' to_crs method on the returned gdf.
-               attr_list: list of the keys which you want to be moved over to
-               the GeoDataFrame.
-               geometry_tag - the key in the data dictionary for each edge which
-               contains the geometry info.
-               xCol - if no geometry is present in the edge data dictionary, the
-               function will try to construct a straight line between the start
-               and end nodes, if geometry information is present in their data
-               dictionaries.  Pass the Longitude info as 'xCol'.
-               yCol - likewise, determining the Latitude tag for the node's data
-               dictionary allows us to make a straight line geometry where an
-               actual geometry is missing.
-     RETURNS: a GeoDataFrame object of the edges in the graph
-    #-------------------------------------------------------------------------#
-    """
+def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geom_col = 'geometry', xCol='x', yCol = 'y'):
+
+    #### Function for generating GeoDataFrame from Graph ####
+    # REQUIRED: a graph object G
+    # OPTIONAL: crs - projection of format {'init' :'epsg:4326'}. Defaults to WGS84
+    #           attr_list: list of the keys which you want to be moved over to the GeoDataFrame
+    # RETURNS: a GeoDataFrame object of the edges in the graph
+    # -------------------------------------------------------------------------#
+
+
     edges = []
     keys = []
 
@@ -251,16 +244,16 @@ def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
             keys.append(list(data.keys()))
         flatten = lambda l: [item for sublist in l for item in sublist]
         keys = list(set(flatten(keys)))
-        if geometry_tag in keys:
-            keys.remove(geometry_tag)
+        if geom_col in keys:
+            keys.remove(geom_col)
         attr_list = keys
 
     for u, v, data in G.edges(data=True):
 
-        if geometry_tag in data:
+        if geom_col in data:
             # if it has a geometry attribute (a list of line segments), add them
             # to the list of lines to plot
-            geom = data[geometry_tag]
+            geom = data[geom_col]
 
         else:
             # if it doesn't have a geometry attribute, the edge is a straight
@@ -290,28 +283,81 @@ def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
 
     return edges_gdf
 
-def graph_nodes_intersecting_polygon(G, polygons, crs = None):
-
+def snap_points_to_graph(G, points, response = None, geomcol = 'geometry', connection_threshold = 5000, xCol='x', yCol='y'):
+    print('WARNING! Fully deprecated. try using pandana_snap instead!')
+    return
     """
     #### Function for generating GeoDataFrame from Graph ####
-     REQUIRED: G - a Graph object OR node geodataframe
-               polygons - a GeoDataFrame containing one or more polygons
-     OPTIONAL: crs - a crs object of form {'init':'epsg:XXXX'}. If passed,
-               matches both inputs to this crs.
-     RETURNS:  a list of the nodes intersecting the polygons
-     Note:     ensure any GeoDataFrames are in the same projection
-               before using function, or pass a crs
-    #--------------------------------------------------------------------------#
+    # REQUIRED: a GeoDataFrame of point objects (points_gdf)
+    #           a Graph object or geodataframe
+    # OPTIONAL: response: return result in different formats - dataframe, list, or
+    #           list of unique nearest nodes
+    #           geomcol: specify a different column name to the default for the
+    #           geometry column of the input GeoDataframe. Useful for GeoDataFrames
+    #           that include multiple columns with shapely geometry info
+    #           connection threshold: stop considering nodes further than the connection_threshold. Default 5km.
+    # RETURNS:  an augmented version of the input GeoDataFrame with the node_ID of
+    #           the nearest nodes to the points in the graph
+    # Note:     ensure any GeoDataFrames are in the same projection
+    #           before using function, or pass a crs
+    # -------------------------------------------------------------------------#
+
+    node_df_G1 = node_gdf_from_graph(G, xCol=xCol, yCol=yCol)
+
+    if type(points) != gpd.geodataframe.GeoDataFrame:
+        raise ValueError('points variable must be of type GeoDataFrame!')
+
+    nn,nl = [], []
+
+    for i, row in points.iterrows():
+
+        pointobj = points[geomcol].loc[i]
+
+        point = (pointobj.x, pointobj.y)
+
+        nearest_nodes = get_nearest_nodes(node_df_G1, point, connection_threshold = connection_threshold, xCol=xCol, yCol=yCol)
+
+        try:
+            nrst_node = nearest_nodes.end_node.loc[nearest_nodes.length.idxmin()]
+            nrst_node_dist = nearest_nodes.length.loc[nearest_nodes.length.idxmin()]
+        except:
+            nrst_node = None
+            nrst_node_dist = None
+
+        nn.append(nrst_node)
+        nl.append(nrst_node_dist)
+
+    points['Nearest_node_ID'] = nn
+    points['Nearest_node_dist'] = nl
+
+    if response is None:
+        return points
+    elif response == 'list':
+        return list(points['Nearest_node'])
+    elif response == 'unique_list':
+        return list(set(nn))
+    else:
+        ValueError('response parameter not recongized!')
     """
+def graph_nodes_intersecting_polygon(G, polygons, crs = None):
+
+    #### Function for generating GeoDataFrame from Graph ####
+    # REQUIRED: a GeoDataFrame containing one or more polygons
+    #           a Graph object or geodataframe
+    # RETURNS:  a list of the nodes intersecting the polygons
+    # Note:     ensure any GeoDataFrames are in the same projection
+    #           before using function, or pass a crs
+    # -------------------------------------------------------------------------#
+
+
 
     if type(G) == nx.classes.multidigraph.MultiDiGraph:
         graph_gdf = node_gdf_from_graph(G)
 
     elif type(G) == gpd.geodataframe.GeoDataFrame:
         graph_gdf = G
-
     else:
-        raise ValueError('Expecting a graph or node geodataframe for G!')
+        raise ValueError('Expecting a graph or geodataframe for G!')
 
     if type(polygons) != gpd.geodataframe.GeoDataFrame:
         raise ValueError('Expecting a geodataframe for polygon(s)!')
@@ -325,7 +371,7 @@ def graph_nodes_intersecting_polygon(G, polygons, crs = None):
     if polygons.crs != graph_gdf.crs:
         raise ValueError('crs mismatch detected! aborting process')
 
-    intersecting_nodes = []
+    aggs = []
     for poly in polygons.geometry:
 
         def chck(x, poly):
@@ -335,39 +381,28 @@ def graph_nodes_intersecting_polygon(G, polygons, crs = None):
                 return 0
 
         graph_gdf['intersecting'] = graph_gdf['geometry'].apply(lambda x: chck(x, poly))
-        intersecting_nodes.append(list(graph_gdf['node_ID'].loc[graph_gdf['intersecting'] == 1]))
+        aggs.append(list(graph_gdf['node_ID'].loc[graph_gdf['intersecting'] == 1]))
 
-    intersecting_nodes = [j for i in intersecting_nodes for j in i]
-    unique_intersecting_nodes = list(set(intersecting_nodes))
-    return unique_intersecting_nodes
+    aggs = [j for i in aggs for j in i]
+    aggs = list(set(aggs))
+    return aggs
 
-def graph_edges_intersecting_polygon(G, polygons, mode, crs = None, fast = True):
+def graph_edges_intersecting_polygon(G, polygons, mode = 'contains', crs = None):
 
-    """
-    #### Function for identifying edges of a graph that intersect polygon(s) ###
-     REQUIRED: G - a Graph object
-               polygons - a GeoDataFrame containing one or more polygons
-               mode - a string, either 'contains' or 'intersecting'
-     OPTIONAL: crs - if passed, will reproject both polygons and graph edge gdf
-               to this projection.
-               fast - (default: True): we can cheaply test whether an edge
-               intersects a polygon gdf by checking whether either the start or
-               end nodes are within a polygon. If both are, then we return
-               'contained'; if at least one is, we can return 'intersects'.
-               If we set fast to False, then we iterate through each geometry
-               one at a time, and check to see whether the geometry object
-               literally intersects the polygon geodataframe, one at a time. May
-               be computationally intensive!
-     RETURNS:  a list of the edges intersecting the polygons
-     Note:     ensure any GeoDataFrames are in the same projection
-               before using function, or pass a crs
-    #--------------------------------------------------------------------------#
-    """
+    #### Function for identifying intersecting edges of a graph with polygon(s) ####
+    # REQUIRED: a GeoDataFrame containing one or more polygons
+    #           a Graph object
+    #           mode - a string, either 'contains' or 'intersecting'
+    # RETURNS:  a list of the edges intersecting the polygons
+    # Note:     ensure any GeoDataFrames are in the same projection
+    #           before using function, or pass a crs
+    # -------------------------------------------------------------------------#
+
     if type(G) == nx.classes.multidigraph.MultiDiGraph:
         node_graph_gdf = node_gdf_from_graph(G)
         edge_graph_gdf = edge_gdf_from_graph(G)
     else:
-        raise ValueError('Expecting a graph for G!')
+        raise ValueError('Expecting a graph or geodataframe for G!')
 
     if type(polygons) != gpd.geodataframe.GeoDataFrame:
         raise ValueError('Expecting a geodataframe for polygon(s)!')
@@ -383,39 +418,25 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs = None, fast = True)
 
     intersecting_nodes = graph_nodes_intersecting_polygon(node_graph_gdf, polygons, crs)
 
-    if fast == True:
-
-        if mode == 'contains':
-            edge_graph_gdf = edge_graph_gdf.loc[(edge_graph_gdf.stnode.isin(intersecting_nodes)) &
-                                     (edge_graph_gdf.endnode.isin(intersecting_nodes))]
-        elif mode == 'intersects':
-            edge_graph_gdf = edge_graph_gdf.loc[(edge_graph_gdf.stnode.isin(intersecting_nodes)) |
-                                     (edge_graph_gdf.endnode.isin(intersecting_nodes))]
-    elif fast == False:
-        poly = unary_union(polygons.geometry)
-
-        if mode == 'contains':
-            edge_graph_gdf = edge_graph_gdf.loc[(edge_graph_gdf.within(poly))]
-
-        elif mode == 'intersects':
-            edge_graph_gdf = edge_graph_gdf.loc[(edge_graph_gdf.intersects(poly))]
-
-    else:
-        raise ValueError("'fast' requires a boolean input!!")
+    if mode == 'contains':
+        edge_graph_gdf = edge_graph_gdf.loc[(edge_graph_gdf.stnode.isin(intersecting_nodes)) &
+                                 (edge_graph_gdf.endnode.isin(intersecting_nodes))]
+    elif mode == 'intersects':
+        edge_graph_gdf = edge_graph_gdf.loc[(edge_graph_gdf.stnode.isin(intersecting_nodes)) |
+                                 (edge_graph_gdf.endnode.isin(intersecting_nodes))]
 
     return edge_graph_gdf
 
 def sample_raster(G, tif_path, property_name = 'RasterValue'):
-    """
+
     #### Function for attaching raster values to corresponding graph nodes ####
-     REQUIRED: a graph containing one or more nodes
-               a raster or path to a tif
-               a property name for the value of the raster attached to the node
-     RETURNS:  a graph
-     Note:     ensure any GeoDataFrames / graphs are in the same projection
-               before using function, or pass a crs
-    #--------------------------------------------------------------------------#
-    """
+    # REQUIRED: a graph containing one or more nodes
+    #           a raster or path to a tif
+    #           a property name for the value of the raster attached to the node
+    # RETURNS:  a graph
+    # Note:     ensure any GeoDataFrames / graphs are in the same projection
+    #           before using function, or pass a crs
+    # -------------------------------------------------------------------------#
 
     import rasterio
 
@@ -430,7 +451,7 @@ def sample_raster(G, tif_path, property_name = 'RasterValue'):
         for u, data in G.nodes(data=True):
             list_of_nodes.update({u:(data['x'], data['y'])})
     except:
-        raise ValueError('loading point geometry went wrong. Ensure node data dict includes x, y values!')
+        raise ValueError('loading point geometry went wrong. Ensure data dict includes x, y values!')
 
     # load raster
     try:
@@ -468,23 +489,18 @@ def sample_raster(G, tif_path, property_name = 'RasterValue'):
     return G
 
 def generate_isochrones(G, origins, thresh, weight = None, stacking = False):
-    """
-    #### Function for generating isochrones from one or more graph nodes
-     REQUIRED:  G - a graph containing one or more nodes
-                origins - a list of node IDs that the isochrones are to be
-                generated from
-                thresh - the time threshold for the calculation of the isochrone
-     OPTIONAL:  weight - name of edge weighting for calculating 'distances'. For
-                isochrones, should be time expressed in seconds. Defaults to
-                time expressed in seconds.
-                stacking - if True, returns number of origins that can be
-                reached from that node. If false, max = 1
-     RETURNS:   the original graph with a new data property for the nodes and
-                edges included in the isochrone
-     Note:      ensure any GeoDataFrames / graphs are in the same projection
-                before using function, or pass a crs
+
+    #### Function for generating isochrones from one or more graph nodes ####
+    # REQUIRED: G - a graph containing one or more nodes
+    #           origins - a list of node IDs that the isochrones are to be generated from
+    #           thresh - the time threshold for the calculation of the isochrone
+    # OPTIONAL: weight - name of edge weighting for calculating 'distances'. For isochrones, should be
+    #           time expressed in seconds. Defaults to time expressed in seconds.
+    #           stacking - if True, returns number of origins that can be reached from that node. If false, max = 1
+    # RETURNS:  the original graph with a new data property for the nodes and edges included in the isochrone
+    # Note:     ensure any GeoDataFrames / graphs are in the same projection
+    #           before using function, or pass a crs
     # -------------------------------------------------------------------------#
-    """
 
     if type(origins) == list and len(origins) >= 1:
         pass
@@ -533,26 +549,22 @@ def generate_isochrones(G, origins, thresh, weight = None, stacking = False):
 
     return G
 
-def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=False, weight = 'time', measure_crs = {'init':'epsg:4326'}):
-    """
-    #### Function for adding a time value to edge dictionaries ####
-     REQUIRED:  G - a graph object
-                origins - a list object of node IDs from which to generate an
-                isochrone poly object
-                trip_times - a list object containing the isochrone values
-     OPTIONAL:  edge_buff - the thickness with which to buffer included edges
-                node_buff - the thickness with whcih to buffer included nodes
-                infill - If True, will remove any holes in isochrones
-                weight - the edge weight to use when appraising travel times.
-                crs - measurement crs, object of form {'init':'epsg:XXXX'}
-    #--------------------------------------------------------------------------#
-    """
+def make_iso_polys(G, origins, trip_times, edge_buff=25, node_buff=50, infill=False, weight = None, crs = None):
+
     default_crs = {'init':'epsg:4326'}
+
+    ddict = list(G.nodes(data = True))[:1][0][1]
 
     if type(origins) == list and len(origins) >= 1:
         pass
     else:
         raise ValueError('Ensure isochrone centers ("origins" object) is a list containing at least one node ID!')
+
+    if weight == None:
+        if 'time' not in ddict.keys():
+            raise ValueError('need "time" key in edge value dictionary!')
+        else:
+            weight = 'time'
 
     isochrone_polys, nodez, tt = [], [], []
 
@@ -561,165 +573,64 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
         for _node_ in origins:
 
             subgraph = nx.ego_graph(G, _node_, radius = trip_time, distance = weight)
+
             node_points = [Point((data['x'], data['y'])) for node, data in subgraph.nodes(data=True)]
+            nodes_gdf = gpd.GeoDataFrame({'id': subgraph.nodes()}, geometry=node_points, crs = default_crs)
+            nodes_gdf = nodes_gdf.set_index('id')
 
-            if len(node_points) > 1:
+            edge_lines = []
+            for n_fr, n_to in subgraph.edges():
+                f = nodes_gdf.loc[n_fr].geometry
+                t = nodes_gdf.loc[n_to].geometry
+                edge_lines.append(LineString([f,t]))
 
-                nodes_gdf = gpd.GeoDataFrame({'id': subgraph.nodes()}, geometry=node_points, crs = default_crs)
-                nodes_gdf = nodes_gdf.set_index('id')
+            edge_gdf = gpd.GeoDataFrame({'geoms':edge_lines}, geometry = 'geoms', crs = default_crs)
 
-                edge_lines = []
-                for n_fr, n_to in subgraph.edges():
-                    f = nodes_gdf.loc[n_fr].geometry
-                    t = nodes_gdf.loc[n_to].geometry
-                    edge_lines.append(LineString([f,t]))
+            if crs != None and nodes_gdf.crs != crs:
+                nodes_gdf = nodes_gdf.to_crs(crs)
+                edge_gdf = edge_gdf.to_crs(crs)
 
-                edge_gdf = gpd.GeoDataFrame({'geoms':edge_lines}, geometry = 'geoms', crs = default_crs)
+            n = nodes_gdf.buffer(node_buff).geometry
+            e = edge_gdf.buffer(edge_buff).geometry
 
-                if measure_crs != None and nodes_gdf.crs != measure_crs:
-                    nodes_gdf = nodes_gdf.to_crs(measure_crs)
-                    edge_gdf = edge_gdf.to_crs(measure_crs)
+            all_gs = list(n) + list(e)
 
-                n = nodes_gdf.buffer(node_buff).geometry
-                e = edge_gdf.buffer(edge_buff).geometry
+            new_iso = gpd.GeoSeries(all_gs).unary_union
 
-                all_gs = list(n) + list(e)
+            # If desired, try and "fill in" surrounded
+            # areas so that shapes will appear solid and blocks
+            # won't have white space inside of them
 
-                new_iso = gpd.GeoSeries(all_gs).unary_union
+            if infill:
+                new_iso = Polygon(new_iso.exterior)
 
-                # If desired, try and "fill in" surrounded
-                # areas so that shapes will appear solid and blocks
-                # won't have white space inside of them
+            isochrone_polys.append(new_iso)
+            tt.append(trip_time)
+            nodez.append(str(_node_))
 
-                if infill:
-                    new_iso = Polygon(new_iso.exterior)
-
-                isochrone_polys.append(new_iso)
-                tt.append(trip_time)
-                nodez.append(str(_node_))
-            else:
-                pass
-
-    gdf = gpd.GeoDataFrame({'geometry':isochrone_polys,'thresh':tt,'nodez':_node_}, crs = measure_crs, geometry = 'geometry')
-    gdf = gdf.to_crs(default_crs)
+    gdf = gpd.GeoDataFrame({'geometry':isochrone_polys,'thresh':tt,'nodez':_node_}, crs = crs, geometry = 'geometry')
 
     return gdf
 
-def find_hwy_distances_by_class(G, distance_tag='length'):
-    """
-    #### Function for finding out the different highway classes in the graph and their respective lengths ####
-     REQUIRED: G - a graph object
-               distance_tag - specifies which edge attribute represents length
-     RETURNS: a dictionary that has each class and the total distance per class
-    #--------------------------------------------------------------------------#
-    """
-
-    if type(G) == nx.classes.multidigraph.MultiDiGraph or type(G) == nx.classes.digraph.DiGraph:
-        pass
-    else:
-        raise ValueError('Expecting a graph or geodataframe for G!')
-
-    G_adj = G.copy()
-
-    class_list = []
-
-    for u, v, data in G_adj.edges(data=True):
-        #print(data['highway'])
-        if type(data['highway']) == list:
-                if data['highway'][0] not in class_list:
-                    class_list.append(data['highway'][0])
-        else:
-            if data['highway'] not in class_list:
-                class_list.append(data['highway'])
-    
-    class_dict = { i : 0 for i in class_list }
-
-    for i in class_list:
-        for u, v, data in G_adj.edges(data=True):
-            if type(data['highway']) == list:
-                if data['highway'][0] == i:
-                    class_dict[i] += data[distance_tag]
-            else:
-                if data['highway'] == i:
-                    class_dict[i] += data[distance_tag]
-
-    return class_dict
-
-def find_graph_avg_speed(G, distance_tag, time_tag):
-    """
-    #### Function for finding the average speed per km for the graph. It will sum up the total meters in the graph and the total time (in sec).
-         Then it will convert m/sec to km/hr. This function needs the 'convert_network_to_time' function to have run previously.  ####
-     REQUIRED: G - a graph containing one or more nodes
-               distance_tag - the key in the dictionary for the field currently
-               containing a distance in meters
-               time_tag - time to traverse the edge in seconds
-     RETURNS:  the average speed for the whole graph in km per hr
-    #--------------------------------------------------------------------------#
-    """
-
-    if type(G) == nx.classes.multidigraph.MultiDiGraph or type(G) == nx.classes.digraph.DiGraph:
-        pass
-    else:
-        raise ValueError('Expecting a graph or geodataframe for G!')
-
-    G_adj = G.copy()
-
-    total_meters = 0
-    total_sec = 0
-
-    for u, v, data in G_adj.edges(data=True):
-
-        total_meters = total_meters + data[distance_tag]
-        total_sec = total_sec + data[time_tag]
-
-    # perform conversion
-    # ex. 5m/1sec = .005/.00027 = 18.51 kph
-    avg_speed_kmph = (total_meters/1000)/(total_sec/3600)
-
-    return avg_speed_kmph
-
 def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'highway', speed_dict = None, walk_speed = 4.5, factor = 1, default = None):
-    """
+
     #### Function for adding a time value to edge dictionaries ####
-     REQUIRED: G - a graph containing one or more nodes
-               distance_tag - the key in the dictionary for the field currently
-               containing a distance in meters
-     OPTIONAL: road_col - key for the road type in the edge data dictionary
-               graph_type - set to either 'drive' or 'walk'.
-               IF walk - will set time = walking time across all segment, using
-               the supplied walk_speed
-               IF drive - will use a speed dictionary for each road type, or
-               defaults as per the note below.
-               speed_dict - speed dictionary to use. If not supplied, reverts to
-               defaults
-               walk_speed - specify a walkspeed in km/h
-               factor - allows you to scale up / down distances if saved in
-               a unit other than metres. Set to 1000 if length in km.
-               default - if highway type not in the speed_dict, use this road
-               class as an in-fill value for time.
-     RETURNS:  the original graph with a new data property for the edges called
-               'time'
-     Note:     ensure any GeoDataFrames / graphs are in the same projection
-               before using function, or pass a crs
+    # REQUIRED: G - a graph containing one or more nodes
+    #           distance_tag - the key in the dictionary for the field currently containing a distance in meters
+    # OPTIONAL: road_col - key for the road type in the edge data dictionary
+    #           graph_type - flags network type
+    #           speed_dict - speed dictionary to use. If not supplied, reverts to defaults
+    #           walk_speed - specify a walkspeed in km/h
+    #           factor - allows you to scale up / down distances if saved in
+    #                    a unit other than metres
+    #           default - if highway type not in the speed_dict, use this road class as an in-fill value for time.
+    # RETURNS:  the original graph with a new data property for the edges called 'time
+    # Note:     ensure any GeoDataFrames / graphs are in the same projection
+    #           before using function, or pass a crs
+    # -------------------------------------------------------------------------#
 
-               DEFAULT SPEEDS:
-
-               speed_dict = {
-               'residential': 20,  # kmph
-               'primary': 40, # kmph
-               'primary_link':35,
-               'motorway':50,
-               'motorway_link': 45,
-               'trunk': 40,
-               'trunk_link':35,
-               'secondary': 30,
-               'secondary_link':25,
-               'tertiary':30,
-               'tertiary_link': 25,
-               'unclassified':20
-               }
-    #--------------------------------------------------------------------------#
-    """
+    ## TODO ##
+    # deal with graphs with multiple edges between node pairs
 
     if type(G) == nx.classes.multidigraph.MultiDiGraph or type(G) == nx.classes.digraph.DiGraph:
         pass
@@ -752,13 +663,12 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
                 'motorway_link': 45,
                 'trunk': 40,
                 'trunk_link':35,
-                'secondary': 30,
+                'secondary': 30, # kmph
                 'secondary_link':25,
                 'tertiary':30,
                 'tertiary_link': 25,
                 'unclassified':20
                 }
-
             highwayclass = data[road_col]
 
             if type(highwayclass) == list:
@@ -786,100 +696,62 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
     return G_adj
 
 def example_edge(G, n=1):
-    """
-    ### Prints out an example edge ###
-     REQUIRED:  G - a graph object
-                n - number of edges to print
-    #--------------------------------------------------------------------------#
-    """
     i = list(G.edges(data = True))[:n]
     for j in i:
         print(j)
 
 def example_node(G, n=1):
-    """
-    ### Prints out an example node ###
-     REQUIRED:  G - a graph object
-                n - number of nodes to print
-    #--------------------------------------------------------------------------#
-    """
     i = list(G.nodes(data = True))[:n]
     for j in i:
         print(j)
 
-def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted_origins = False):
-    """
+def calculate_OD(G, origins, destinations, fail_value, weight = 'time'):
     #### Function for generating an origin: destination matrix  ####
-     REQUIRED: G - a graph containing one or more nodes
-               fail_value - the value to return if the trip cannot be completed
-               (implies some sort of disruption / disconnected nodes)
-               origins - a list of the node IDs to treat as origins points
-               destinations - a list of the node IDs to treat as destinations
-     OPTIONAL: weight - use edge weight of 'time' unless otherwise specified
-               weighted_origins - equals 'true' if the origins have weights.
-               If so, the input to 'origins' must be dictionary instead of a
-               list, where the keys are the origin IDs and the values are the
-               weighted demands.
-     RETURNS:  a numpy matrix of format OD[o][d] = shortest time possible
+    # REQUIRED: G - a graph containing one or more nodes
+    #           fail_value - the value to return if the trip cannot be completed (implies some sort of disruption / disconnected nodes)
+    #           origins - a list of the node IDs to treat as origins points
+    #           destinations - a list of the node IDs to treat as destination points
+    # OPTIONAL: weight - use edge weight of 'time' unless otherwise specified
+    #           weighted_origins - equals 'true' if the origins have weights. If so, the input to 'origins' must be
+    #           dictionary instead of a list, where the keys are the origin IDs and the values are the weighted demands.
+    # RETURNS:  a numpy matrix of format OD[o][d] = shortest time possible
     # -------------------------------------------------------------------------#
-    """
-    
-    if weighted_origins == True:
-        print('weighted_origins equals true')
-        OD = np.zeros((len(origins), len(destinations)))
-        #dictionary key length
-        o = 0
-        #loop through dictionary
-        for key,value in origins.items():
-            origin = key
-            for d in range(0,len(destinations)):
-                destination = destinations[d]
-                #find the shortest distance between the origin and destination
-                distance = nx.dijkstra_path_length(G, origin, destination, weight = weight)
-                # calculate weighted distance
-                weighted_distance = distance * float(value)
-                OD[o][d] = weighted_distance
-            o += 1
 
-    else:
-        flip = 0
-        if len(origins) > len(destinations):
-            flip = 1
-            o_2 = destinations
-            destinations = origins
-            origins = o_2
+    flip = 0
+    if len(origins) > len(destinations):
+        flip = 1
+        o_2 = destinations
+        destinations = origins
+        origins = o_2
 
-        #origins will be number or rows, destinations will be number of columns
-        OD = np.zeros((len(origins), len(destinations)))
+    #origins will be number or rows, destinations will be number of columns
+    OD = np.zeros((len(origins), len(destinations)))
 
-        for o in range(0, len(origins)):
-            origin = origins[o]
-            results_dict = nx.single_source_dijkstra_path_length(G, origin, cutoff = None, weight = weight)
+    for o in range(0, len(origins)):
+        origin = origins[o]
+        results_dict = nx.single_source_dijkstra_path_length(G, origin, cutoff = None, weight = weight)
 
-            for d in range(0, len(destinations)):
-                destination = destinations[d]
-                if destination in results_dict.keys():
-                    OD[o][d] = results_dict[destination]
-                else:
-                    OD[o][d] = fail_value
+        for d in range(0, len(destinations)):
+            destination = destinations[d]
+            if destination in results_dict.keys():
+                OD[o][d] = results_dict[destination]
+            else:
+                OD[o][d] = fail_value
 
-        if flip == 1:
-            OD = np.transpose(OD)
+    if flip == 1:
+        OD = np.transpose(OD)
 
     return OD
 
 def disrupt_network(G, property, thresh, fail_value):
-    """
-    #### Function for disrupting a graph given a threshold value against a node's value ####
-    Any edges which bind to broken nodes have their 'time' property set to fail_value
-     REQUIRED: G - a graph containing one or more nodes and one or more edges
-               property - the element in the data dictionary for the edges to test
-               thresh - values of data[property] above this value are disrupted
-               fail_value - the data['time'] property is set to this value to
-               simulate the removal of the edge
-     RETURNS:  a modified graph with the edited 'time' attribute
-    #--------------------------------------------------------------------------#
-    """
+    #### Function for disrupting a graph ####
+    # REQUIRED: G - a graph containing one or more nodes and one or more edges
+    #           property - the element in the data dictionary for the edges to test
+    #           thresh - values of data[property] above this value are disrupted
+    #           fail_value - the data['time'] property is set to this value to simulate the removal of the edge
+    # RETURNS:  a modified graph with the edited 'time' attribute
+    # -------------------------------------------------------------------------#
+
     G_copy = G.copy()
 
     broken_nodes = []
@@ -903,19 +775,16 @@ def disrupt_network(G, property, thresh, fail_value):
     return G_copy
 
 def randomly_disrupt_network(G, edge_frac, fail_value):
-    """
+
     #### Function for randomly disurpting a network ####
-     REQUIRED: G - a graph containing one or more nodes and one or more edges
-               edge_frac - the percentage of edges to destroy.
-               Interger rather than decimal, e.g. 5 = 5% of edges
-               fail_value - the data['time'] property is set to this value to
-               simulate the removal of the edge
-     RETURNS:  a modified graph with the edited 'time' attribute
-               the list of edge IDs randomly chosen for destruction
-     NOTE:     requires the graph to have an 'edge_id' value in the edge data
-               dictionary. This DOES NOT have to be unique.
-    #--------------------------------------------------------------------------#
-    """
+    # REQUIRED: G - a graph containing one or more nodes and one or more edges
+    #           edge_frac - the percentage of edges to destroy. Interger rather than decimal
+    #           fail_value - the data['time'] property is set to this value to simulate the removal of the edge
+    # RETURNS:  a modified graph with the edited 'time' attribute
+    #           the list of edge IDs randomly chosen for destruction
+    # NOTE:     requires the graph to have an 'edge_id' value in the edge data dictionary. This DOES NOT have to be unique.
+    # -------------------------------------------------------------------------#
+
     edgeid = []
 
     for u,v, data in G.edges(data = True):
@@ -933,26 +802,20 @@ def randomly_disrupt_network(G, edge_frac, fail_value):
 
     return G_adj, destroy_list
 
+
 def gravity_demand(G, origins, destinations, weight, maxtrips = 100, dist_decay = 1, fail_value = 99999999999):
-    """
     #### Function for generating a gravity-model based demand matrix ####
-     REQUIRED: G - a graph containing one or more nodes and one or more edges
-               origins - a list of node IDs. Must be in G.
-               destinations - a list of node IDs Must be in G.
-               weight - the gravity weighting of the nodes in the model,
-               e.g. population
-     OPTIONAL: fail_value - the data['time'] property is set to this value to
-               simulate the removal of the edge
-               maxtrips - normalize the number of trips in the resultant
-               function to this number of trip_times
-               dist_decay - parameter controlling the aggresion of discounting
-               based on distance
-     RETURNS:  a numpy array describing the demand between o and d in terms of
-               number of trips
-     NOTE:     1 trip will always be returned between an origin and a
-               destination, even if weighting would otherewise be 0
-    #--------------------------------------------------------------------------#
-    """
+    # REQUIRED: G - a graph containing one or more nodes and one or more edges
+    #           origins - a list of node IDs
+    #           destinations - a list of node IDs
+    #           weight - the gravity weighting of the nodes in the model, e.g. population
+    # OPTIONAL: fail_value - the data['time'] property is set to this value to simulate the removal of the edge
+    #           maxtrips - normalize the number of trips in the resultant function to this number of trip_times
+    #           dist_decay - parameter controlling the aggresion of discounting based on distance
+    # RETURNS:  a numpy array describing the demand between o and d in terms of number of trips
+    # NOTE:     1 trip will always be returned between an origins and a destination, even if weighting would otherewise be 0
+    # -------------------------------------------------------------------------#
+
     maxtrips = 100
     dist_decay = 1
 
@@ -966,29 +829,44 @@ def gravity_demand(G, origins, destinations, weight, maxtrips = 100, dist_decay 
                 demand[o][d] = 0
             else:
                 normalized_dist = shortest_time[o][d] / shortest_time.max()
-                demand[o][d] = (
-                (G.node[origins[o]][weight] *
-                G.node[destinations[d]][weight]) *
-                np.exp(-1 * dist_decay * normalized_dist)
-                )
+                demand[o][d] = ((G.node[origins[o]][weight] * G.node[destinations[d]][weight]) * np.exp(-1 * dist_decay * normalized_dist))
 
     demand = ((demand / demand.max()) * maxtrips)
     demand = np.ceil(demand).astype(int)
-    return demand
+
+def reflect_roads(G):
+    warnings.warn("WARNING! This function is deprecated and will be removed in \
+    future releases of GOSTnets. Consider using add_missing_reflected_edges \
+    instead", DeprecationWarning)
+    #### Function for ensuring bi-directionality of roads ####
+    # REQUIRED: G - a graph containing one or more nodes and one or more edges
+    # -------------------------------------------------------------------------#
+    G_copy = G.copy()
+
+    new_edge_bucket = []
+
+    edge_id = 0
+
+    for u,v, data in G_copy.edges(data = True):
+        data['edge_id'] = edge_id
+        new_edge = (v,u,data)
+        new_edge_bucket.append(new_edge)
+        edge_id += 1
+
+    G_copy.add_edges_from(new_edge_bucket)
+
+    return G_copy
 
 def unbundle_geometry(c):
-    """
     #### Function for unbundling complex geometric objects ####
-     REQUIRED: any object. This helper function is usually applied in lambda
-               format against a pandas / geopandas dataframe. The idea is to
-               try to return more simple versions of complex geometries for
-               LineString and MultiLineString type objects
-     RETURNS:  an unbundled geometry value that can be plotted.
-     NOTE:     shapely MultiLineString objects quickly get complicated. They
-               may not show up when you plot them in QGIS. This function aims
-               to make a .csv 'plottable'
+    # REQUIRED: any object. This helper function is usually applied in lambda
+    #           format against a pandas / geopandas dataframe
+    # RETURNS:  an unbundled geometry value that can be plotted.
+    # NOTE:     shapely MultiLineString objects quickly get complicated. They
+    #           may not show up when you plot them in QGIS. This function aims
+    #           to make a .csv 'plottable'
     # -------------------------------------------------------------------------#
-    """
+
     if type(c) == list:
         objs = []
         for i in c:
@@ -1014,17 +892,15 @@ def unbundle_geometry(c):
     else:
         return c
 
+
 def save(G, savename, wpath, pickle = True, edges = True, nodes = True):
-    """
+
     ### function used to save a graph object in a variety of handy formats ###
-     REQUIRED:     G - a graph object
-                   savename - the filename, WITHOUT extension
-                   wpath - the write path for where the user wants the files saved
-     OPTIONAL:     pickle - if set to false, will not save a pickle of the graph
-                   edges - if set to false, will not save an edge gdf
-                   nodes - if set to false, will not save a node gdf
+    # REQUIRED:     G - a graph object
+    #               savename - the filename, WITHOUT extension
+    #               wpath - the write path for where the user wants the files saved
     # -------------------------------------------------------------------------#
-    """
+
     if nodes == True:
         new_node_gdf = node_gdf_from_graph(G)
         new_node_gdf.to_csv(os.path.join(wpath, '%s_nodes.csv' % savename))
@@ -1034,17 +910,18 @@ def save(G, savename, wpath, pickle = True, edges = True, nodes = True):
     if pickle == True:
         nx.write_gpickle(G, os.path.join(wpath, '%s.pickle' % savename))
 
+
 def add_missing_reflected_edges(G):
-    """
+
     ### function for adding any missing reflected edges - makes all edges
-       bidirectional. This is essential for routing with simplified graphs ###
-     REQUIRED:     G - a graph object
-    #--------------------------------------------------------------------------#
-    """
+    #   bidirectional. This is essential for routing with simplified graphs ###
+    # REQUIRED:     G - a graph object
+    # -------------------------------------------------------------------------#
+
     unique_edges = []
     missing_edges = []
 
-    for u, v in G.edges(data = False):
+    for u, v, data in G.edges(data = True):
         unique_edges.append((u,v))
     for u, v, data in G.edges(data = True):
         if (v, u) not in unique_edges:
@@ -1054,23 +931,14 @@ def add_missing_reflected_edges(G):
     print(G2.number_of_edges())
     return G2
 
-def remove_duplicate_edges(G, max_ratio = 1.5):
-    """
-    ### function for deleting duplicated edges - where there is more
-       than one edge connecting a node pair. USE WITH CAUTION - will change both
-       topological relationships and node maps                              ###
-     REQUIRED:     G - a graph object
-     OPTIONAL:     max_ratio - most of the time we see duplicate edges that are
-                   clones of each other. Sometimes, however, there are valid
-                   duplicates. These occur if multiple roads connect two junctions
-                   uniquely and without interruption - e.g. two roads running
-                   either side of a lake which meet at either end. The idea here
-                   is that valid 'duplicate edges' will have geometries of
-                   materially different length. Hence, we include a ratio -
-                   defaulting to 1.5 - beyond which we are sure the duplicates
-                   are valid edges, and will not be deleted.
-    #--------------------------------------------------------------------------#
-    """
+def remove_duplicate_edges(G):
+
+    ### function for adding any deleting duplicated edges - where there is more
+    #   than one edge connecting a node pair. USE WITH CAUTION - will change both
+    #   topological relationships and node maps                              ###
+    # REQUIRED:     G - a graph object
+    # -------------------------------------------------------------------------#
+
     G2 = G.copy()
     uniques = []
     deletes = []
@@ -1081,22 +949,22 @@ def remove_duplicate_edges(G, max_ratio = 1.5):
             lengths = []
             for i in range(0,t):
                 lengths.append(G2.edges[u,v,i]['length'])
-            if max(lengths) / min(lengths) >= max_ratio:
+            if max(lengths) / min(lengths) >= 1.5:
                 pass
             else:
                 deletes.append((u,v))
-
+        else:
+            pass
     for d in deletes:
         G2.remove_edge(d[0],d[1])
     print(G2.number_of_edges())
     return G2
 
 def convert_to_MultiDiGraph(G):
-    """
-    ### takes any graph object, loads it into a MultiDiGraph type Networkx object ###
-     REQUIRED:     G - a graph object
-    #--------------------------------------------------------------------------#
-    """
+    ### takes any graph object, loads it into a MultiDiGraph type Networkx object.
+    # REQUIRED:     G - a graph object
+    # -------------------------------------------------------------------------#
+
     a = nx.MultiDiGraph()
 
     node_bunch = []
@@ -1107,27 +975,30 @@ def convert_to_MultiDiGraph(G):
 
     edge_bunch = []
     for u, v, data in G.edges(data = True):
-        if 'Wkt' in data.keys():
-            data['Wkt'] = str(data['Wkt'])
+        data['Wkt'] = str(data['Wkt'])
         edge_bunch.append((u,v,data))
 
     a.add_edges_from(edge_bunch)
+    print(a.number_of_edges())
     return a
+
 
 #### NETWORK SIMPLIFICATION ####
 
 def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 25):
-    """
+
+    # TODO: incorporate speedups from pandana_snap
+
     ### simplifies topology of networks by simplifying node clusters into single
     # nodes
     # REQUIRED:     G - a graph object
     #               measure_crs - the crs to make the measurements inself.
-    # OPTIONAL:     in_crs - the current crs of the graph's geometry properties.
+    # OPTIONAL:    in_crs - the current crs of the graph's geometry properties.
     #               by default, assumes WGS 84 (epsg 4326)
     #               thresh - the threshold distance in which to simplify junctions.
     #               by default, assumes 25 metres
     # -------------------------------------------------------------------------#
-    """
+
     G2 = G.copy()
 
     gdfnodes = node_gdf_from_graph(G2)
@@ -1238,6 +1109,7 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
     print(G2.number_of_edges())
 
     return G2
+
 
 def custom_simplify(G, strict=True):
     """
@@ -1498,18 +1370,18 @@ def custom_simplify(G, strict=True):
 
 def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = None):
     print('WARNING: "factor behavior has changed! now divides rather than multiplies. This change brings gn.salt_long_lines into line with gn.convert_network_to_time" ')
-    """
+
     ### adds in new nodes to edges greater than a given length ###
-     REQUIRED:    G - a graph object
-                  source - crs object in format 'epsg:4326'
-                  target - crs object in format 'epsg:32638'
-     OPTIONAL:    thresh - distance in metres after which to break edges.
-                  factor - edge lengths can be returned in units other than
-                  metres by specifying a numerical multiplication factor
-                  attr_dict - list of attributes to be saved onto new edges.
-                  Values will inherit from original edge.
-    #--------------------------------------------------------------------------#
-    """
+    # REQUIRED:     G - a graph object
+    #               source - crs object in format 'epsg:4326'
+    #               target - crs object in format 'epsg:32638'
+    # OPTIONAL:    thresh - distance in metres after which to break edges.
+    #              factor - edge lengths can be returned in units other than
+    #              metres by specifying a numerical multiplication factor
+    #              attr_dict - list of attributes to be saved onto new edges.
+    #              Values will inherit from original edge.
+    # -------------------------------------------------------------------------#
+
     def cut(line, distance):
         # Cuts a line in two at a distance from its starting point
         if distance <= 0.0 or distance >= line.length:
@@ -1590,7 +1462,7 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
         elif v_x_cond and v_y_cond:
             u, v = v, u
         else:
-            print('ERROR!')
+            print('ERROR! FUCKED!')
 
         # calculate number of new nodes to add along length
         number_of_new_points = UTM_geom.length / thresh
@@ -1670,19 +1542,25 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
 
     return G2
 
-def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
-                    add_dist_to_node_col = True):
-    """
+def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', add_dist_to_node_col = False):
+
     ### snaps points to a graph at very high speed ###
-     REQUIRED:     G - a graph object
-                   point_gdf - a geodataframe of points, in the same source
-                   crs as the geometry of the graph object
-     OPTIONAL:     source_crs - crs object in format 'epsg:32638'
-                   target_crs - crs object in format 'epsg:32638'
-                   add_dist_to_node_col - return distance in metres to nearest
-                   node
-    #--------------------------------------------------------------------------#
-    """
+    # REQUIRED:     G - a graph object
+    #               point_gdf - a geodataframe of points, in the same source
+    #               crs as the geometry of the graph object
+    # OPTIONAL:     source_crs - crs object in format 'epsg:32638'
+    #               target_crs - crs object in format 'epsg:32638'
+    #               add_dist_to_node_col - return distance in metres to nearest
+    #               node
+    # -------------------------------------------------------------------------#
+
+    import networkx as nx
+    import geopandas as gpd
+    from shapely.geometry import Point
+    from scipy import spatial
+    from functools import partial
+    import pyproj
+    from shapely.ops import transform
 
     in_df = point_gdf.copy()
     node_gdf = node_gdf_from_graph(G)
@@ -1704,9 +1582,9 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
         node_gdf['x'] = node_gdf.Proj_geometry.x
         node_gdf['y'] = node_gdf.Proj_geometry.y
 
-        G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(node_gdf[['x','y']].values)
 
-        distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        distances, indices = G_tree.query(in_df[['x','y']].values)
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
         in_df['NN_dist'] = distances
@@ -1715,27 +1593,38 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
     else:
         in_df['x'] = in_df.geometry.x
         in_df['y'] = in_df.geometry.y
-        G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+        #G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+        #G_tree = spatial.KDTree(node_gdf[['x','y']].values)
+        #FYI this code below works the same way
+        #G_tree = spatial.KDTree(np.array(list(zip(node_gdf.geometry.x, node_gdf.geometry.y))))
 
-        distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        #distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        distances, indices = G_tree.query(in_df[['x','y']].values)
+        #FYI this code below works the same way
+        #distances, indices = G_tree.query(np.array(list(zip(in_df.geometry.x, in_df.geometry.y))))
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
 
     return in_df
 
-def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', add_dist_to_node_col = True):
-    """
+def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', add_dist_to_node_col = False):
     ### snaps points to another GeoDataFrame at very high speed ###
-     REQUIRED:     source_gdf - a geodataframe of points, in the same source
-                   crs as the geometry of the target_gdf
-                   target_gdf - a geodataframe of points, in the same source
-                   crs as the geometry of the source_gdf
-     OPTIONAL:     source_crs - crs object in format 'epsg:32638'
-                   target_crs - crs object in format 'epsg:32638'
-                   add_dist_to_node_col - return distance in metres to nearest
-                   node
-    #--------------------------------------------------------------------------#
-    """
+    # REQUIRED:     source_gdf - a geodataframe of points, in the same source
+    #               crs as the geometry of the target_gdf
+    #               target_gdf - a geodataframe of points, in the same source
+    #               crs as the geometry of the source_gdf
+    # OPTIONAL:     source_crs - crs object in format 'epsg:32638'
+    #               target_crs - crs object in format 'epsg:32638'
+    #               add_dist_to_node_col - return distance in metres to nearest
+    #               node
+    # -------------------------------------------------------------------------#
+    import networkx as nx
+    import geopandas as gpd
+    from shapely.geometry import Point
+    from scipy import spatial
+    from functools import partial
+    import pyproj
+    from shapely.ops import transform
 
     source_gdf = source_gdf.copy()
     target_gdf = target_gdf.copy()
@@ -1758,9 +1647,9 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
         source_gdf['x'] = source_gdf.P.x
         source_gdf['y'] = source_gdf.P.y
 
-        G_tree = spatial.KDTree(target_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(target_gdf[['x','y']].values)
 
-        distances, indices = G_tree.query(source_gdf[['x','y']].as_matrix())
+        distances, indices = G_tree.query(source_gdf[['x','y']].values)
 
         source_gdf['NN'] = list(target_gdf['ID'].iloc[indices])
 
@@ -1773,23 +1662,24 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
         target_gdf['x'] = target_gdf.geometry.x
         target_gdf['y'] = target_gdf.geometry.y
 
-        G_tree = spatial.KDTree(target_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(target_gdf[['x','y']].values)
 
-        distances, indices = G_tree.query(source_gdf[['x','y']].as_matrix())
+        distances, indices = G_tree.query(source_gdf[['x','y']].values)
 
         source_gdf['NN'] = list(target_gdf['ID'].iloc[indices])
 
     return source_gdf
 
 def join_networks(base_net, new_net, measure_crs, thresh = 500):
-    """
     ### joins two networks together within a binding threshold ###
-     REQUIRED:     base_net - a base network object (nx.MultiDiGraph)
-                   new_net - the network to add on to the base (nx.MultiDiGraph)
-                   measure_crs - the crs number of the measurement (epsg code)
-     OPTIONAL:     binding threshold - unit of the crs - default 500m
+    # REQUIRED:     base_net - a base netowrk object (nx.MultiDiGraph)
+    #               new_net - the network to add on to the base (nx.MultiDiGraph)
+    #               measure_crs - the crs number of the measurement (epsg code)
+    # OPTIONAL:     binding threshold - unit of the crs - default 500m
     # -------------------------------------------------------------------------#
-    """
+
+    from shapely.geometry import LineString
+
     G_copy = base_net.copy()
     join_nodes_df = pandana_snap(G_copy,
                          node_gdf_from_graph(new_net),
@@ -1832,16 +1722,15 @@ def join_networks(base_net, new_net, measure_crs, thresh = 500):
     return G_copy
 
 def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col = 'geometry', largest_G = True):
-    """
     ### removes any edges that fall beyond a polygon, and shortens any other edges that do so ###
-     REQUIRED:     G - a graph object
-                   bound - a shapely polygon object
-     OPTIONAL:     source_crs - crs object in format 'epsg:4326'
-                   target_crs - crs object in format 'epsg:4326'
-                   geom_col - label name for geometry object
-                   largest_G - if True, takes largest remaining subgraph of G as G
+    # REQUIRED:     G - a graph object
+    #               bound - a shapely polygon object
+    # OPTIONAL:     source_crs - crs object in format 'epsg:4326'
+    #               target_crs - crs object in format 'epsg:4326'
+    #               geom_col - label name for geometry object
+    #               largest_G - if True, takes largest remaining subgraph of G as G
     # -------------------------------------------------------------------------#
-    """
+
     edges_to_add, nodes_to_add = [],[]
     edges_to_remove, nodes_to_remove = [],[]
 
@@ -1880,13 +1769,10 @@ def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col 
             pass
 
         else:
+
             # define basics from data dictionary
             infra_type = data['infra_type']
-            #extract the geometry of the geom_col, if there is no explicit geometry, load the wkt
-            try:
-                geom = data[geom_col]
-            except:
-                geom = loads(data['Wkt'])
+            geom = data[geom_col]
 
             # road fully within country - do nothing
             if bound.contains(geom) == True:
@@ -1954,17 +1840,16 @@ def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col 
     return G_copy
 
 def new_edge_generator(passed_geom, infra_type, iterator, existing_legitimate_point_geometries, geom_col, project_WGS_UTM):
-    """
     ### Generates new edge and node geometries based on a passed geometry ###
-     REQUIRED:     passed_geom - a shapely Linestring object
-                   infra_type - the road / highway class of the passed geometry
-                   iterator - helps count the new node IDs to keep unique nodes
-                   existing_legitimate_point_geometries - a dictionary of points already created / valid in [u:geom] format
-                   project_WGS_UTM - projection object to transform passed geometries
-     OPTIONAL:     geom_col - label name for geometry object
-     WARNING:      This is a child process of clip(), and shouldn't be run on its own
+    # REQUIRED:     passed_geom - a shapely Linestring object
+    #               infra_type - the road / highway class of the passed geometry
+    #               iterator - helps count the new node IDs to keep unique nodes
+    #               existing_legitimate_point_geometries - a dictionary of points already created / valid in [u:geom] format
+    #               project_WGS_UTM - projection object to transform passed geometries
+    # OPTIONAL:     geom_col - label name for geometry object
+    # WARNING:      This is a child process of clip(), and shouldn't be run on its own
     # -------------------------------------------------------------------------#
-    """
+
     edges_to_add = []
     nodes_to_add = []
 
@@ -2016,53 +1901,334 @@ def new_edge_generator(passed_geom, infra_type, iterator, existing_legitimate_po
 
     return nodes_to_add, edges_to_add, new_node_dict_entries, iterator
 
-def reproject_graph(input_net, source_crs, target_crs):
-    ### converts the node coordinates of a graph ###
-    ### assumes that there are straight lines between the start and end nodes ###
-    # REQUIRED:     input_net - a base network object (nx.MultiDiGraph)
-    #               source_crs - The projection of the input_net (epsg code)
-    #               target_crs - The projection input_net will be converted to (epsg code)
+def optimize_facility_locations(OD, facilities, p, existing_facilities = None, verbose=False, 
+            execute=True, write=''):
+    '''
+    Function for identifying spatially optimal locations of facilities (P-median problem) ###
+    REQUIRED:   OD - an Origin:Destination matrix, origins as rows, destinations
+                 as columns, in pandas DataFrame format.
+                 facilities - the 'destinations' of the OD-Matrix.
+                 MUST be a list of objects included in OD.columns (or subset)
+                 if certain nodes are unsuitable for facility locations
+                 p - the number of facilities to solve for
+     OPTIONAL:  existing_facilities - facilities to always include in the solution. MUST be in 'facilities' list
+                verbose [boolean] - print a bunch of status updates
+                execute [boolean] - should the problem be executed
+                write [string] - outPath to write problem                
+    '''
+
+    #from pulp import LpInteger,LpVariable, LpProblem, lpSum, LpMinimize
+    import pulp
+    import pandas
+    
+    import time
+    import multiprocessing as mp
+    
+    num_procs = mp.cpu_count()
+    if verbose:
+        print('cpu count: %s' % num_procs)
+    t1=time.time()
+    
+    if type(OD) != pandas.core.frame.DataFrame:
+        raise ValueError('OD must be pandas Dataframe!')
+
+    for f in facilities:
+        if f not in OD.columns:
+            raise ValueError('Potential facility locations MUST be in OD.columns')
+
+    if p < 1:
+        raise ValueError('need to solve for more than one facility!')
+    elif p > len(facilities):
+        raise ValueError('need to solve for fewer locations than location options!')
+    
+    if verbose:
+        print('Setting up problem')
+    
+    origins = OD.index
+    origins = list(map(int, origins))
+
+    X = pulp.LpVariable.dicts('X',(facilities),0,1,pulp.LpInteger)
+
+    Y = pulp.LpVariable.dicts('Y', (origins,facilities),0,1,pulp.LpInteger)
+
+    prob = pulp.LpProblem('P Median', pulp.LpMinimize)
+
+    prob += sum(sum(OD.loc[i,j] * Y[i][j] for j in facilities) for i in origins)
+
+    prob += pulp.lpSum([X[j] for j in facilities]) == p
+
+    for i in origins: prob += sum(Y[i][j] for j in facilities) == 1
+
+    for i in origins:
+        for j in facilities:
+            prob +=  Y[i][j] <= X[j]
+
+    if existing_facilities is not None:
+        for e in existing_facilities:
+            prob += X[e] == 1
+    
+    if verbose:
+        print('Set up the problem')
+    
+    if write != '':
+        prob.writeLP(write)
+        
+    if execute:
+        prob.solve()
+        #the code below needs coin-or to be installed in the OS
+        #prob.solve(pulp.COIN_CMD(threads=16)))
+        ans = []
+        if verbose:
+            print("Processing time took: ", time.time() - t1)
+        
+        for v in prob.variables():
+            subV = v.name.split('_')
+
+            if subV[0] == "X" and v.varValue == 1:
+                ans.append(int(str(v).split('_')[1]))
+
+        return ans
+    else:
+        return(prob)
+
+
+
+def optimize_set_coverage(OD, max_coverage = 2000, existing_facilities = None):
+
+    ### Determine the minimum number of facilities and their locations in order to cover all demands within a pre-specified maximum distance (or time) coverage (Location Set-Covering Problem) ###
+    # REQUIRED:   OD - an Origin:Destination matrix, origins as rows, destinations
+    #             as columns, in pandas DataFrame format.
+    #             max_coverage - The pre-specified maximum distance (or time) coverage.
+    # OPTIONAL:   existing_facilities - facilities to always include in the
+    #             solution. MUST be in 'facilities' list
     # -------------------------------------------------------------------------#
 
-    import networkx as nx
-    import geopandas as gpd
-    from shapely.geometry import Point
-    from scipy import spatial
-    from functools import partial
-    import pyproj
-    from shapely.ops import transform
+    from pulp import LpInteger, LpVariable, LpProblem, lpSum, LpMinimize
+    import pandas
 
-    project_WGS_UTM = partial(
-                pyproj.transform,
-                pyproj.Proj(init=source_crs),
-                pyproj.Proj(init=target_crs))
+    # OD keys must be integers
+    OD.columns = OD.columns.astype(int)
 
-    i = list(input_net.nodes(data = True))
+    origins = OD.index
+    origins = list(map(int, origins))
 
-    for j in i:
-        #print(j[1])
-        #print(j[1]['x'])
-        #print(transform(project_WGS_UTM,j[1]['geom']))
-        j[1]['x'] = transform(project_WGS_UTM,j[1]['geom']).x
-        j[1]['y'] = transform(project_WGS_UTM,j[1]['geom']).y
-        j[1]['geom'] = transform(project_WGS_UTM,j[1]['geom'])
+    facilities = OD.keys()
+    facilities = list(map(int, facilities))
+
+    X = LpVariable.dicts('X',(facilities),0,1,LpInteger)
+
+    prob = LpProblem('Set Cover', LpMinimize)
+
+    prob += sum(X[j] for j in facilities)
+
+    for i in origins:
+        #set of facilities that are eligible to provide coverage to point i
+        eligibleFacilities = []
+        for j in facilities:
+            if OD.loc[i,j] <= max_coverage:
+                eligibleFacilities.append(j)
+        prob += sum(X[j] for j in eligibleFacilities) >= 1
+
+    prob.solve()
+
+    ans = []
+
+    for v in prob.variables():
+        subV = v.name.split('_')
+
+        if subV[0] == "X" and v.varValue == 1:
+            ans.append(int(str(v).split('_')[1]))
+
+    if existing_facilities is not None:
+        for e in existing_facilities:
+            prob += X[e] == 1
+
+    #print out other variables
+    print('number of origins')
+    print(len(origins))
+
+    totalCoveredFacilities = 0
+
+    for i in origins:
+        coveredFacilities = []
+        for j in ans:
+            if OD.loc[i,j] <= max_coverage:
+                coveredFacilities.append(j)
+        if len(coveredFacilities) >= 1:
+            totalCoveredFacilities += 1
+
+    print('print totalCoveredFacilities')
+    print(totalCoveredFacilities)
+            
+    print('print percent coverage')
+    print(totalCoveredFacilities/len(origins)*100)
+    
+    print('print prob obj')
+    print(prob.objective)
+
+    return ans
+
+def optimize_partial_set_coverage(OD, pop_coverage = .8, max_coverage = 2000, origins_pop_series = None, existing_facilities = None):
+
+    ### Function to determine the minimum number of facilities and their locations in order to cover a given fraction of the population within a pre-specified maximum distance (or time) coverage (Partial Set-Covering Problem). Do not use a demand-weighted OD matrix as an input. ###
+    # REQUIRED:   OD - an Origin:Destination matrix, origins as rows, destinations
+    #             as columns, in pandas DataFrame format.
+    #             max_coverage - The pre-specified maximum distance (or time) coverage.
+    #             pop_coverage - The given fraction of the population that should be covered
+    # OPTIONAL:   origins_pop_series - a series that contains each origin as the key, and each origin's population as the value
+    #             existing_facilities - facilities to always include in the
+    #             solution. MUST be in 'facilities' list
+    # -------------------------------------------------------------------------#
+
+    from pulp import LpInteger,LpVariable, LpProblem, lpSum, LpMinimize
+    import pandas
+
+    # OD keys must be integers
+    OD.columns = OD.columns.astype(int)
+    
+    origins = OD.index
+    origins = list(map(int, origins))
+
+    facilities = OD.keys()
+    facilities = list(map(int, facilities))  
+
+    X = LpVariable.dicts('X',(facilities),0,1,LpInteger)
+
+    Z = LpVariable.dicts('Z',(origins),0,1,LpInteger)
+
+    prob = LpProblem('Partial Set Cover', LpMinimize)
+
+    #objective function
+    prob += sum(X[j] for j in facilities)
+
+    for i in origins:
+        #set of facilities that are eligible to provide coverage to point i
+        eligibleFacilities = []
+        for j in facilities:
+            if OD.loc[i,j] <= max_coverage:
+                eligibleFacilities.append(j)
+        # corrected formulation
+        prob += sum(X[j] for j in eligibleFacilities) - Z[i] >= 0
 
 
-    return input_net
+    #if origins_pop_series exists then sum up total population and multiply by pop_coverage
 
-def euclidean_distance(lat1, lon1, lat2, lon2):
-    """
-    Calculate the great circle distance between two points
-    on the earth (specified in decimal degrees)
-    """
-    from math import radians, cos, sin, asin, sqrt
+    if origins_pop_series is not None:
 
-    # convert decimal degrees to radians
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-    # haversine formula
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * asin(sqrt(a))
-    km = 6367 * c
-    return km
+        #print('print origins_pop_series')
+        #print(origins_pop_series)
+
+        #print('print sum(origins_pop_series)')
+        #print(sum(origins_pop_series))
+
+        #print('print origins')
+        #print(origins)
+
+        #for i in origins:
+            #print(i)
+
+        min_coverage = sum(origins_pop_series) * pop_coverage
+
+        print('print min_coverage')
+        print(min_coverage)
+
+        prob += sum(Z[i] * origins_pop_series[i] for i in origins) >= min_coverage
+
+    else:
+
+        min_coverage = len(origins) * pop_coverage
+
+        print('print min_coverage')
+        print(min_coverage)
+
+        prob += sum(Z[i] for i in origins) >= min_coverage
+
+    if existing_facilities is not None:
+        for e in existing_facilities:
+            prob += X[e] == 1
+
+    prob.solve()
+
+    ans = []
+
+    for v in prob.variables():
+        subV = v.name.split('_')
+
+        if subV[0] == "X" and v.varValue == 1:
+            ans.append(int(str(v).split('_')[1]))
+
+    return ans
+
+def optimize_max_coverage(OD, p_facilities = 5, max_coverage = 2000, origins_pop_series = None, existing_facilities = None):
+
+    ### Determine the location of P facilities in order to maximize the demand covered within a pre-specified maximum distance coverage (Max Cover). Do not use a demand-weighted OD matrix as an input. ###
+    # REQUIRED:   OD - an Origin:Destination matrix, origins as rows, destinations
+    #             as columns, in pandas DataFrame format.
+    #             max_coverage - The pre-specified maximum distance (or time) coverage.
+    #             p_facilities - The number of facilities to locate.
+    # OPTIONAL:   existing_facilities - facilities to always include in the
+    #             solution. MUST be in 'facilities' list
+    # -------------------------------------------------------------------------#
+
+    from pulp import LpInteger, LpVariable, LpProblem, lpSum, LpMaximize
+    import pandas
+
+    # OD keys must be integers
+    OD.columns = OD.columns.astype(int)
+    
+    origins = OD.index
+    origins = list(map(int, origins))
+
+    facilities = OD.keys()
+    facilities = list(map(int, facilities))  
+
+    #If a facility is located at candidate site j
+    X = LpVariable.dicts('X', (facilities),0,1,LpInteger)
+
+    #If demand Y is covered
+    Y = LpVariable.dicts('Y', (origins),0,1,LpInteger)
+
+    prob = LpProblem('Max Cover', LpMaximize)
+
+    if origins_pop_series is not None:
+
+        #objective function
+        prob += sum(origins_pop_series[i] * Y[i] for i in origins)
+
+    else:
+
+        #objective function
+        prob += sum(Y[i] for i in origins)
+
+    for i in origins:
+        #set of facilities that are eligible to provide coverage to point i
+        eligibleFacilities = []
+        for j in facilities:
+            if OD.loc[i,j] <= max_coverage:
+                eligibleFacilities.append(j)
+        prob += sum(X[j] for j in eligibleFacilities) >= Y[i]
+
+    prob += sum(X[j] for j in facilities) == p_facilities
+
+    if existing_facilities is not None:
+        for e in existing_facilities:
+            prob += X[e] == 1
+
+    prob.solve()
+
+    #print('print prob')
+    #print(prob)
+
+    ans = []
+
+    for v in prob.variables():
+        subV = v.name.split('_')
+
+        if subV[0] == "X" and v.varValue == 1:
+            ans.append(int(str(v).split('_')[1]))
+
+    print('print objective value')
+    print(prob.objective.value())
+    #print(prob.objective)
+
+    return ans
