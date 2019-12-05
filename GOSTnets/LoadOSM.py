@@ -23,6 +23,17 @@ from boltons.iterutils import pairwise
 from shapely.wkt import loads,dumps
 
 class OSM_to_network(object):
+    ''' Object to load OSM PBF to networkX objects
+    
+    EXAMPLE:
+    G_loader = losm.OSM_to_network(bufferedOSM_pbf)
+    G_loader.generateRoadsGDF()
+    G = G.initialReadIn()
+
+    # snap origins and destinations
+    o_snapped = gn.pandana_snap(G, origins)
+    d_snapped = gn.pandana_snap(G, destinations)
+    '''
 
     def __init__(self, osmFile):
         ''' Generate a networkX object from a osm file
@@ -31,6 +42,8 @@ class OSM_to_network(object):
         self.roads_raw = self.fetch_roads(osmFile)
 
     def generateRoadsGDF(self, in_df = None, outFile='', verbose = False):
+        ''' Convert the raw OSM roads from the OSM file to a GeoDataFrame
+        '''
         if type(in_df) != gpd.geodataframe.GeoDataFrame:
             in_df = self.roads_raw
         roads = self.get_all_intersections(in_df, verboseness = verbose)
@@ -44,10 +57,7 @@ class OSM_to_network(object):
         nodes.columns = ['u','v']
 
         roads['length'] = roads.geometry.apply(lambda x : self.line_length(x))
-
-        #G = ox.gdfs_to_graph(all_nodes,roads)
         roads.rename(columns={'geometry':'Wkt'}, inplace=True)
-
         roads = pd.concat([roads,nodes],axis=1)
 
         if outFile != '':
@@ -56,18 +66,28 @@ class OSM_to_network(object):
         self.roadsGPD = roads
 
     def filterRoads(self, acceptedRoads = ['primary','primary_link','secondary','secondary_link','motorway','motorway_link','trunk','trunk_link']):
+        ''' Extract certain times of roads from the OSM before the netowrkX conversion 
+        
+        INPUT
+            [ optional ] acceptedRoads [ list of strings ] 
+        
+        RETURNS
+            None - the raw roads are filtered based on the list of accepted roads
+        '''
         self.roads_raw = self.roads_raw.loc[self.roads_raw.infra_type.isin(acceptedRoads)]
 
     def fetch_roads(self, data_path):
-
+        ''' Extract roads from osm pbf
+        
+        RETURNS
+           None
+        '''
         if data_path.split('.')[-1] == 'pbf':
-
             driver = ogr.GetDriverByName('OSM')
             data = driver.Open(data_path)
-
             sql_lyr = data.ExecuteSQL("SELECT osm_id,highway FROM lines WHERE highway IS NOT NULL")
-
             roads=[]
+
             for feature in sql_lyr:
                 if feature.GetField('highway') is not None:
                     osm_id = feature.GetField('osm_id')
@@ -89,7 +109,7 @@ class OSM_to_network(object):
             print('No roads found')
 
     def line_length(self, line, ellipsoid='WGS-84'):
-        """Length of a line in meters, given in geographic coordinates
+        '''Length of a line in meters, given in geographic coordinates
 
         Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
 
@@ -100,7 +120,7 @@ class OSM_to_network(object):
 
         Returns:
             Length of line in meters
-        """
+        '''
         if line.geometryType() == 'MultiLineString':
             return sum(line_length(segment) for segment in line)
 
@@ -130,19 +150,14 @@ class OSM_to_network(object):
             key1 = row.osm_id
             line = row.geometry
             infra_type = row.infra_type
-            ### TIMING
             if count % 1000 == 0 and verboseness == True:
                 print("Processing %s of %s" % (count, tLength))
             count += 1
-            #infra_line = line['infra_type']#shape_input.at[shape_input.index[shape_input['osm_id']==key1].tolist()[0],'infra_type']
-            ### TIMING
             intersections = shape_input.iloc[list(idx_osm.intersection(line.bounds))]
             intersections = dict(zip(list(intersections.osm_id),list(intersections.geometry)))
-            ### TIMING
-            # Remove line1
-            if key1 in intersections: intersections.pop(key1)
+            if key1 in intersections: 
+                intersections.pop(key1)
             # Find intersecting lines
-            ### TIMING
             for key2,line2 in intersections.items():
                 # Check that this intersection has not been recorded already
                 if (key1, key2) in inters_done or (key2, key1) in inters_done:
@@ -164,8 +179,11 @@ class OSM_to_network(object):
             hits = [n.object for n in idx_inters.intersection(line.bounds, objects=True)]
 
             if len(hits) != 0:
-                out = shapely.ops.split(line, MultiPoint(hits))
-                new_lines.append([{'geometry': LineString(x), 'osm_id':key1,'infra_type':infra_type} for x in out.geoms])
+                try:
+                    out = shapely.ops.split(line, MultiPoint(hits))
+                    new_lines.append([{'geometry': LineString(x), 'osm_id':key1,'infra_type':infra_type} for x in out.geoms])
+                except:
+                    pass
             else:
                 new_lines.append([{'geometry': line, 'osm_id':key1,
                         'infra_type':infra_type}])
@@ -189,14 +207,26 @@ class OSM_to_network(object):
         full_gpd.crs = {'init' :'epsg:4326'}
         return(full_gpd)
 
-    def initialReadIn(self, fpath=None):
+    def initialReadIn(self, fpath=None, wktField='Wkt'):
+        ''' Convert the OSM object to a networkX object
+        
+        INPUT
+        [ optional ] fpath [ string ] - path to CSV file with roads to read in
+        
+        RETURNS
+            [ Networkx Multi-digraph ]
+        '''
         if isinstance(fpath, str):
             edges_1 = pd.read_csv(fpath)
-            edges_1 = edges_1['Wkt'].apply(lambda x: loads(x))
+            edges_1 = edges_1[wktField].apply(lambda x: loads(x))
         elif isinstance(fpath, gpd.GeoDataFrame):
             edges_1 = fpath
         else:
-            edges_1 = self.roadsGPD
+            try:
+                edges_1 = self.roadsGPD
+            except:
+                self.generateRoadsGDF()
+                edges_1 = self.roadsGPD
         edges = edges_1.copy()
         node_bunch = list(set(list(edges['u']) + list(edges['v'])))
         def convert(x):
