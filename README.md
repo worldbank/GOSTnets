@@ -6,10 +6,10 @@ The package contains four folders:
 2. Tutorial - Jupyter Notebooks for getting to grips with the basics of the library. 
 
 ### Installation
-The library is available on both pip and conda (we are hoping to add to conda-forge in the short term). We suggest using conda to install, because the pip install of geopandas and osmnx do not work
-
+Eventually we will have the tool available on pip and conda, but for now, please use the setup.py in this repository
 ```
-conda install -c conda-forge -c bpstewar GOSTnets
+\home> python setup.py build
+\home> python setup.py install
 ```
 
 ### Usage
