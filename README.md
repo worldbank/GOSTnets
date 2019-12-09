@@ -8,8 +8,12 @@ The package contains four folders:
 ### Installation
 Eventually we will have the tool available on pip and conda, but for now, please use the setup.py in this repository
 ```
-\home> python setup.py build
-\home> python setup.py install
+conda create --name test
+conda activate test
+conda install -c conda-forge geopandas rasterio geojson
+git clone https://github.com/worldbank/GOSTnets.git
+python setup.py build
+python setup.py install
 ```
 
 ### Usage
