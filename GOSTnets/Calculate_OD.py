@@ -32,9 +32,6 @@ def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calc
     oNodes = origins['NN'].unique()
     dNodes = destinations['NN'].unique()
     od = gn.calculate_OD(G, oNodes, dNodes, fail_value)
-    #TODO: the OD matrix is related to the unique list of origins and destinations
-    #   instead of the origins and destination indices. How to fix that?
-    # HERE'S HOW MUTHERFUCKER
     origins['OD_O'] = origins['NN'].apply(lambda x: np.where(oNodes==x)[0][0])
     destinations['OD_D'] = destinations['NN'].apply(lambda x: np.where(dNodes==x)[0][0])
     outputMatrix = od[origins['OD_O'].values,:][:,destinations['OD_D'].values]
@@ -45,7 +42,8 @@ def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calc
         destinationsUTM['tTime_sec'] = destinationsUTM['NN_dist'] / 1000 / 5 * 60 * 60 # Convert snap distance to walking time in seconds
         for idx, row in originsUTM.iterrows():
             outputMatrix_adj[idx,:] = outputMatrix_adj[idx,:] + row['tTime_sec']
-    return()    
+        outputMatrix = outputMatrix_adj
+    return(outputMatrix)    
     
 def calculateOD_csv(G, originCSV, destinationCSV='', 
         oLat="Lat", oLon="Lon", dLat="Lat", dLon="Lon",
