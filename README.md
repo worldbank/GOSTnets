@@ -25,6 +25,11 @@ pip install geopy
 pip install boltons
 ```
 
+##### optimization.py
+```
+pip install pulp
+```
+
 ## Documentation
 
 Documentation available at [readthedocs](https://gostnets.readthedocs.io/)

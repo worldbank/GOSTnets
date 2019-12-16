@@ -83,18 +83,18 @@ class OSM_to_network(object):
            None
         '''
         if data_path.split('.')[-1] == 'pbf':
-            driver = ogr.GetDriverByName('OSM')
+            driver = ogr.GetDriverByName("OSM")
             data = driver.Open(data_path)
             sql_lyr = data.ExecuteSQL("SELECT osm_id,highway FROM lines WHERE highway IS NOT NULL")
             roads=[]
 
             for feature in sql_lyr:
-                if feature.GetField('highway') is not None:
-                    osm_id = feature.GetField('osm_id')
+                if feature.GetField("highway") is not None:
+                    osm_id = feature.GetField("osm_id")
                     shapely_geo = loads(feature.geometry().ExportToWkt())
                     if shapely_geo is None:
                         continue
-                    highway=feature.GetField('highway')
+                    highway=feature.GetField("highway")
                     roads.append([osm_id,highway,shapely_geo])
 
             if len(roads) > 0:
