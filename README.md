@@ -16,6 +16,15 @@ python setup.py build
 python setup.py install
 ```
 
+#### Optional Dependencies
+
+##### load_osm.py
+```
+conda install -c conda-forge gdal
+pip install geopy
+pip install boltons
+```
+
 ## Documentation
 
 Documentation available at [readthedocs](https://gostnets.readthedocs.io/)
