@@ -14,12 +14,12 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-#from osgeo import ogr
+from osgeo import ogr
 from rtree import index
 from shapely import speedups
 from shapely.geometry import LineString, MultiLineString, MultiPoint, Point
-#from geopy.distance import vincenty
-#from boltons.iterutils import pairwise
+from geopy.distance import vincenty
+from boltons.iterutils import pairwise
 from shapely.wkt import loads,dumps
 
 class OSM_to_network(object):

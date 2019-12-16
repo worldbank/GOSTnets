@@ -3,7 +3,7 @@ import os, sys, time
 
 #import GOSTnet as gn
 import importlib
-import networkx as nx
+#import networkx as nx
 import osmnx as ox
 from shapely.ops import unary_union
 from shapely.wkt import loads

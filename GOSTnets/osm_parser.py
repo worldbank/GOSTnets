@@ -1,6 +1,7 @@
 '''
-https://gist.github.com/Tofull/49fbb9f3661e376d2fe08c2e9d64320e
+source: https://gist.github.com/Tofull/49fbb9f3661e376d2fe08c2e9d64320e
 '''
+
 ## Modules
 # Elementary modules
 from math import radians, cos, sin, asin, sqrt
@@ -12,7 +13,6 @@ import networkx
 # Specific modules
 import xml.sax # parse osm file
 from pathlib import Path # manage cached tiles
-
 
 
 def haversine(lon1, lat1, lon2, lat2, unit_m = True):
@@ -35,12 +35,10 @@ def haversine(lon1, lat1, lon2, lat2, unit_m = True):
     return c * r
 
 
-
 def download_osm(left, bottom, right, top, proxy = False, proxyHost = "10.0.4.2", proxyPort = "3128", cache = False, cacheTempDir = "/tmp/tmpOSM/", verbose = True):
     """ Return a filehandle to the downloaded data from osm api."""
 
     import urllib.request # To request the web
-
 
 
     if (cache):
@@ -298,6 +296,7 @@ def line_length(line, ellipsoid='WGS-84'):
     Returns:
         Length of line in meters
     '''
+    
     if line.geometryType() == 'MultiLineString':
         return sum(line_length(segment) for segment in line)
 
