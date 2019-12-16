@@ -1,3 +1,0 @@
-https://conda.io/projects/conda-build/en/latest/user-guide/tutorials/build-pkgs-skeleton.html
-https://medium.com/@giswqs/building-a-conda-package-and-uploading-it-to-anaconda-cloud-6a3abd1c5c52
-https://dzone.com/articles/executable-package-pip-install

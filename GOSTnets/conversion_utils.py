@@ -1,15 +1,15 @@
 import os, sys
-import rasterio
+#import rasterio
 
 import pandas as pd
 import geopandas as gpd
 import numpy as np
 
 from scipy import interpolate
-from rasterio import features
-from rasterio.mask import mask
-from rasterio.features import rasterize
-from rasterio.warp import reproject, Resampling
+#from rasterio import features
+#from rasterio.mask import mask
+#from rasterio.features import rasterize
+#from rasterio.warp import reproject, Resampling
 
 def rasterize_od_results(inD, outFile, field):
     ''' Convert gridded point data frame to raster of commensurate size and resolution

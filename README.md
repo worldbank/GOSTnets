@@ -1,22 +1,39 @@
-### GOSTNets
-This package contains a library and example notebooks for running network analysis leveraging a number of existing network analysis libraries: peartree, osmnx, and networkx
+# GOSTNets
 
-The package contains four folders:
-1. GOSTNets - the library containng the functions for running the network analysis
-2. Tutorial - Jupyter Notebooks for getting to grips with the basics of the library. 
+**Python for network analysis**
+
+Builds, process, and analyze networks. GOSTNets is built on top of geopandas, networkx, osmnx, and peartree.
 
 ### Installation
 Eventually we will have the tool available on pip and conda, but for now, please use the setup.py in this repository
+
 ```
 conda create --name test
 conda activate test
-conda install -c conda-forge geopandas rasterio geojson
+conda install -c conda-forge rtree
 git clone https://github.com/worldbank/GOSTnets.git
 python setup.py build
 python setup.py install
 ```
 
-### Usage
+## Documentation
+
+Documentation available at [readthedocs](https://gostnets.readthedocs.io/)
+
+Plenty of examples and tutorials using Jupyter Notebooks live inside of the Implementations folder within the [GOST_PublicGoods Github repo](https://github.com/worldbank/GOST_PublicGoods)
+
+### how to autobuild docs:
+in the docs/source dir, run: 
+```
+sphinx-apidoc -f -o . ../../GOSTnets
+```
+in the docs dir, run:
+```
+make html
+```
+
+## Usage
+
 Every function contains a docstring which can be brought up in use to check the inputs for various functions. For example: 
 
 ```python

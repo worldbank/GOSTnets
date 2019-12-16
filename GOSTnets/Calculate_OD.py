@@ -8,7 +8,7 @@ import numpy as np
 
 from shapely.geometry import Point
 
-import GOSTnets as gn
+#import GOSTnets as gn
 
 def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calculate_snap=False):
     ''' Calculate Origin destination matrix from GeoDataframes
@@ -45,27 +45,28 @@ def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calc
         outputMatrix = outputMatrix_adj
     return(outputMatrix)    
     
-def calculateOD_csv(G, originCSV, destinationCSV='', 
-        oLat="Lat", oLon="Lon", dLat="Lat", dLon="Lon",
-        crs={'init':'epsg:4326'},
-        fail_value=-1, weight='time', calculate_snap=False):
-    ''' Calculate OD matrix from csv files of points
-    Args:
-        G (networkx graph): describes the road network. Often extracted using OSMNX
-        origins (string): path to csv file with locations for calculating access
-        destinations (string): path to csv with destination locations for calculating access
-        oLat/oLon/dLat/dLon (string, optional): name of latitude and longitude in origin/destination files.
-            defaults to "Lat" and "Lon for both origins and destinations
-        crs (dictionary, optional): crs of input origins and destinations, defaults to {'init':'epsg:4326'}
-        fail-value (integer, optional): value to put in OD matrix if no route found, defaults to -1
-        weight (string, optional): variable in G used to define edge impedance, defaults to 'time'
-        calculate_snap (boolean, optioinal): variable to add snapping distance to travel time, default is false
-    Returns:
-        numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
-    '''
+def calculateOD_csv(G, originCSV, destinationCSV='', oLat="Lat", oLon="Lon", dLat="Lat", dLon="Lon", crs={'init':'epsg:4326'}, fail_value=-1, weight='time', calculate_snap=False):
+    """
+    Calculate OD matrix from csv files of points
+
+    :param G: describes the road network. Often extracted using OSMNX
+    :param string origins: path to csv file with locations for calculating access
+    :param string destinations: path to csv with destination locations for calculating access
+    :param string oLat:
+    :param string oLon:
+    :param string dLat:
+    :param string dLon:
+    :param dict crs: crs of input origins and destinations, defaults to {'init':'epsg:4326'}
+    :param int fail-value: value to put in OD matrix if no route found, defaults to -1
+    :param string weight: variable in G used to define edge impedance, defaults to 'time'
+    :param bool calculate_snap: variable to add snapping distance to travel time, default is false
+    :returns: numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
+    """
+
     originPts = pd.read_csv(originCSV)
     pts = [Point(x) for x in zip(originPts[oLon],originPts[oLat])]
     originGDF = gpd.GeoDataFrame(originPts, geometry=pts, crs=crs)
+
     if destinationCSV == '':
         destinationGDF = originGDF.copy()
     else:
@@ -73,6 +74,7 @@ def calculateOD_csv(G, originCSV, destinationCSV='',
         pts = [Point(x) for x in zip(originPts[dLon],originPts[dLat])]
         destinationGDF = gpd.GeoDataFrame(originPts, geometry=pts, crs=crs)
     OD = calculateOD_gdf(G, originGDF, destinationGDF, fail_value, weight, calculate_snap = calculate_snap)
+
     return(OD)
    
 def calculate_gravity(od, oWeight=[], dWeight=[], decayVals=[0.01,

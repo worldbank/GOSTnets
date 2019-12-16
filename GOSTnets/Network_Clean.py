@@ -1,7 +1,7 @@
 #the cleaning network part
 import os, sys, time
 sys.path.append(r'/home/vagrant/repos/GOST_PublicGoods/GOSTNets/GOSTNets')
-import GOSTnet as gn
+#import GOSTnet as gn
 import importlib
 import networkx as nx
 import osmnx as ox

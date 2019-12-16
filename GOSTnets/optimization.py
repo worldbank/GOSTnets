@@ -2,9 +2,9 @@ import os, sys, logging, warnings, time
 
 import pyproj
 
-import peartree as pt
-import peartree.graph as ptg
-print('peartree version: %s ' % pt.__version__)
+#import peartree as pt
+#import peartree.graph as ptg
+#print('peartree version: %s ' % pt.__version__)
 import networkx as nx
 print('networkx version: %s ' % nx.__version__)
 import matplotlib as mpl
@@ -1901,21 +1901,18 @@ def new_edge_generator(passed_geom, infra_type, iterator, existing_legitimate_po
 
     return nodes_to_add, edges_to_add, new_node_dict_entries, iterator
 
-def optimize_facility_locations(OD, facilities, p, existing_facilities = None, verbose=False, 
-            execute=True, write=''):
-    '''
-    Function for identifying spatially optimal locations of facilities (P-median problem) ###
-    REQUIRED:   OD - an Origin:Destination matrix, origins as rows, destinations
-                 as columns, in pandas DataFrame format.
-                 facilities - the 'destinations' of the OD-Matrix.
-                 MUST be a list of objects included in OD.columns (or subset)
-                 if certain nodes are unsuitable for facility locations
-                 p - the number of facilities to solve for
-     OPTIONAL:  existing_facilities - facilities to always include in the solution. MUST be in 'facilities' list
-                verbose [boolean] - print a bunch of status updates
-                execute [boolean] - should the problem be executed
-                write [string] - outPath to write problem                
-    '''
+def optimize_facility_locations(OD, facilities, p, existing_facilities = None, verbose=False, execute=True, write=''):
+    """
+    Function for identifying spatially optimal locations of facilities (P-median problem)
+
+    :param OD: an Origin:Destination matrix, origins as rows, destinations as columns, in pandas DataFrame format. 
+    :param facilities: The 'destinations' of the OD-Matrix. MUST be a list of objects included in OD.columns (or subset) if certain nodes are unsuitable for facility locations
+    :param p: the number of facilities to solve for
+    :param existing_facilities: facilities to always include in the solution. MUST be in 'facilities' list
+    :param verbose: print a bunch of status updates
+    :param execute: should the problem be executed
+    :param write: outPath to write problem
+    """
 
     #from pulp import LpInteger,LpVariable, LpProblem, lpSum, LpMinimize
     import pulp
