@@ -741,6 +741,75 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
 
     return G_adj
 
+def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link'], verbose = False, road_col = 'infra_type'):
+    """
+    Function for querying travel times from the Mapbox "driving traffic" API. Queries are only made for the specified road types.
+
+    :param G: a graph object of the road network
+    :param mb_token: Mapbox token (retrieve from Mapbox account, starts with "pk:")
+    :param road_types: a list of OSM road types for which to query traffic-aware travel time, defaults to main roads
+    :param verbose: Set to true to monitor progress of queries and notify if any queries failed, defaults to False
+    :param road_col: key for the road type in the edge data dictionary, defaults to 'infra_type'
+    :returns: The original graph with two new data properties for the edges: 'mapbox_api' (a boolean set to True if the edge succesfuly received a trafic time value) and 'time_traffic' (travel time in seconds)
+    """
+    import json, time
+    import urllib.request as url
+    edges_all = edge_gdf_from_graph(G)
+    edges = edges_all[edges_all[road_col].isin(accepted_road_types)].copy()
+
+    base_url = 'https://api.mapbox.com/directions/v5/mapbox/driving-traffic/'
+    end_url = f'?&access_token={mb_token}'
+    numcalls = 0
+    loop_count = 1
+
+    start = time.time()
+    for idx, row in edges.iterrows():
+
+        # build request
+        start_x = G.nodes[row.stnode]['x']
+        start_y = G.nodes[row.stnode]['y']
+        end_x = G.nodes[row.endnode]['x']
+        end_y = G.nodes[row.endnode]['y']
+        coordinates = str(start_x)+','+str(start_y)+';'+str(end_x)+','+str(end_y)
+        request = base_url+coordinates+end_url
+        r = url.urlopen(request)
+        try:
+            data = json.loads(r.read().decode('utf-8'))['routes'][0]['duration']
+        except:
+            data = np.nan
+
+        # assign response duration value to edges df
+        edges.at[idx,'duration'] = data
+
+        numcalls += 1
+        if numcalls == 299:
+
+            elapsed_seconds = (time.time() - start)%60
+            if verbose == True: print(f"Did {numcalls+1} calls in {elapsed_seconds:.2f} seconds, now wait {60-elapsed_seconds:.2f}, {(300*loop_count)/len(edges):.2%} complete")
+            time.sleep(60-elapsed_seconds)
+
+            # reset count
+            numcalls = 0
+            start = time.time()
+            loop_count += 1
+
+    edges['newID'] = edges['stnode'].astype(str)+"_"+edges['endnode'].astype(str)+"_"+edges['id'].astype(str)
+    edges_duration = edges[['newID','duration']].copy()
+    edges_duration = edges_duration.set_index('newID')
+    n_null = edges_duration.isnull().sum()['duration']
+    if verbose == True and n_null > 0: print(f'query failed {n_null} times')
+    edges_duration = edges_duration.dropna()
+
+    for u, v, data in G.edges(data = True):
+        newID = str(u)+"_"+str(v)+"_"+str(data['id'])
+        if newID in edges_duration.index:
+            data['time_mapbox'] = edges_duration.loc[newID,'duration']
+            data['mapbox_api'] = True
+        else:
+            data['mapbox_api'] = False
+
+    return G
+
 def example_edge(G, n=1):
     """
     Prints out an example edge
