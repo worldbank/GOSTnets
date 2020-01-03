@@ -741,7 +741,7 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
 
     return G_adj
 
-def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link'], verbose = False, road_col = 'infra_type'):
+def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','motorway','motorway_link'], verbose = False, road_col = 'infra_type', id_col = 'id'):
     """
     Function for querying travel times from the Mapbox "driving traffic" API. Queries are only made for the specified road types.
 
@@ -750,11 +750,37 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
     :param road_types: a list of OSM road types for which to query traffic-aware travel time, defaults to main roads
     :param verbose: Set to true to monitor progress of queries and notify if any queries failed, defaults to False
     :param road_col: key for the road type in the edge data dictionary, defaults to 'infra_type'
+    :param id_col: key for the id in the edge data dictionary, defaults to 'id'
     :returns: The original graph with two new data properties for the edges: 'mapbox_api' (a boolean set to True if the edge succesfuly received a trafic time value) and 'time_traffic' (travel time in seconds)
     """
+
     import json, time
     import urllib.request as url
+
     edges_all = edge_gdf_from_graph(G)
+
+    def first_val(x):
+      if isinstance(x, list):
+        return x[0]
+      else:
+        return x
+
+    edges_all[road_col] = edges_all[road_col].apply(lambda x: first_val(x))
+
+    # print('print edges_all')
+    # print(edges_all[road_col][390:400])
+
+    print('print unique roads')
+    # may not of orginally worked because some fields can contain multiple road tags in a list. Ex. [motorway, trunk]. need to do pre-processing
+    print(edges_all[road_col].unique())
+
+    print('print accepted_road_types')
+    print(accepted_road_types)
+
+    # pre-process the id_col to make sure it has only one value, sometimes the osmid column can contain a list
+    edges_all[id_col] = edges_all[id_col].apply(lambda x: first_val(x))
+
+    # specific rows can be selected by using .isin method on a series.
     edges = edges_all[edges_all[road_col].isin(accepted_road_types)].copy()
 
     base_url = 'https://api.mapbox.com/directions/v5/mapbox/driving-traffic/'
@@ -762,7 +788,9 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
     numcalls = 0
     loop_count = 1
 
+    function_start = time.time()
     start = time.time()
+
     for idx, row in edges.iterrows():
 
         # build request
@@ -773,10 +801,13 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
         coordinates = str(start_x)+','+str(start_y)+';'+str(end_x)+','+str(end_y)
         request = base_url+coordinates+end_url
         r = url.urlopen(request)
+
         try:
             data = json.loads(r.read().decode('utf-8'))['routes'][0]['duration']
         except:
             data = np.nan
+
+        # print(data)
 
         # assign response duration value to edges df
         edges.at[idx,'duration'] = data
@@ -785,6 +816,8 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
         if numcalls == 299:
 
             elapsed_seconds = (time.time() - start)%60
+            # print('print elapsed_seconds without %: ' + str((time.time() - start)))
+            # print('print elapsed_seconds: ' + str(elapsed_seconds))
             if verbose == True: print(f"Did {numcalls+1} calls in {elapsed_seconds:.2f} seconds, now wait {60-elapsed_seconds:.2f}, {(300*loop_count)/len(edges):.2%} complete")
             time.sleep(60-elapsed_seconds)
 
@@ -793,20 +826,24 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
             start = time.time()
             loop_count += 1
 
-    edges['newID'] = edges['stnode'].astype(str)+"_"+edges['endnode'].astype(str)+"_"+edges['id'].astype(str)
+    edges['newID'] = edges['stnode'].astype(str)+"_"+edges['endnode'].astype(str)+"_"+edges[id_col].astype(str)
     edges_duration = edges[['newID','duration']].copy()
     edges_duration = edges_duration.set_index('newID')
     n_null = edges_duration.isnull().sum()['duration']
+
     if verbose == True and n_null > 0: print(f'query failed {n_null} times')
+
     edges_duration = edges_duration.dropna()
 
     for u, v, data in G.edges(data = True):
-        newID = str(u)+"_"+str(v)+"_"+str(data['id'])
+        newID = str(u) + "_" + str(v) + "_" + str(data[id_col])
         if newID in edges_duration.index:
             data['time_mapbox'] = edges_duration.loc[newID,'duration']
             data['mapbox_api'] = True
         else:
             data['mapbox_api'] = False
+
+    print('complete function time: ' + str(time.time() - function_start))
 
     return G
 
@@ -1690,6 +1727,29 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
 
     return in_df
 
+def pandana_snap_single_point(G, shapely_point, source_crs = 'epsg:4326', target_crs = 'epsg:4326'):
+    """
+    snaps a point to a graph at very high speed
+
+    :param G: a graph object
+    :param shapely_point: a shapely point (ex. Point(x, y)), in the same source crs as the geometry of the graph object
+    :param source_crs: crs object in format 'epsg:32638'
+    :param target_crs: crs object in format 'epsg:32638'
+    :param add_dist_to_node_col: return distance in metres to nearest node
+    """
+
+    node_gdf = node_gdf_from_graph(G)
+
+    G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+    distances, indices = G_tree.query([[shapely_point.x,shapely_point.y]])
+
+    #print("print distances, indices")
+    #print(distances, indices)
+
+    return_list = list(node_gdf['node_ID'].iloc[indices])
+
+    return return_list[0]
+
 def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', add_dist_to_node_col = True):
     """
     snaps points to another GeoDataFrame at very high speed
@@ -2039,3 +2099,4 @@ def euclidean_distance(lat1, lon1, lat2, lon2):
     c = 2 * asin(sqrt(a))
     km = 6367 * c
     return km
+
