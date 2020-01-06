@@ -17,6 +17,8 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
+master_doc = 'index'
+
 project = 'GOSTnets'
 copyright = '2019, Charles Fox, Keith Garrett, Benjamin Stewart, Tom Gertin, Andres Chamorro'
 author = 'Charles Fox, Keith Garrett, Benjamin Stewart, Tom Gertin, Andres Chamorro'
