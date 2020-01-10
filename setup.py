@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="GOSTnets",
-    version="0.1.2",
+    version="1.0.0",
     packages=find_packages(),
 
     # Project uses reStructuredText, so ensure that the docutils get
@@ -26,7 +26,7 @@ setup(
     # metadata to display on PyPI
     author="Benjamin P. Stewart",
     author_email="ben.gis.stewart@gmail.com",
-    description="Networkx wrapper to simplify geospatial analysis",
+    description="Networkx wrapper to simplify network analysis using geospatial data",
     license="PSF",
     keywords="networkx networks OSM",
     url="https://github.com/worldbank/GOSTnets",   # project home page, if any
