@@ -36,7 +36,8 @@ autodoc_mock_imports = [
   'shapely.geometry',
   'shapely.ops',
   'sklearn',
-  'sklearn.neighbors'
+  'sklearn.neighbors',
+  'osmnx',
 ]
 
 # -- Project information -----------------------------------------------------
