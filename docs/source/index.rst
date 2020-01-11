@@ -6,6 +6,9 @@
 Welcome to gostnets's documentation!
 ====================================
 
+.. automodule:: GOSTnets.core
+    :members:
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
