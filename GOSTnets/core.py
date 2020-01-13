@@ -14,6 +14,21 @@ from shapely.geometry import Point, LineString, MultiLineString, box
 from shapely.ops import linemerge, unary_union, transform
 from collections import Counter
 
+gost_speed_dict = {
+                'residential': 20,  # kmph
+                'primary': 40, # kmph
+                'primary_link':35,
+                'motorway':50,
+                'motorway_link': 45,
+                'trunk': 40,
+                'trunk_link':35,
+                'secondary': 30,
+                'secondary_link':25,
+                'tertiary':30,
+                'tertiary_link': 25,
+                'unclassified':20
+                }
+
 def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', largest_G = False):
     """
     Function for generating a G object from a saved combo .csv
@@ -71,8 +86,7 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
 
     return G
 
-def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_tag = 'endnode', geometry_tag = 'Wkt', largest_G = False):
-
+def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, u_tag = 'stnode', v_tag = 'endnode', geometry_tag = 'Wkt', largest_G = False):
     """
     Function for generating a G object from a saved .csv of edges
 
@@ -89,7 +103,6 @@ def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_t
     :returns: 
       a multidigraph object
     """
-
     nodes_df = pd.read_csv(fpath_nodes)
     edges_df = pd.read_csv(fpath_edges)
 
@@ -147,6 +160,26 @@ def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_t
         G = list_of_subgraphs[max_ID]
 
     return G
+
+def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_tag = 'endnode', geometry_tag = 'Wkt', largest_G = False):
+    """
+    :param fpath_nodes: 
+      path to a .csv containing nodes
+    :param fpath_edges: 
+      path to a .csv containing edges
+    :param u_tag: 
+      optional. specify column containing u node ID if not labelled 'stnode'
+    :param v_tag: 
+      specify column containing v node ID if not labelled 'endnode'
+    :param geometry_tag: 
+      specify column containing geometry if not labelled 'Wkt'
+    :returns: 
+      a multidigraph object
+    """
+    nodes_df = pd.read_csv(fpath_nodes)
+    edges_df = pd.read_csv(fpath_edges)
+    G = edges_and_nodes_gdf_to_graph(nodes_df, edges_df, u_tag, v_tag, geometry_tag, largest_G)
+    return(G)
 
 def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geometry_tag = 'geometry', xCol='x', yCol='y'):
     """
@@ -700,21 +733,8 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
         elif graph_type == 'drive':
 
             if speed_dict == None:
-                speed_dict = {
-                'residential': 20,  # kmph
-                'primary': 40, # kmph
-                'primary_link':35,
-                'motorway':50,
-                'motorway_link': 45,
-                'trunk': 40,
-                'trunk_link':35,
-                'secondary': 30,
-                'secondary_link':25,
-                'tertiary':30,
-                'tertiary_link': 25,
-                'unclassified':20
-                }
-
+                speed_dict = gost_speed_dict
+                
             highwayclass = data[road_col]
 
             if type(highwayclass) == list:
