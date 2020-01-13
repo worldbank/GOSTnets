@@ -2,7 +2,7 @@
 
 **Python for network analysis**
 
-Builds, process, and analyze networks. GOSTNets is built on top of geopandas, networkx, osmnx, and peartree.
+Build, process, and analyze networks. GOSTNets is built on top of geopandas, networkx, osmnx, and peartree.
 
 ### Installation
 Eventually we will have the tool available on pip and conda, but for now, please use the setup.py in this repository

@@ -36,7 +36,9 @@ def haversine(lon1, lat1, lon2, lat2, unit_m = True):
 
 
 def download_osm(left, bottom, right, top, proxy = False, proxyHost = "10.0.4.2", proxyPort = "3128", cache = False, cacheTempDir = "/tmp/tmpOSM/", verbose = True):
-    """ Return a filehandle to the downloaded data from osm api."""
+    """ 
+    Return a filehandle to the downloaded data from osm api.
+    """
 
     import urllib.request # To request the web
 
@@ -97,20 +99,20 @@ def download_osm(left, bottom, right, top, proxy = False, proxyHost = "10.0.4.2"
 
 
 def read_osm(filename_or_stream, only_roads=True):
-    """Read graph in OSM format from file specified by name or by stream object.
-    Parameters
-    ----------
-    filename_or_stream : filename or stream object
-    Returns
-    -------
-    G : Graph
-    Examples
-    --------
+    """
+    Read graph in OSM format from file specified by name or by stream object.
+
+    Examples:
     >>> G=nx.read_osm(nx.download_osm(-122.33,47.60,-122.31,47.61))
     >>> import matplotlib.pyplot as plt
     >>> plt.plot([G.node[n]['lat']for n in G], [G.node[n]['lon'] for n in G], 'o', color='k')
     >>> plt.show()
+
+    :param filename_or_stream: filename or stream object
+    :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
+    :returns G: networkx multidigraph
     """
+
     osm = OSM(filename_or_stream)
     G = networkx.DiGraph()
 
@@ -195,7 +197,10 @@ class Way:
 
 class OSM:
     def __init__(self, filename_or_stream):
-        """ File can be either a filename or stream/file object."""
+        """ 
+        File can be either a filename or stream/file object.
+        """
+
         nodes = {}
         ways = {}
 
@@ -259,11 +264,19 @@ class OSM:
         self.ways = new_ways
         
 def fetch_roads_OSM(osm_path, acceptedRoads=["motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","secondary_link","tertiary","tertiary_link"]):
+    """
+    Returns a GeoDataFrame of OSM roads from an OSM file
+
+    :param osm_path: path to OSM file
+    :param list acceptedRoads: list of OSM road types
+    :returns: A GeoDataFrame of OSM roads
+    """
+
     driver=ogr.GetDriverByName('OSM')
     data = driver.Open(osm_path)
         
     sql_lyr = data.ExecuteSQL("SELECT osm_id,highway FROM lines WHERE highway IS NOT NULL")
-    
+
     roads=[]                          
     for feature in sql_lyr:
         if feature.GetField('highway') is not None:
@@ -284,19 +297,14 @@ def fetch_roads_OSM(osm_path, acceptedRoads=["motorway","motorway_link","trunk",
         print('No roads in {}'.format(country))
         
 def line_length(line, ellipsoid='WGS-84'):
-    '''Length of a line in meters, given in geographic coordinates
+    """
+    Returns length of a line in meters, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
 
-    Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
-
-    Arguments:
-        line {Shapely LineString} -- a shapely LineString object with WGS-84 coordinates
-        ellipsoid {String} -- string name of an ellipsoid that `geopy` understands (see
-            http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-
-    Returns:
-        Length of line in meters
-    '''
-    
+    :param line: a shapely LineString object with WGS-84 coordinates
+    :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
+    :returns: Length of line in meters
+    """
+      
     if line.geometryType() == 'MultiLineString':
         return sum(line_length(segment) for segment in line)
 

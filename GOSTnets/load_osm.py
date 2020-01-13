@@ -23,17 +23,19 @@ from boltons.iterutils import pairwise
 from shapely.wkt import loads,dumps
 
 class OSM_to_network(object):
-"""
-Object to load OSM PBF to networkX objects. \
-EXAMPLE: \
-G_loader = losm.OSM_to_network(bufferedOSM_pbf) \
-G_loader.generateRoadsGDF() \
-G = G.initialReadIn() \
+    """
+    Object to load OSM PBF to networkX objects.
 
-snap origins and destinations \
-o_snapped = gn.pandana_snap(G, origins) \
-d_snapped = gn.pandana_snap(G, destinations) \
-"""
+    Object to load OSM PBF to networkX objects. \
+    EXAMPLE: \
+    G_loader = losm.OSM_to_network(bufferedOSM_pbf) \
+    G_loader.generateRoadsGDF() \
+    G = G.initialReadIn() \
+
+    snap origins and destinations \
+    o_snapped = gn.pandana_snap(G, origins) \
+    d_snapped = gn.pandana_snap(G, destinations) \
+    """
 
     def __init__(self, osmFile):
         ''' Generate a networkX object from a osm file
@@ -109,18 +111,14 @@ d_snapped = gn.pandana_snap(G, destinations) \
             print('No roads found')
 
     def line_length(self, line, ellipsoid='WGS-84'):
-        '''Length of a line in meters, given in geographic coordinates
+        """
+        Returns length of a line in meters, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
 
-        Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
-
-        Arguments:
-            line {Shapely LineString} -- a shapely LineString object with WGS-84 coordinates
-            ellipsoid {String} -- string name of an ellipsoid that `geopy` understands (see
-                http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-
-        Returns:
-            Length of line in meters
-        '''
+        :param line: a shapely LineString object with WGS-84 coordinates
+        :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
+        :returns: Length of line in meters
+        """
+        
         if line.geometryType() == 'MultiLineString':
             return sum(line_length(segment) for segment in line)
 
