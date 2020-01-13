@@ -23,17 +23,17 @@ from boltons.iterutils import pairwise
 from shapely.wkt import loads,dumps
 
 class OSM_to_network(object):
-    """
-    Object to load OSM PBF to networkX objects. \
-    EXAMPLE: \
-    G_loader = losm.OSM_to_network(bufferedOSM_pbf) \
-    G_loader.generateRoadsGDF() \
-    G = G.initialReadIn() \
+"""
+Object to load OSM PBF to networkX objects. \
+EXAMPLE: \
+G_loader = losm.OSM_to_network(bufferedOSM_pbf) \
+G_loader.generateRoadsGDF() \
+G = G.initialReadIn() \
 
-    snap origins and destinations \
-    o_snapped = gn.pandana_snap(G, origins) \
-    d_snapped = gn.pandana_snap(G, destinations) \
-    """
+snap origins and destinations \
+o_snapped = gn.pandana_snap(G, origins) \
+d_snapped = gn.pandana_snap(G, destinations) \
+"""
 
     def __init__(self, osmFile):
         ''' Generate a networkX object from a osm file

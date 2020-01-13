@@ -4,6 +4,14 @@ GOSTnets package
 Submodules
 ----------
 
+GOSTnets.core module
+--------------------
+
+.. automodule:: GOSTnets.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 GOSTnets.calculate\_od module
 -----------------------------
 
@@ -16,14 +24,6 @@ GOSTnets.conversion\_utils module
 ---------------------------------
 
 .. automodule:: GOSTnets.conversion_utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-GOSTnets.core module
---------------------
-
-.. automodule:: GOSTnets.core
    :members:
    :undoc-members:
    :show-inheritance:

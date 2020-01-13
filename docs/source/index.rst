@@ -3,17 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to gostnets's documentation!
+GOSTnets documentation
 ====================================
-
-.. automodule:: GOSTnets.core
-    :members:
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   GOSTnets
+
+**GOSTNets**: Build, process, and analyze networks. GOSTNets is built on top of geopandas, networkx, osmnx, and peartree.
 
 Indices and tables
 ==================
