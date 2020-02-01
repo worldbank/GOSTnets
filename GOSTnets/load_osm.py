@@ -112,11 +112,11 @@ class OSM_to_network(object):
 
     def line_length(self, line, ellipsoid='WGS-84'):
         """
-        Returns length of a line in meters, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
+        Returns length of a line in kilometers, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
 
         :param line: a shapely LineString object with WGS-84 coordinates
         :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-        :returns: Length of line in meters
+        :returns: Length of line in kilometers
         """
         
         if line.geometryType() == 'MultiLineString':

@@ -148,7 +148,7 @@ def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_t
 
     return G
 
-def node_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geometry_tag = 'geometry', xCol='x', yCol='y'):
+def node_gdf_from_graph(G, crs = 'epsg:4326', attr_list = None, geometry_tag = 'geometry', xCol='x', yCol='y'):
     """
     Function for generating GeoDataFrame from Graph
 
@@ -495,7 +495,7 @@ def generate_isochrones(G, origins, thresh, weight = None, stacking = False):
 
     return G
 
-def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=False, weight = 'time', measure_crs = {'init':'epsg:4326'}):
+def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=False, weight = 'time', measure_crs = 'epsg:4326'):
     """
     Function for adding a time value to edge dictionaries
 
@@ -506,10 +506,10 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
     :param node_buff: the thickness with whcih to buffer included nodes
     :param infill: If True, will remove any holes in isochrones
     :param weight: The edge weight to use when appraising travel times.
-    :param crs: measurement crs, object of form {'init':'epsg:XXXX'}
+    :param measure_crs: measurement crs, object of form {'init':'epsg:XXXX'}
     """
 
-    default_crs = {'init':'epsg:4326'}
+    default_crs = 'epsg:4326'
 
     if type(origins) == list and len(origins) >= 1:
         pass
@@ -531,9 +531,10 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
                 nodes_gdf = nodes_gdf.set_index('id')
 
                 edge_lines = []
+
                 for n_fr, n_to in subgraph.edges():
-                    f = nodes_gdf.loc[n_fr].geometry
-                    t = nodes_gdf.loc[n_to].geometry
+                    f = nodes_gdf.loc[str(n_fr)].geometry
+                    t = nodes_gdf.loc[str(n_to)].geometry
                     edge_lines.append(LineString([f,t]))
 
                 edge_gdf = gpd.GeoDataFrame({'geoms':edge_lines}, geometry = 'geoms', crs = default_crs)
@@ -1689,6 +1690,11 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
     """
 
     in_df = point_gdf.copy()
+
+    # check in in_df has a geometry column, or else provide warning
+    if not set(['geometry']).issubset(in_df.columns):
+        raise Exception('input point_gdf should have a geometry column')
+
     node_gdf = node_gdf_from_graph(G)
 
     if add_dist_to_node_col is True:
@@ -1708,9 +1714,9 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
         node_gdf['x'] = node_gdf.Proj_geometry.x
         node_gdf['y'] = node_gdf.Proj_geometry.y
 
-        G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(node_gdf[['x','y']].values)
 
-        distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        distances, indices = G_tree.query(in_df[['x','y']].values)
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
         in_df['NN_dist'] = distances
@@ -1719,9 +1725,16 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
     else:
         in_df['x'] = in_df.geometry.x
         in_df['y'] = in_df.geometry.y
-        G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
 
-        distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        print('print node_gdf x')
+        print(node_gdf['x'])
+
+        # .as_matrix() is now depreciated as of Pandas 1.0.0
+        #G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(node_gdf[['x','y']].values)
+
+        #distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        distances, indices = G_tree.query(in_df[['x','y']].values)
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
 
@@ -1740,7 +1753,7 @@ def pandana_snap_single_point(G, shapely_point, source_crs = 'epsg:4326', target
 
     node_gdf = node_gdf_from_graph(G)
 
-    G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+    G_tree = spatial.KDTree(node_gdf[['x','y']].values)
     distances, indices = G_tree.query([[shapely_point.x,shapely_point.y]])
 
     #print("print distances, indices")
@@ -1783,9 +1796,9 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
         source_gdf['x'] = source_gdf.P.x
         source_gdf['y'] = source_gdf.P.y
 
-        G_tree = spatial.KDTree(target_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(target_gdf[['x','y']].values)
 
-        distances, indices = G_tree.query(source_gdf[['x','y']].as_matrix())
+        distances, indices = G_tree.query(source_gdf[['x','y']].values)
 
         source_gdf['NN'] = list(target_gdf['ID'].iloc[indices])
 
@@ -1798,9 +1811,9 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
         target_gdf['x'] = target_gdf.geometry.x
         target_gdf['y'] = target_gdf.geometry.y
 
-        G_tree = spatial.KDTree(target_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(target_gdf[['x','y']].values)
 
-        distances, indices = G_tree.query(source_gdf[['x','y']].as_matrix())
+        distances, indices = G_tree.query(source_gdf[['x','y']].values)
 
         source_gdf['NN'] = list(target_gdf['ID'].iloc[indices])
 
