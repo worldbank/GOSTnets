@@ -116,7 +116,6 @@ class OSM_to_network(object):
 
             driver = ogr.GetDriverByName('OSM')
             data = driver.Open(data_path)
-
             sql_lyr = data.ExecuteSQL("SELECT * FROM lines")
 
             roads=[]
@@ -128,13 +127,14 @@ class OSM_to_network(object):
                         continue
                     highway=feature.GetField('highway')
                     roads.append([osm_id,highway,shapely_geo])
-                elif "ferry" in feature.GetField('other_tags'):
-                    osm_id = feature.GetField('osm_id')
-                    shapely_geo = loads(feature.geometry().ExportToWkt())
-                    if shapely_geo is None:
-                        continue
-                    highway='ferry'
-                    roads.append([osm_id,highway,shapely_geo])
+                elif feature.GetField('other_tags'):
+                    if "ferry" in feature.GetField('other_tags'):
+                        osm_id = feature.GetField('osm_id')
+                        shapely_geo = loads(feature.geometry().ExportToWkt())
+                        if shapely_geo is None:
+                            continue
+                        highway='ferry'
+                        roads.append([osm_id,highway,shapely_geo])
 
             if len(roads) > 0:
                 road_gdf = gpd.GeoDataFrame(roads,columns=['osm_id','infra_type','geometry'],crs={'init': 'epsg:4326'})
