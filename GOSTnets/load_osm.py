@@ -38,28 +38,41 @@ class OSM_to_network(object):
     """
 
     def __init__(self, osmFile, includeFerries=False):
-        ''' Generate a networkX object from a osm file
-        '''
+        """
+        Generate a networkX object from a osm file
+        """
         self.osmFile = osmFile
         self.roads_raw = self.fetch_roads_and_ferries(osmFile) if includeFerries else self.fetch_roads(osmFile)
 
     def generateRoadsGDF(self, in_df = None, outFile='', verbose = False):
-        ''' Convert the raw OSM roads from the OSM file to a GeoDataFrame
-        '''
+        """
+        post-process roads GeoDataFrame adding additional attributes
+
+        :param in_df: Optional input GeoDataFrame
+        :param outFile: optional parameter to output a csv with the processed roads
+        :returns: Length of line in kilometers
+        """
         if type(in_df) != gpd.geodataframe.GeoDataFrame:
             in_df = self.roads_raw
-        roads = self.get_all_intersections(in_df, verboseness = verbose)
+
+        # get all intersections
+        roads = self.get_all_intersections(in_df, unique_id = 'osm_id', verboseness = verbose)
+
+        # add new key column that has a unique id
         roads['key'] = ['edge_'+str(x+1) for x in range(len(roads))]
         np.arange(1,len(roads)+1,1)
 
         def get_nodes(x):
             return list(x.geometry.coords)[0],list(x.geometry.coords)[-1]
 
+        # generate all of the nodes per edge and to and from node columns
         nodes = gpd.GeoDataFrame(roads.apply(lambda x: get_nodes(x),axis=1).apply(pd.Series))
         nodes.columns = ['u','v']
 
+        # compute the length per edge
         roads['length'] = roads.geometry.apply(lambda x : self.line_length(x))
         roads.rename(columns={'geometry':'Wkt'}, inplace=True)
+
         roads = pd.concat([roads,nodes],axis=1)
 
         if outFile != '':
@@ -68,22 +81,23 @@ class OSM_to_network(object):
         self.roadsGPD = roads
 
     def filterRoads(self, acceptedRoads = ['primary','primary_link','secondary','secondary_link','motorway','motorway_link','trunk','trunk_link']):
-        ''' Extract certain times of roads from the OSM before the netowrkX conversion 
-        
-        INPUT
-            [ optional ] acceptedRoads [ list of strings ] 
-        
-        RETURNS
-            None - the raw roads are filtered based on the list of accepted roads
-        '''
+        """
+        Extract certain times of roads from the OSM before the netowrkX conversion 
+
+        :param acceptedRoads: [ optional ] acceptedRoads [ list of strings ] 
+        :returns: None - the raw roads are filtered based on the list of accepted roads
+        """
+
         self.roads_raw = self.roads_raw.loc[self.roads_raw.infra_type.isin(acceptedRoads)]
 
     def fetch_roads(self, data_path):
-        ''' Extract roads from osm pbf
-        
-        RETURNS
-           None
-        '''
+        """
+        Extracts roads from an OSM PBF
+
+        :param data_path: The directory of the shapefiles consisting of edges and nodes
+        :returns: a road GeoDataFrame
+        """
+
         if data_path.split('.')[-1] == 'pbf':
             driver = ogr.GetDriverByName("OSM")
             data = driver.Open(data_path)
@@ -111,6 +125,12 @@ class OSM_to_network(object):
             print('No roads found')
 
     def fetch_roads_and_ferries(self, data_path):
+        """
+        Extracts roads and ferries from an OSM PBF
+
+        :param data_path: The directory of the shapefiles consisting of edges and nodes
+        :returns: a road GeoDataFrame
+        """
 
         if data_path.split('.')[-1] == 'pbf':
 
@@ -164,13 +184,23 @@ class OSM_to_network(object):
                     for a, b in pairwise(line.coords)
         )
 
-    def get_all_intersections(self, shape_input, idx_osm = None, verboseness = False):
+    def get_all_intersections(self, shape_input, idx_osm = None, unique_id = 'osm_id', verboseness = False):
+        """
+        Processes GeoDataFrame and splits edges as intersections
+
+        :param shape_input: Input GeoDataFrame
+        :param idx_osm: The geometry index name
+        :param idx_osm: The unique id field name
+        :returns: returns processed GeoDataFrame
+        """
+
         # Initialize Rtree
         idx_inters = index.Index()
         # Load data
-        #all_data = dict(zip(list(shape_input.osm_id),list(shape_input.geometry),list(shape_input.infra_type)))
+        # all_data = dict(zip(list(shape_input.osm_id),list(shape_input.geometry),list(shape_input.infra_type)))
         ### TODO - it shouldn't be necessary to reference the geometry column specifically
         #   ... but here we are
+
         if idx_osm is None:
             idx_osm = shape_input['geometry'].sindex
 
@@ -182,18 +212,18 @@ class OSM_to_network(object):
         allCounts = []
 
         for idx, row in shape_input.iterrows():
-            key1 = row.osm_id
+            key1 = row.unique_id
             line = row.geometry
             infra_type = row.infra_type
             if count % 1000 == 0 and verboseness == True:
                 print("Processing %s of %s" % (count, tLength))
             count += 1
             intersections = shape_input.iloc[list(idx_osm.intersection(line.bounds))]
-            intersections = dict(zip(list(intersections.osm_id),list(intersections.geometry)))
+            intersections = dict(zip(list(intersections.unique_id),list(intersections.geometry)))
             if key1 in intersections: 
                 intersections.pop(key1)
             # Find intersecting lines
-            for key2,line2 in intersections.items():
+            for key2, line2 in intersections.items():
                 # Check that this intersection has not been recorded already
                 if (key1, key2) in inters_done or (key2, key1) in inters_done:
                     continue
@@ -238,19 +268,19 @@ class OSM_to_network(object):
                     all_data[i] = item
 
         # Transform into geodataframe and add coordinate system
-        full_gpd = gpd.GeoDataFrame(flat_list,geometry ='geometry')
+        full_gpd = gpd.GeoDataFrame(flat_list, geometry ='geometry')
         full_gpd.crs = {'init' :'epsg:4326'}
+
         return(full_gpd)
 
     def initialReadIn(self, fpath=None, wktField='Wkt'):
-        ''' Convert the OSM object to a networkX object
-        
-        INPUT
-        [ optional ] fpath [ string ] - path to CSV file with roads to read in
-        
-        RETURNS
-            [ Networkx Multi-digraph ]
-        '''
+        """
+        Convert the OSM object to a networkX object
+
+        :param fpath: path to CSV file with roads to read in
+        :param wktField: wktField name
+        :returns: Networkx Multi-digraph
+        """
         if isinstance(fpath, str):
             edges_1 = pd.read_csv(fpath)
             edges_1 = edges_1[wktField].apply(lambda x: loads(x))
@@ -262,8 +292,10 @@ class OSM_to_network(object):
             except:
                 self.generateRoadsGDF()
                 edges_1 = self.roadsGPD
+
         edges = edges_1.copy()
         node_bunch = list(set(list(edges['u']) + list(edges['v'])))
+        
         def convert(x):
             u = x.u
             v = x.v
@@ -276,9 +308,11 @@ class OSM_to_network(object):
             return (u, v, data)
 
         edge_bunch = edges.apply(lambda x: convert(x), axis = 1).tolist()
+
         G = nx.MultiDiGraph()
         G.add_nodes_from(node_bunch)
         G.add_edges_from(edge_bunch)
+
         for u, data in G.nodes(data = True):
             if type(u) == str:
                 q = tuple(float(x) for x in u[1:-1].split(','))
@@ -288,4 +322,5 @@ class OSM_to_network(object):
             data['y'] = q[1]
         G = nx.convert_node_labels_to_integers(G)
         self.network = G
+        
         return G

@@ -8,7 +8,6 @@ import geopandas as gpd
 import numpy as np
 
 from scipy import spatial
-import cython
 from functools import partial
 from shapely.wkt import loads
 from shapely.geometry import Point, LineString, MultiLineString, box
@@ -1715,17 +1714,9 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
         node_gdf['x'] = node_gdf.Proj_geometry.x
         node_gdf['y'] = node_gdf.Proj_geometry.y
 
-        reg_c_start = time.time()
-        print("reg_start KD build start")
         G_tree = spatial.KDTree(node_gdf[['x','y']].values)
-        reg_c_end = time.time()
-        print(reg_c_end - reg_c_start)
 
-        reg_c_start = time.time()
-        print("reg_start query start")
         distances, indices = G_tree.query(in_df[['x','y']].values)
-        reg_c_end = time.time()
-        print(reg_c_end - reg_c_start)
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
         in_df['NN_dist'] = distances
@@ -1750,15 +1741,20 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
     return in_df
 
 def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
-                    add_dist_to_node_col = True):
+                    add_dist_to_node_col = True, time_it = False):
     """
-    snaps points to a graph at very high speed
+    snaps points to a graph at a faster speed than pandana_snap. 
     :param G: a graph object
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
     :param source_crs: crs object in format 'epsg:32638'
     :param target_crs: crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance in metres to nearest node
+    :param time_it: return time to complete function
     """
+    import time
+
+    if time_it == True:
+      func_start = time.time()
 
     in_df = point_gdf.copy()
 
@@ -1770,74 +1766,56 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
 
     if add_dist_to_node_col is True:
 
-        func_start = time.time()
-        print("func start")
-        project_WGS_UTM = partial(
-                    pyproj.transform,
-                    pyproj.Proj(init=source_crs),
-                    pyproj.Proj(init=target_crs))
+        # only need to re-project if source is different than the target
+        if source_crs != target_crs:
 
-        #in_df['Proj_geometry'] = in_df.apply(lambda x: transform(project_WGS_UTM, x.geometry), axis = 1)
+          in_df_proj = in_df.to_crs(f'{target_crs}')
+          in_df_proj['x'] = in_df_proj.geometry.x
+          in_df_proj['y'] = in_df_proj.geometry.y
 
-        in_df_proj = in_df.to_crs({'init': 'epsg:32646'})
-        #in_df = in_df.set_geometry('Proj_geometry')
-        in_df_proj['x'] = in_df_proj.geometry.x
-        in_df_proj['y'] = in_df_proj.geometry.y
+          # print('print in_df')
+          # print(in_df_proj)
 
-        print('print in_df')
-        print(in_df)
+          node_gdf_proj = node_gdf.to_crs(f'{target_crs}')
+          node_gdf_proj['x'] = node_gdf_proj.geometry.x
+          node_gdf_proj['y'] = node_gdf_proj.geometry.y
 
+          G_tree = spatial.cKDTree(node_gdf_proj[['x','y']].values)
 
-        func_end = time.time()
-        print('functio part 1 time')
-        print(func_end - func_start)
+          distances, indices = G_tree.query(in_df_proj[['x','y']].values)
 
-        func_start2 = time.time()
-        print("func start part 2")
-        node_gdf['Proj_geometry'] = node_gdf.apply(lambda x: transform(project_WGS_UTM, x.geometry), axis = 1)
-        node_gdf = node_gdf.set_geometry('Proj_geometry')
-        node_gdf['x'] = node_gdf.Proj_geometry.x
-        node_gdf['y'] = node_gdf.Proj_geometry.y
+          in_df['NN'] = list(node_gdf_proj['node_ID'].iloc[indices])
+          in_df['NN_dist'] = distances
 
-        func_end2 = time.time()
-        print('function part 2 time')
-        print(func_end2 - func_start2)
+        else:
 
-        kd_c_start = time.time()
-        print("kd_reg_start kd")
-        G_tree = spatial.cKDTree(node_gdf[['x','y']].values, balanced_tree=False, compact_nodes=False)
-        kd_c_end = time.time()
-        print(kd_c_end - kd_c_start)
+          in_df['x'] = in_df.geometry.x
+          in_df['y'] = in_df.geometry.y
 
-        kd_c_start = time.time()
-        print("kd_c_start start")
-        distances, indices = G_tree.query(in_df[['x','y']].values)
-        kd_c_end = time.time()
-        print(kd_c_end - kd_c_start)
+          G_tree = spatial.cKDTree(node_gdf[['x','y']].values)
+          distances, indices = G_tree.query(in_df[['x','y']].values)
 
-        in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
-        in_df['NN_dist'] = distances
-        in_df = in_df.drop(['x','y','Proj_geometry'], axis = 1)
+          in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+          in_df['NN_dist'] = distances
 
     else:
+
         in_df['x'] = in_df.geometry.x
         in_df['y'] = in_df.geometry.y
 
-        print('print node_gdf x')
-        print(node_gdf['x'])
-
         # .as_matrix() is now depreciated as of Pandas 1.0.0
         #G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
-        kd_c_start = time.time()
-        print("kd_c_start start")
         G_tree = spatial.KDTree(node_gdf[['x','y']].values)
-        kd_c_end = time.time()
-        print(kd_c_end - kd_c_start)
 
         #distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
         distances, indices = G_tree.query(in_df[['x','y']].values)
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+
+    if time_it == True:
+      func_end = time.time()
+      print('time elapsed for function')
+      print(func_end - func_start)
 
     return in_df
 
