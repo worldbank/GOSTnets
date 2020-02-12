@@ -127,6 +127,14 @@ class OSM_to_network(object):
                         continue
                     highway=feature.GetField('highway')
                     roads.append([osm_id,highway,shapely_geo])
+                elif feature.GetField('man_made'):
+                    if "pier" in feature.GetField('man_made'):
+                        osm_id = feature.GetField('osm_id')
+                        shapely_geo = loads(feature.geometry().ExportToWkt())
+                        if shapely_geo is None:
+                            continue
+                        highway='pier'
+                        roads.append([osm_id,highway,shapely_geo])
                 elif feature.GetField('other_tags'):
                     if "ferry" in feature.GetField('other_tags'):
                         osm_id = feature.GetField('osm_id')
