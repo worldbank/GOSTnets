@@ -140,21 +140,29 @@ class OSM_to_network(object):
 
             roads=[]
             for feature in sql_lyr:
-                if feature.GetField('highway') is not None:
-                    osm_id = feature.GetField('osm_id')
-                    shapely_geo = loads(feature.geometry().ExportToWkt())
-                    if shapely_geo is None:
-                        continue
-                    highway=feature.GetField('highway')
-                    roads.append([osm_id,highway,shapely_geo])
+                if feature.GetField('man_made'):
+                    if "pier" in feature.GetField('man_made'):
+                        osm_id = feature.GetField('osm_id')
+                        shapely_geo = loads(feature.geometry().ExportToWkt())
+                        if shapely_geo is None:
+                            continue
+                        highway = 'pier'
+                        roads.append([osm_id,highway,shapely_geo])
                 elif feature.GetField('other_tags'):
                     if "ferry" in feature.GetField('other_tags'):
                         osm_id = feature.GetField('osm_id')
                         shapely_geo = loads(feature.geometry().ExportToWkt())
                         if shapely_geo is None:
                             continue
-                        highway='ferry'
+                        highway = 'ferry'
                         roads.append([osm_id,highway,shapely_geo])
+                elif feature.GetField('highway') is not None:
+                    osm_id = feature.GetField('osm_id')
+                    shapely_geo = loads(feature.geometry().ExportToWkt())
+                    if shapely_geo is None:
+                        continue
+                    highway=feature.GetField('highway')
+                    roads.append([osm_id,highway,shapely_geo])
 
             if len(roads) > 0:
                 road_gdf = gpd.GeoDataFrame(roads,columns=['osm_id','infra_type','geometry'],crs={'init': 'epsg:4326'})
