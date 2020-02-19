@@ -502,8 +502,8 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
     :param G: a graph object
     :param origins: a list object of node IDs from which to generate an isochrone poly object
     :param trip_times: a list object containing the isochrone values
-    :param edge_buff: the thickness with which to buffer included edges
-    :param node_buff: the thickness with whcih to buffer included nodes
+    :param edge_buff: the thickness with witch to buffer included edges
+    :param node_buff: the thickness with witch to buffer included nodes
     :param infill: If True, will remove any holes in isochrones
     :param weight: The edge weight to use when appraising travel times.
     :param measure_crs: measurement crs, object of form {'init':'epsg:XXXX'}
@@ -1737,6 +1737,85 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
         distances, indices = G_tree.query(in_df[['x','y']].values)
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+
+    return in_df
+
+def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
+                    add_dist_to_node_col = True, time_it = False):
+    """
+    snaps points to a graph at a faster speed than pandana_snap. 
+    :param G: a graph object
+    :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
+    :param source_crs: crs object in format 'epsg:32638'
+    :param target_crs: crs object in format 'epsg:32638'
+    :param add_dist_to_node_col: return distance in metres to nearest node
+    :param time_it: return time to complete function
+    """
+    import time
+
+    if time_it == True:
+      func_start = time.time()
+
+    in_df = point_gdf.copy()
+
+    # check if in_df has a geometry column, or else provide warning
+    if not set(['geometry']).issubset(in_df.columns):
+        raise Exception('input point_gdf should have a geometry column')
+
+    node_gdf = node_gdf_from_graph(G)
+
+    if add_dist_to_node_col is True:
+
+        # only need to re-project if source is different than the target
+        if source_crs != target_crs:
+
+          in_df_proj = in_df.to_crs(f'{target_crs}')
+          in_df_proj['x'] = in_df_proj.geometry.x
+          in_df_proj['y'] = in_df_proj.geometry.y
+
+          # print('print in_df')
+          # print(in_df_proj)
+
+          node_gdf_proj = node_gdf.to_crs(f'{target_crs}')
+          node_gdf_proj['x'] = node_gdf_proj.geometry.x
+          node_gdf_proj['y'] = node_gdf_proj.geometry.y
+
+          G_tree = spatial.cKDTree(node_gdf_proj[['x','y']].values)
+
+          distances, indices = G_tree.query(in_df_proj[['x','y']].values)
+
+          in_df['NN'] = list(node_gdf_proj['node_ID'].iloc[indices])
+          in_df['NN_dist'] = distances
+
+        else:
+
+          in_df['x'] = in_df.geometry.x
+          in_df['y'] = in_df.geometry.y
+
+          G_tree = spatial.cKDTree(node_gdf[['x','y']].values)
+          distances, indices = G_tree.query(in_df[['x','y']].values)
+
+          in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+          in_df['NN_dist'] = distances
+
+    else:
+
+        in_df['x'] = in_df.geometry.x
+        in_df['y'] = in_df.geometry.y
+
+        # .as_matrix() is now depreciated as of Pandas 1.0.0
+        #G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(node_gdf[['x','y']].values)
+
+        #distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        distances, indices = G_tree.query(in_df[['x','y']].values)
+
+        in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+
+    if time_it == True:
+        func_end = time.time()
+        print('time elapsed for function')
+        print(func_end - func_start)
 
     return in_df
 
