@@ -1758,7 +1758,7 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
 
     in_df = point_gdf.copy()
 
-    # check in in_df has a geometry column, or else provide warning
+    # check if in_df has a geometry column, or else provide warning
     if not set(['geometry']).issubset(in_df.columns):
         raise Exception('input point_gdf should have a geometry column')
 
@@ -1813,9 +1813,9 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
 
     if time_it == True:
-      func_end = time.time()
-      print('time elapsed for function')
-      print(func_end - func_start)
+        func_end = time.time()
+        print('time elapsed for function')
+        print(func_end - func_start)
 
     return in_df
 
