@@ -11,18 +11,18 @@ from shapely.geometry import LineString, MultiLineString, Point
 from .core import *
 
 
-def clean_network(G, wpath = '', output_file_name='', UTM={'init': 'epsg:3857'}, WGS = {'init': 'epsg:4326'}, junctdist = 50, verbose = False):   
-    ''' Topologically simplifies an input graph object by collapsing junctions and removing interstital nodes
-    # REQUIRED - G: a graph object containing nodes and edges. edges should have a property 
-    #               called 'Wkt' containing geometry objects describing the roads
-    #            wpath: the write path - a drive directory for inputs and output
-    #            output_file_name: This will be the output file name with '_processed' appended
-    #            UTM: the epsg code of the projection, in metres, to apply the junctdist
-    #            WGS: the current crs of the graph's geometry properties. By default, assumes WGS 84 (epsg 4326)
-    # OPTIONAL - junctdist: distance within which to collapse neighboring nodes. simplifies junctions. 
-    #            Set to 0.1 if not simplification desired. 50m good for national (primary / secondary) networks
-    #            verbose: if True, saves down intermediate stages for dissection
-    '''
+def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:3857'}, WGS = {'init': 'epsg:4326'}, junctdist = 50, verbose = False):   
+    """
+    Topologically simplifies an input graph object by collapsing junctions and removing interstital nodes
+    :param G: a graph object containing nodes and edges. Edges should have a property called 'Wkt' containing geometry objects describing the roads.
+    :param wpath: the write path - a drive directory for inputs and output
+    :param output_file_name: This will be the output file name with '_processed' appended
+    :param UTM: The epsg code of the projection, in metres, to apply the junctdist
+    :param WGS: the current crs of the graph's geometry properties. By default, assumes WGS 84 (epsg 4326)
+    :param junctdist: distance within which to collapse neighboring nodes. simplifies junctions. Set to 0.1 if not simplification desired. 50m good for national (primary / secondary) networks
+    :param verbose: if True, saves down intermediate stages for dissection
+    """
+
     # Squeezes clusters of nodes down to a single node if they are within the snapping tolerance
     a = simplify_junctions(G, UTM, WGS, junctdist)
 
@@ -40,7 +40,7 @@ def clean_network(G, wpath = '', output_file_name='', UTM={'init': 'epsg:3857'},
     for u, v, data in b.edges(data = True):
         if type(data['Wkt']) == list:
                 data['Wkt'] = unbundle_geometry(data['Wkt'])
-    
+
     # save progress
     if verbose is True: 
         save(b, 'b', wpath)
