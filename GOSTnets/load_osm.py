@@ -220,14 +220,15 @@ class OSM_to_network(object):
         allCounts = []
 
         for idx, row in shape_input.iterrows():
-            key1 = row.unique_id
+            #print(row)
+            key1 = row[f'{unique_id}']
             line = row.geometry
             infra_type = row.infra_type
             if count % 1000 == 0 and verboseness == True:
                 print("Processing %s of %s" % (count, tLength))
             count += 1
             intersections = shape_input.iloc[list(idx_osm.intersection(line.bounds))]
-            intersections = dict(zip(list(intersections.unique_id),list(intersections.geometry)))
+            intersections = dict(zip(list(intersections[f'{unique_id}']),list(intersections.geometry)))
             if key1 in intersections: 
                 intersections.pop(key1)
             # Find intersecting lines
@@ -265,7 +266,7 @@ class OSM_to_network(object):
         flat_list = []
         all_data = {}
 
-        #item for sublist in new_lines for item in sublist
+        # item for sublist in new_lines for item in sublist
         i = 1
         for sublist in new_lines:
             if sublist is not None:
