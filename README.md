@@ -30,6 +30,12 @@ pip install boltons
 pip install pulp
 ```
 
+#### Install Jupyter Notebook
+Jupyter Notebook is used in many GOSTnets examples. We recommend installing it within your environment
+```
+conda install -c conda-forge jupyterlab
+```
+
 ## Documentation
 
 Documentation available at [readthedocs](https://gostnets.readthedocs.io/)
