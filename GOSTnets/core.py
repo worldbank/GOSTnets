@@ -1769,39 +1769,47 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
         # only need to re-project if source is different than the target
         if source_crs != target_crs:
 
-          in_df_proj = in_df.to_crs(f'{target_crs}')
-          in_df_proj['x'] = in_df_proj.geometry.x
-          in_df_proj['y'] = in_df_proj.geometry.y
+            in_df_proj = in_df.to_crs(f'{target_crs}')
+            in_df_proj['x'] = in_df_proj.geometry.x
+            in_df_proj['y'] = in_df_proj.geometry.y
 
-          # print('print in_df')
-          # print(in_df_proj)
+            # print('print in_df')
+            # print(in_df_proj)
 
-          node_gdf_proj = node_gdf.to_crs(f'{target_crs}')
-          node_gdf_proj['x'] = node_gdf_proj.geometry.x
-          node_gdf_proj['y'] = node_gdf_proj.geometry.y
+            node_gdf_proj = node_gdf.to_crs(f'{target_crs}')
+            node_gdf_proj['x'] = node_gdf_proj.geometry.x
+            node_gdf_proj['y'] = node_gdf_proj.geometry.y
 
-          G_tree = spatial.cKDTree(node_gdf_proj[['x','y']].values)
+            G_tree = spatial.cKDTree(node_gdf_proj[['x','y']].values)
 
-          distances, indices = G_tree.query(in_df_proj[['x','y']].values)
+            distances, indices = G_tree.query(in_df_proj[['x','y']].values)
 
-          in_df['NN'] = list(node_gdf_proj['node_ID'].iloc[indices])
-          in_df['NN_dist'] = distances
+            in_df['NN'] = list(node_gdf_proj['node_ID'].iloc[indices])
+            in_df['NN_dist'] = distances
 
         else:
 
-          in_df['x'] = in_df.geometry.x
-          in_df['y'] = in_df.geometry.y
+            try:
+                in_df['x'] = in_df.geometry.x
+                in_df['y'] = in_df.geometry.y
+            except:
+                in_df['x'] = in_df.geometry.apply(lambda geometry: geometry.x)
+                in_df['y'] = in_df.geometry.apply(lambda geometry: geometry.y)
 
-          G_tree = spatial.cKDTree(node_gdf[['x','y']].values)
-          distances, indices = G_tree.query(in_df[['x','y']].values)
+            G_tree = spatial.cKDTree(node_gdf[['x','y']].values)
+            distances, indices = G_tree.query(in_df[['x','y']].values)
 
-          in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
-          in_df['NN_dist'] = distances
+            in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+            in_df['NN_dist'] = distances
 
     else:
 
-        in_df['x'] = in_df.geometry.x
-        in_df['y'] = in_df.geometry.y
+        try:
+            in_df['x'] = in_df.geometry.x
+            in_df['y'] = in_df.geometry.y
+        except:
+            in_df['x'] = in_df.geometry.apply(lambda geometry: geometry.x)
+            in_df['y'] = in_df.geometry.apply(lambda geometry: geometry.y)
 
         # .as_matrix() is now depreciated as of Pandas 1.0.0
         #G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
