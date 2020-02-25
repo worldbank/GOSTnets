@@ -7,10 +7,10 @@ import geopandas as gpd
 import numpy as np
 
 from shapely.geometry import Point
+from .core import pandana_snap
+from .core import calculate_OD as calc_od
 
-#import GOSTnets as gn
-
-def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calculate_snap=False):
+def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calculate_snap=False, wgs84 = {'init':'epsg:4326'}):
     ''' Calculate Origin destination matrix from GeoDataframes
     
     Args:
@@ -18,31 +18,32 @@ def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calc
         origins (geopandas dataframe): source locations for calculating access
         destinations (geopandas dataframe): destination locations for calculating access
         calculate_snap (boolean, optioinal): variable to add snapping distance to travel time, default is false
+        wgs84 (CRS dictionary, optional): CRS fo road network to which the GDFs are projected
     Returns:
         numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
     '''
     #Get a list of originNodes and destinationNodes
-    wgs84 = {'init':'epsg:4326'}
     if origins.crs != wgs84:
         origins = origins.to_crs(wgs84)
     if destinations.crs != wgs84:
         destinations = destinations.to_crs(wgs84)
-    origins = gn.pandana_snap(G, origins)
-    destinations = gn.pandana_snap(G, destinations)
+    origins = pandana_snap(G, origins)
+    destinations = pandana_snap(G, destinations)
     oNodes = origins['NN'].unique()
     dNodes = destinations['NN'].unique()
-    od = gn.calculate_OD(G, oNodes, dNodes, fail_value)
+    od = calc_od(G, oNodes, dNodes, fail_value)
     origins['OD_O'] = origins['NN'].apply(lambda x: np.where(oNodes==x)[0][0])
     destinations['OD_D'] = destinations['NN'].apply(lambda x: np.where(dNodes==x)[0][0])
     outputMatrix = od[origins['OD_O'].values,:][:,destinations['OD_D'].values]
     if calculate_snap:
-        originsUTM = gn.pandana_snap(G, origins, target_crs='epsg:3857')
-        destinationsUTM = gn.pandana_snap(G, destinations, target_crs='epsg:3857')
+        originsUTM = pandana_snap(G, origins, target_crs='epsg:3857')
+        destinationsUTM = pandana_snap(G, destinations, target_crs='epsg:3857')
         originsUTM['tTime_sec'] =      originsUTM['NN_dist']      / 1000 / 5 * 60 * 60 # Convert snap distance to walking time in seconds
         destinationsUTM['tTime_sec'] = destinationsUTM['NN_dist'] / 1000 / 5 * 60 * 60 # Convert snap distance to walking time in seconds
+        originsUTM.reset_index(inplace=True)
         for idx, row in originsUTM.iterrows():
-            outputMatrix_adj[idx,:] = outputMatrix_adj[idx,:] + row['tTime_sec']
-        outputMatrix = outputMatrix_adj
+            outputMatrix[idx,:] = outputMatrix[idx,:] + row['tTime_sec']
+        outputMatrix = outputMatrix
     return(outputMatrix)    
     
 def calculateOD_csv(G, originCSV, destinationCSV='', oLat="Lat", oLon="Lon", dLat="Lat", dLon="Lon", crs={'init':'epsg:4326'}, fail_value=-1, weight='time', calculate_snap=False):
