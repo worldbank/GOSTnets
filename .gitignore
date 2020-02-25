@@ -106,3 +106,8 @@ venv.bak/
 .DS_Store
 
 tutorial/tutorial_outputs/*
+Tutorial/tutorial_data/rek_grid_pop_gravity.cpg
+Tutorial/tutorial_data/rek_grid_pop_gravity.dbf
+Tutorial/tutorial_data/rek_grid_pop_gravity.prj
+Tutorial/tutorial_data/rek_grid_pop_gravity.shp
+Tutorial/tutorial_data/rek_grid_pop_gravity.shx
