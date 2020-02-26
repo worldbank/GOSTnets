@@ -13,7 +13,7 @@ setup(
                       'numpy',
                       'osmnx',
                       'pandas>=0.23.5',
-                      'pyproj',
+                      'pyproj>=2.4.2',
                       'scipy',
                       'shapely'
                       ],
