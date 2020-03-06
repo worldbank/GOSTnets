@@ -54,6 +54,11 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:385
 
     # Run this again after removing duplicated edges
     c = custom_simplify(c)
+    
+    # rectify geometry again
+    for u, v, data in c.edges(data = True):
+        if type(data['Wkt']) == list:
+            data['Wkt'] = unbundle_geometry(data['Wkt'])
 
     # Ensure all remaining edges are duplicated (two-way streets)
     c = add_missing_reflected_edges(c)

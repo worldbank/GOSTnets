@@ -215,7 +215,7 @@ def node_gdf_from_graph(G, crs = 'epsg:4326', attr_list = None, geometry_tag = '
 
     return nodes_gdf
 
-def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geometry_tag = 'geometry', xCol='x', yCol = 'y'):
+def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = 'geometry', xCol='x', yCol = 'y'):
     """
     Function for generating a GeoDataFrame from a networkx Graph object
 
@@ -238,6 +238,8 @@ def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
         keys = list(set(flatten(keys)))
         if geometry_tag in keys:
             keys.remove(geometry_tag)
+        if 'geometry' in keys:
+            keys.remove('geometry')
         attr_list = keys
 
     for u, v, data in G.edges(data=True):
@@ -245,6 +247,7 @@ def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
         if geometry_tag in data:
             # if it has a geometry attribute (a list of line segments), add them
             # to the list of lines to plot
+            # geom = str(data[geometry_tag])
             geom = data[geometry_tag]
 
         else:
@@ -259,7 +262,7 @@ def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
         new_column_info = {
             'stnode':u,
             'endnode':v,
-            'geometry':geom}
+            geometry_tag:geom}
 
         for i in attr_list:
             try:
@@ -270,8 +273,10 @@ def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
         edges.append(new_column_info)
 
     edges_df = pd.DataFrame(edges)
-    edges_df = edges_df[['stnode','endnode',*attr_list,'geometry']]
-    edges_gdf = gpd.GeoDataFrame(edges_df, geometry = edges_df.geometry, crs = crs)
+    edges_df = edges_df[['stnode','endnode',*attr_list,geometry_tag]]
+    if type(edges_df.iloc[0][geometry_tag]) == str:
+        edges_df[geometry_tag] = edges_df[geometry_tag].apply(loads)
+    edges_gdf = gpd.GeoDataFrame(edges_df, geometry = geometry_tag, crs = crs)
 
     return edges_gdf
 
@@ -1533,6 +1538,9 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
                 return [LineString(coords[:i] + [(cp.x, cp.y)]),LineString([(cp.x, cp.y)] + coords[i:])]
 
     G2 = G.copy()
+    edges = edge_gdf_from_graph(G2, geometry_tag = 'Wkt')
+    edges_projected = edges.to_crs(target)
+    nodes_projected = node_gdf_from_graph(G).to_crs(target).set_index('node_ID')
 
     # define transforms for exchanging between source and target projections
 
@@ -1549,14 +1557,13 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
     long_edges, long_edge_IDs, unique_long_edges, new_nodes, new_edges = [], [], [], [], []
 
     # Identify long edges
-    for u, v, data in G2.edges(data = True):
+    for idx, data in edges_projected.iterrows():
+
+        u = data['stnode']
+        v = data['endnode']
 
         # load geometry
-        if type(data['Wkt']) == str:
-            WGS_geom = loads(data['Wkt'])
-        else:
-            WGS_geom = unbundle_geometry(data['Wkt'])
-        UTM_geom = transform(project_WGS_UTM, WGS_geom)
+        UTM_geom = data['Wkt']
 
         # test geomtry length
         if UTM_geom.length > thresh:
@@ -1576,22 +1583,17 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
     for u, v, data in unique_long_edges:
 
         # load geometry of long edge
-        if type(data['Wkt']) == str:
-            WGS_geom = loads(data['Wkt'])
-        else:
-            WGS_geom = unbundle_geometry(data['Wkt'])
+        UTM_geom = data['Wkt']
 
-        if WGS_geom.type == 'MultiLineString':
-            WGS_geom = linemerge(WGS_geom)
-
-        UTM_geom = transform(project_WGS_UTM, WGS_geom)
+        if UTM_geom.type == 'MultiLineString':
+            UTM_geom = linemerge(UTM_geom)
 
         # flip u and v if Linestring running from v to u, coordinate-wise
-        u_x_cond = round(WGS_geom.coords[0][0], 6) == round(G.nodes()[u]['x'], 6)
-        u_y_cond = round(WGS_geom.coords[0][1], 6) == round(G.nodes()[u]['y'], 6)
+        u_x_cond = round(UTM_geom.coords[0][0], 3) == round(nodes_projected.loc[u, 'geometry'].x, 3)
+        u_y_cond = round(UTM_geom.coords[0][1], 3) == round(nodes_projected.loc[u, 'geometry'].y, 3)
 
-        v_x_cond = round(WGS_geom.coords[0][0], 6) == round(G.nodes()[v]['x'], 6)
-        v_y_cond = round(WGS_geom.coords[0][1], 6) == round(G.nodes()[v]['y'], 6)
+        v_x_cond = round(UTM_geom.coords[0][0], 3) == round(nodes_projected.loc[v, 'geometry'].x, 3)
+        v_y_cond = round(UTM_geom.coords[0][1], 3) == round(nodes_projected.loc[v, 'geometry'].y, 3)
 
         if u_x_cond and u_y_cond:
             pass
@@ -1626,42 +1628,40 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
                 new_nodes.append((new_node_ID, node_data))
 
             ## GENERATE NEW EDGES ##
-            try:
-                # define geometry to be cutting (iterative)
-                if i == 0:
-                    geom_to_split = UTM_geom
+            # define geometry to be cutting (iterative)
+            if i == 0:
+                geom_to_split = UTM_geom
 
-                else:
-                    geom_to_split = result[1]
+            else:
+                geom_to_split = result[1]
 
-                # cut geometry. result[0] is the section cut off, result[1] is remainder
-                result = cut(geom_to_split, (thresh))
+            # cut geometry. result[0] is the section cut off, result[1] is remainder
+            result = cut(geom_to_split, (thresh))
 
-                t_geom = transform(project_UTM_WGS, result[0])
+            t_geom = transform(project_UTM_WGS, result[0])
 
-                edge_data = {'Wkt' : t_geom,
-                            'length' : (int(result[0].length) / factor),
-                            }
+            edge_data = {'Wkt' : t_geom,
+                        'length' : (int(result[0].length) / factor),
+                        }
 
-                if attr_list != None:
-                    for attr in attr_list:
+            if attr_list != None:
+                for attr in attr_list:
+                    if attr in data:
                         edge_data[attr] = data[attr]
 
-                if i == 0:
-                    prev_node_ID = u
+            if i == 0:
+                prev_node_ID = u
 
-                if i == int(number_of_new_points):
-                    new_node_ID = v
+            if i == int(number_of_new_points):
+                new_node_ID = v
 
-                # append resulting edges to a list of new edges, bidirectional.
-                new_edges.append((prev_node_ID,new_node_ID,edge_data))
-                new_edges.append((new_node_ID,prev_node_ID,edge_data))
+            # append resulting edges to a list of new edges, bidirectional.
+            new_edges.append((prev_node_ID,new_node_ID,edge_data))
+            new_edges.append((new_node_ID,prev_node_ID,edge_data))
 
-                o += 1
+            o += 1
 
-                prev_node_ID = new_node_ID
-            except:
-                pass
+            prev_node_ID = new_node_ID
 
         j+=1
 
@@ -1968,15 +1968,17 @@ def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col 
     :param largest_G: if True, takes largest remaining subgraph of G as G
     """
 
+    from shapely.geometry import MultiPolygon, Polygon
+
     edges_to_add, nodes_to_add = [],[]
     edges_to_remove, nodes_to_remove = [],[]
 
-    if type(bound) == shapely.geometry.multipolygon.MultiPolygon or type(bound) == shapely.geometry.polygon.Polygon:
+    if type(bound) == MultiPolygon or type(bound) == Polygon:
         pass
     else:
         raise ValueError('Bound input must be a Shapely Polygon or MultiPolygon object!')
 
-    if type(G) != networkx.classes.multidigraph.MultiDiGraph:
+    if type(G) != nx.classes.multidigraph.MultiDiGraph:
         raise ValueError('Graph object must be of type networkx.classes.multidigraph.MultiDiGraph!')
 
     project_WGS_UTM = partial(
@@ -2035,18 +2037,18 @@ def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col 
 
                 # identify the new line sections inside the boundary
                 new_geom = bound.intersection(geom)
-                if type(new_geom) == shapely.geometry.multilinestring.MultiLineString:
+                if type(new_geom) == MultiLineString:
                     new_geom = linemerge(new_geom)
 
                 # If there is only one:
-                if type(new_geom) == shapely.geometry.linestring.LineString:
+                if type(new_geom) == LineString:
 
                     new_nodes, new_edges, new_node_dict_entries, iterator = new_edge_generator(new_geom,infra_type,iterator,existing_legitimate_point_geometries,geom_col,project_WGS_UTM)
                     existing_legitimate_point_geometries.update(new_node_dict_entries)
                     nodes_to_add.append(new_nodes)
                     edges_to_add.append(new_edges)
 
-                elif type(new_geom) == shapely.geometry.multilinestring.MultiLineString:
+                elif type(new_geom) == MultiLineString:
 
                     for n in new_geom:
                         new_nodes, new_edges, new_node_dict_entries, iterator = new_edge_generator(n,infra_type,iterator,existing_legitimate_point_geometries,geom_col, project_WGS_UTM)
