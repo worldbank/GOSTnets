@@ -25,11 +25,11 @@ def rasterize_od_results(inD, outFile, field, template = None):
     if template:
         raster_template = rasterio.open(template)
         # get info from template file
-        xRes = raster_template.res[0]
-        yRes = raster_template.res[1]
+        xRes = raster_template.res[1]
+        yRes = raster_template.res[0]
         trans = raster_template.transform
-        x_pixels = raster_template.shape[0]
-        y_pixels = raster_template.shape[1]
+        x_pixels = raster_template.shape[1]
+        y_pixels = raster_template.shape[0]
 
         new_dataset = rasterio.open(
             outFile, 'w', driver = 'GTiff',
@@ -40,7 +40,7 @@ def rasterize_od_results(inD, outFile, field, template = None):
         )
 
         shapes = ((row.geometry,row[field]) for idx, row in inD.iterrows())
-        burned = features.rasterize(shapes=shapes, fill=0, out_shape=raster_template.shape, transform=new_dataset.transform)
+        burned = features.rasterize(shapes=shapes, fill=0, out_shape=raster_template.shape, transform=trans)
         burned = burned.astype(str(inD[field].dtype))
         new_dataset.write_band(1, burned)
 
