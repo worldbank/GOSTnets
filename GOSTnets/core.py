@@ -275,6 +275,7 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
     edges_df = pd.DataFrame(edges)
     edges_df = edges_df[['stnode','endnode',*attr_list,geometry_tag]]
     if type(edges_df.iloc[0][geometry_tag]) == str:
+        edges_df[geometry_tag] = edges_df[geometry_tag].apply(str)
         edges_df[geometry_tag] = edges_df[geometry_tag].apply(loads)
     edges_gdf = gpd.GeoDataFrame(edges_df, geometry = geometry_tag, crs = crs)
 
