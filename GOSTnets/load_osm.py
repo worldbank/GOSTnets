@@ -98,9 +98,6 @@ class OSM_to_network(object):
         :returns: a road GeoDataFrame
         """
 
-        print('running fetch roads only')
-        hwy_count = 0
-
         if data_path.split('.')[-1] == 'pbf':
             driver = ogr.GetDriverByName("OSM")
             data = driver.Open(data_path)
@@ -109,7 +106,6 @@ class OSM_to_network(object):
 
             for feature in sql_lyr:
                 if feature.GetField("highway") is not None:
-                    hwy_count = hwy_count + 1
                     osm_id = feature.GetField("osm_id")
                     shapely_geo = loads(feature.geometry().ExportToWkt())
                     if shapely_geo is None:
@@ -119,7 +115,6 @@ class OSM_to_network(object):
 
             if len(roads) > 0:
                 road_gdf = gpd.GeoDataFrame(roads,columns=['osm_id','infra_type','geometry'],crs={'init': 'epsg:4326'})
-                print("hwy_count is {}".format(hwy_count))
                 return road_gdf
 
         elif data_path.split('.')[-1] == 'shp':
@@ -178,7 +173,6 @@ class OSM_to_network(object):
                     roads.append([osm_id,highway,shapely_geo])
 
             if len(roads) > 0:
-                print("hwy_count is {}".format(hwy_count))
                 road_gdf = gpd.GeoDataFrame(roads,columns=['osm_id','infra_type','geometry'],crs={'init': 'epsg:4326'})
                 return road_gdf
 
