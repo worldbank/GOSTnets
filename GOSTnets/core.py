@@ -1827,6 +1827,98 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
         print(func_end - func_start)
 
     return in_df
+    
+def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
+                    add_dist_to_node_col = True, time_it = False, k_nearest=5, origin_id = 'index'):
+    """
+    snaps points to a graph at a faster speed than pandana_snap. 
+    :param G: a graph object
+    :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
+    :param source_crs: crs object in format 'epsg:32638'
+    :param target_crs: crs object in format 'epsg:32638'
+    :param add_dist_to_node_col: return distance in metres to nearest node
+    :param time_it: return time to complete function
+    """
+    import time
+
+    if time_it == True:
+      func_start = time.time()
+
+    in_df = point_gdf.copy()
+
+    # check if in_df has a geometry column, or else provide warning
+    if not set(['geometry']).issubset(in_df.columns):
+        raise Exception('input point_gdf should have a geometry column')
+
+    node_gdf = node_gdf_from_graph(G)
+    nn_map = {}
+
+    if add_dist_to_node_col is True:
+
+        # only need to re-project if source is different than the target
+        if source_crs != target_crs:
+
+            in_df_proj = in_df.to_crs(f'{target_crs}')
+            in_df_proj['x'] = in_df_proj.geometry.x
+            in_df_proj['y'] = in_df_proj.geometry.y
+
+            # print('print in_df')
+            # print(in_df_proj)
+
+            node_gdf_proj = node_gdf.to_crs(f'{target_crs}')
+            node_gdf_proj['x'] = node_gdf_proj.geometry.x
+            node_gdf_proj['y'] = node_gdf_proj.geometry.y
+
+            G_tree = spatial.cKDTree(node_gdf_proj[['x','y']].values)
+
+            distances, indices = G_tree.query(in_df_proj[['x','y']].values, k=k_nearest)
+
+            for origin, distance_list, index_list in zip(list(in_df[origin_id]), distances, indices):
+                index_list_NN = list(node_gdf['node_ID'].iloc[index_list])
+                nn_map[origin] = {'NN':list(index_list_NN), 'NN_dist':list(distance_list)}
+            
+        else:
+
+            try:
+                in_df['x'] = in_df.geometry.x
+                in_df['y'] = in_df.geometry.y
+            except:
+                in_df['x'] = in_df.geometry.apply(lambda geometry: geometry.x)
+                in_df['y'] = in_df.geometry.apply(lambda geometry: geometry.y)
+
+            G_tree = spatial.cKDTree(node_gdf[['x','y']].values)
+            distances, indices = G_tree.query(in_df[['x','y']].values, k=k_nearest)
+
+            for origin, distance_list, index_list in zip(list(in_df[origin_id]), distances, indices):
+                index_list_NN = list(node_gdf['node_ID'].iloc[index_list])
+                nn_map[origin] = {'NN':list(index_list_NN), 'NN_dist':list(distance_list)}
+
+    else:
+
+        try:
+            in_df['x'] = in_df.geometry.x
+            in_df['y'] = in_df.geometry.y
+        except:
+            in_df['x'] = in_df.geometry.apply(lambda geometry: geometry.x)
+            in_df['y'] = in_df.geometry.apply(lambda geometry: geometry.y)
+
+        # .as_matrix() is now depreciated as of Pandas 1.0.0
+        #G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
+        G_tree = spatial.KDTree(node_gdf[['x','y']].values)
+
+        #distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
+        distances, indices = G_tree.query(in_df[['x','y']].values, k=k_nearest)
+
+        for origin, distance_list, index_list in zip(list(in_df[origin_id]), distances, indices):
+            index_list_NN = list(node_gdf['node_ID'].iloc[index_list])
+            nn_map[origin] = {'NN':list(index_list_NN)}
+
+    if time_it == True:
+        func_end = time.time()
+        print('time elapsed for function')
+        print(func_end - func_start)
+
+    return nn_map
 
 def pandana_snap_single_point(G, shapely_point, source_crs = 'epsg:4326', target_crs = 'epsg:4326'):
     """
@@ -1868,42 +1960,40 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
     target_gdf['ID'] = target_gdf.index
 
     if add_dist_to_node_col is True:
+        
+        if source_crs != target_crs:
+            target_gdf = target_gdf.to_crs(f'{target_crs}')
+            source_gdf = source_gdf.to_crs(f'{target_crs}')
+        
+        target_gdf['x'] = target_gdf.geometry.x
+        target_gdf['y'] = target_gdf.geometry.y
 
-        project_WGS_UTM = partial(
-                    pyproj.transform,
-                    pyproj.Proj(init=source_crs),
-                    pyproj.Proj(init=target_crs))
+        source_gdf['x'] = source_gdf.geometry.x
+        source_gdf['y'] = source_gdf.geometry.y
 
-        target_gdf['P'] = target_gdf.apply(lambda x: transform(project_WGS_UTM, x.geometry), axis = 1)
-        target_gdf = target_gdf.set_geometry('P')
-        target_gdf['x'] = target_gdf.P.x
-        target_gdf['y'] = target_gdf.P.y
-
-        source_gdf['P'] = source_gdf.apply(lambda x: transform(project_WGS_UTM, x.geometry), axis = 1)
-        source_gdf = source_gdf.set_geometry('P')
-        source_gdf['x'] = source_gdf.P.x
-        source_gdf['y'] = source_gdf.P.y
-
-        G_tree = spatial.KDTree(target_gdf[['x','y']].values)
+        G_tree = spatial.cKDTree(target_gdf[['x','y']].values)
 
         distances, indices = G_tree.query(source_gdf[['x','y']].values)
 
-        source_gdf['NN'] = list(target_gdf['ID'].iloc[indices])
+        source_gdf['idx'] = list(target_gdf['ID'].iloc[indices])
 
-        source_gdf['NN_dist'] = distances
+        source_gdf['idx_dist'] = distances
 
-        source_gdf = source_gdf.drop(['x','y','P'], axis = 1)
+        source_gdf = source_gdf.drop(['x','y'], axis = 1)
 
     else:
 
         target_gdf['x'] = target_gdf.geometry.x
         target_gdf['y'] = target_gdf.geometry.y
+        
+        source_gdf['x'] = source_gdf.geometry.x
+        source_gdf['y'] = source_gdf.geometry.y
 
-        G_tree = spatial.KDTree(target_gdf[['x','y']].values)
+        G_tree = spatial.cKDTree(target_gdf[['x','y']].values)
 
         distances, indices = G_tree.query(source_gdf[['x','y']].values)
 
-        source_gdf['NN'] = list(target_gdf['ID'].iloc[indices])
+        source_gdf['idx'] = list(target_gdf['ID'].iloc[indices])
 
     return source_gdf
 
