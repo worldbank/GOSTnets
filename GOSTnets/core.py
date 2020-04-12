@@ -178,7 +178,7 @@ def node_gdf_from_graph(G, crs = 'epsg:4326', attr_list = None, geometry_tag = '
 
     z = 0
 
-    for u, data in G.nodes(data=True):
+    for u, data in G.nodes(data = True):
 
         if geometry_tag not in attr_list and xCol in attr_list and yCol in attr_list :
             try:
@@ -209,9 +209,9 @@ def node_gdf_from_graph(G, crs = 'epsg:4326', attr_list = None, geometry_tag = '
         z += 1
 
     nodes_df = pd.DataFrame(nodes)
-    nodes_df = nodes_df[['node_ID',*non_geom_attr_list,geometry_tag]]
-    nodes_df = nodes_df.drop_duplicates(subset=['node_ID'], keep='first')
-    nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=nodes_df.geometry, crs = crs)
+    nodes_df = nodes_df[['node_ID', *non_geom_attr_list, geometry_tag]]
+    nodes_df = nodes_df.drop_duplicates(subset = ['node_ID'], keep = 'first')
+    nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry = nodes_df.geometry, crs = crs)
 
     return nodes_gdf
 
@@ -1680,15 +1680,20 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
     return G2
 
 def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
-                    add_dist_to_node_col = True):
+                    add_dist_to_node_col = True, time_it = False):
     """
     snaps points to a graph at very high speed
-    :param G: a graph object
+    :param G: a graph object.
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
-    :param source_crs: crs object in format 'epsg:32638'
-    :param target_crs: crs object in format 'epsg:32638'
-    :param add_dist_to_node_col: return distance in metres to nearest node
+    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
+    :param target_crs: The desired crs returned point GeoDataFrame. The crs object in format 'epsg:32638'
+    :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
+    :return: returns a GeoDataFrame that is the same as the input point_gdf but adds a column containing the id of the nearest node in the graph, and the distance if add_dist_to_node_col == True
     """
+    import time
+
+    if time_it == True:
+      func_start = time.time()
 
     in_df = point_gdf.copy()
 
@@ -1700,57 +1705,75 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
 
     if add_dist_to_node_col is True:
 
-        project_WGS_UTM = partial(
-                    pyproj.transform,
-                    pyproj.Proj(init=source_crs),
-                    pyproj.Proj(init=target_crs))
+        # only need to re-project if source is different than the target
+        if source_crs != target_crs:
 
-        in_df['Proj_geometry'] = in_df.apply(lambda x: transform(project_WGS_UTM, x.geometry), axis = 1)
-        in_df = in_df.set_geometry('Proj_geometry')
-        in_df['x'] = in_df.Proj_geometry.x
-        in_df['y'] = in_df.Proj_geometry.y
+            in_df_proj = in_df.to_crs(f'{target_crs}')
+            in_df_proj['x'] = in_df_proj.geometry.x
+            in_df_proj['y'] = in_df_proj.geometry.y
 
-        node_gdf['Proj_geometry'] = node_gdf.apply(lambda x: transform(project_WGS_UTM, x.geometry), axis = 1)
-        node_gdf = node_gdf.set_geometry('Proj_geometry')
-        node_gdf['x'] = node_gdf.Proj_geometry.x
-        node_gdf['y'] = node_gdf.Proj_geometry.y
+            # print('print in_df')
+            # print(in_df_proj)
 
-        G_tree = spatial.KDTree(node_gdf[['x','y']].values)
+            node_gdf_proj = node_gdf.to_crs(f'{target_crs}')
+            node_gdf_proj['x'] = node_gdf_proj.geometry.x
+            node_gdf_proj['y'] = node_gdf_proj.geometry.y
 
-        distances, indices = G_tree.query(in_df[['x','y']].values)
+            G_tree = spatial.KDTree(node_gdf_proj[['x','y']].values)
 
-        in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
-        in_df['NN_dist'] = distances
-        in_df = in_df.drop(['x','y','Proj_geometry'], axis = 1)
+            distances, indices = G_tree.query(in_df_proj[['x','y']].values)
+
+            in_df['NN'] = list(node_gdf_proj['node_ID'].iloc[indices])
+            in_df['NN_dist'] = distances
+
+            #in_df = in_df.drop(['x','y','Proj_geometry'], axis = 1)
+
+        else:
+
+            try:
+                in_df['x'] = in_df.geometry.x
+                in_df['y'] = in_df.geometry.y
+            except:
+                in_df['x'] = in_df.geometry.apply(lambda geometry: geometry.x)
+                in_df['y'] = in_df.geometry.apply(lambda geometry: geometry.y)
+
+            G_tree = spatial.KDTree(node_gdf[['x','y']].values)
+            distances, indices = G_tree.query(in_df[['x','y']].values)
+
+            in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+            in_df['NN_dist'] = distances
 
     else:
-        in_df['x'] = in_df.geometry.x
-        in_df['y'] = in_df.geometry.y
+        try:
+            in_df['x'] = in_df.geometry.x
+            in_df['y'] = in_df.geometry.y
+        except:
+            in_df['x'] = in_df.geometry.apply(lambda geometry: geometry.x)
+            in_df['y'] = in_df.geometry.apply(lambda geometry: geometry.y)
 
-        print('print node_gdf x')
-        print(node_gdf['x'])
-
-        # .as_matrix() is now depreciated as of Pandas 1.0.0
-        #G_tree = spatial.KDTree(node_gdf[['x','y']].as_matrix())
         G_tree = spatial.KDTree(node_gdf[['x','y']].values)
-
-        #distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
         distances, indices = G_tree.query(in_df[['x','y']].values)
 
         in_df['NN'] = list(node_gdf['node_ID'].iloc[indices])
+
+    if time_it == True:
+        func_end = time.time()
+        print('time elapsed for function')
+        print(func_end - func_start)
 
     return in_df
 
 def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
                     add_dist_to_node_col = True, time_it = False):
     """
-    snaps points to a graph at a faster speed than pandana_snap. 
+    snaps points to a graph at a faster speed than pandana_snap.
     :param G: a graph object
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
-    :param source_crs: crs object in format 'epsg:32638'
-    :param target_crs: crs object in format 'epsg:32638'
-    :param add_dist_to_node_col: return distance in metres to nearest node
+    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
+    :param target_crs: The desired crs returned point GeoDataFrame. The crs object in format 'epsg:32638'
+    :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
     :param time_it: return time to complete function
+    :return: returns a GeoDataFrame that is the same as the input point_gdf but adds a column containing the id of the nearest node in the graph, and the distance if add_dist_to_node_col == True
     """
     import time
 
@@ -1831,12 +1854,12 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
 def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
                     add_dist_to_node_col = True, time_it = False, k_nearest=5, origin_id = 'index'):
     """
-    snaps points to a graph at a faster speed than pandana_snap. 
+    snaps points their k nearest neighbors in the graph. 
     :param G: a graph object
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
-    :param source_crs: crs object in format 'epsg:32638'
-    :param target_crs: crs object in format 'epsg:32638'
-    :param add_dist_to_node_col: return distance in metres to nearest node
+    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
+    :param target_crs: The desired crs returned point GeoDataFrame. The crs object in format 'epsg:32638'
+    :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
     :param time_it: return time to complete function
     """
     import time
@@ -1871,7 +1894,7 @@ def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'e
 
             G_tree = spatial.cKDTree(node_gdf_proj[['x','y']].values)
 
-            distances, indices = G_tree.query(in_df_proj[['x','y']].values, k=k_nearest)
+            distances, indices = G_tree.query(in_df_proj[['x','y']].values, k = k_nearest)
 
             for origin, distance_list, index_list in zip(list(in_df[origin_id]), distances, indices):
                 index_list_NN = list(node_gdf['node_ID'].iloc[index_list])
@@ -1887,7 +1910,7 @@ def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'e
                 in_df['y'] = in_df.geometry.apply(lambda geometry: geometry.y)
 
             G_tree = spatial.cKDTree(node_gdf[['x','y']].values)
-            distances, indices = G_tree.query(in_df[['x','y']].values, k=k_nearest)
+            distances, indices = G_tree.query(in_df[['x','y']].values, k = k_nearest)
 
             for origin, distance_list, index_list in zip(list(in_df[origin_id]), distances, indices):
                 index_list_NN = list(node_gdf['node_ID'].iloc[index_list])
@@ -1907,7 +1930,7 @@ def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'e
         G_tree = spatial.KDTree(node_gdf[['x','y']].values)
 
         #distances, indices = G_tree.query(in_df[['x','y']].as_matrix())
-        distances, indices = G_tree.query(in_df[['x','y']].values, k=k_nearest)
+        distances, indices = G_tree.query(in_df[['x','y']].values, k = k_nearest)
 
         for origin, distance_list, index_list in zip(list(in_df[origin_id]), distances, indices):
             index_list_NN = list(node_gdf['node_ID'].iloc[index_list])
