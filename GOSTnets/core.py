@@ -650,6 +650,29 @@ def find_graph_avg_speed(G, distance_tag, time_tag):
 
     return avg_speed_kmph
 
+def example_edge(G, n=1):
+    """
+    Prints out an example edge
+
+    :param G: a graph object
+    :param n: n - number of edges to print
+    """
+    i = list(G.edges(data = True))[:n]
+    for j in i:
+        print(j)
+
+def example_node(G, n=1):
+    """
+    Prints out an example node
+
+    :param G: a graph object
+    :param n: number of nodes to print
+    """
+
+    i = list(G.nodes(data = True))[:n]
+    for j in i:
+        print(j)
+
 def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'highway', speed_dict = None, walk_speed = 4.5, factor = 1, default = None):
     """
     Function for adding a time value to edge dictionaries. Ensure any GeoDataFrames / graphs are in the same projection before using function, or pass a crs.
@@ -688,6 +711,15 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
         pass
     else:
         raise ValueError('Expecting a graph or geodataframe for G!')
+
+    import warnings
+
+    try:
+        # checks the first edge to see if the 'time' attribute already exists
+        if list(G.edges(data = True))[0][2]['time']:
+          warnings.warn('Aree you sure you want to convert length to time? This graph already has a time attribute')
+    except:
+        pass
 
     G_adj = G.copy()
 
@@ -853,29 +885,6 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
     print('complete function time: ' + str(time.time() - function_start))
 
     return G
-
-def example_edge(G, n=1):
-    """
-    Prints out an example edge
-
-    :param G: a graph object
-    :param n: n - number of edges to print
-    """
-    i = list(G.edges(data = True))[:n]
-    for j in i:
-        print(j)
-
-def example_node(G, n=1):
-    """
-    Prints out an example node
-
-    :param G: a graph object
-    :param n: number of nodes to print
-    """
-
-    i = list(G.nodes(data = True))[:n]
-    for j in i:
-        print(j)
 
 def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted_origins = False):
     """
