@@ -1970,12 +1970,11 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
     """
     snaps points to another GeoDataFrame at very high speed
 
-    :param source_gdf: a geodataframe of points, in the same source crs as the geometry of the target_gdf
-    :param target_gdf: a geodataframe of points, in the same source crs as the geometry of the source_gdf
-    :param source_gdf: a geodataframe of points, in the same source crs as the geometry of the source_gdf
-    :param source_crs: crs object in format 'epsg:32638'
+    :param source_gdf: a geodataframe of points
+    :param target_gdf: a geodataframe of points, in the same source crs as the geometry of the source_gdfsg:32638'
     :param target_crs: crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance in metres to nearest node
+    :return: returns a GeoDataFrame that is the same as the input source_gdf but adds a column containing the id of the nearest node in the target_gdf, and the distance if add_dist_to_node_col == True
     """
 
     source_gdf = source_gdf.copy()
