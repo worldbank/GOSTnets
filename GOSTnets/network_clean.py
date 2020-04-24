@@ -26,46 +26,54 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:385
     # Squeezes clusters of nodes down to a single node if they are within the snapping tolerance
     a = simplify_junctions(G, UTM, WGS, junctdist)
 
+    print('finished with simplify_junctions')
+
     # ensures all streets are two-way
     a = add_missing_reflected_edges(a)
+
+    print('finished with add_missing_reflected_edges')
     
     # save progress
-    if verbose is True: 
-        save(a, 'a', wpath)
+    # if verbose is True: 
+    #     save(a, 'a', wpath)
     
     # Finds and deletes interstital nodes based on node degree
     b = custom_simplify(a)
+
+    print('finished with custom_simplify')
     
     # rectify geometry
-    for u, v, data in b.edges(data = True):
-        if type(data['Wkt']) == list:
-                data['Wkt'] = unbundle_geometry(data['Wkt'])
+    # for u, v, data in b.edges(data = True):
+    #     if type(data['Wkt']) == list:
+    #             data['Wkt'] = unbundle_geometry(data['Wkt'])
+
+    print('finished with rectify geometry')
 
     # save progress
-    if verbose is True: 
-        save(b, 'b', wpath)
+    # if verbose is True: 
+    #     save(b, 'b', wpath)
     
     # For some reason CustomSimplify doesn't return a MultiDiGraph. Fix that here
-    c = convert_to_MultiDiGraph(b)
+    #c = convert_to_MultiDiGraph(b)
 
     # This is the most controversial function - removes duplicated edges. This takes care of two-lane but separate highways, BUT
     # destroys internal loops within roads. Can be run with or without this line
-    c = remove_duplicate_edges(c)
+    #c = remove_duplicate_edges(c)
 
     # Run this again after removing duplicated edges
-    c = custom_simplify(c)
+    #c = custom_simplify(c)
     
     # rectify geometry again
-    for u, v, data in c.edges(data = True):
-        if type(data['Wkt']) == list:
-            data['Wkt'] = unbundle_geometry(data['Wkt'])
+    # for u, v, data in c.edges(data = True):
+    #     if type(data['Wkt']) == list:
+    #         data['Wkt'] = unbundle_geometry(data['Wkt'])
 
     # Ensure all remaining edges are duplicated (two-way streets)
-    c = add_missing_reflected_edges(c)
+    #c = add_missing_reflected_edges(c)
     
     # save final
-    if verbose:
-       save(c, '%s_processed' % output_file_name, wpath)
+    # if verbose:
+    #    save(c, '%s_processed' % output_file_name, wpath)
     
     print('Edge reduction: %s to %s (%d percent)' % (G.number_of_edges(), 
                                                c.number_of_edges(), 

@@ -326,9 +326,18 @@ class OSM_to_network(object):
 
         edge_bunch = edges.apply(lambda x: convert(x), axis = 1).tolist()
 
+        print('print edge bunch')
+        print(edge_bunch[:10])
+
         G = nx.MultiDiGraph()
         G.add_nodes_from(node_bunch)
         G.add_edges_from(edge_bunch)
+
+        #print('print edges in Multi-digraph')
+        #print(G.edges)
+
+        print('print nodes in Multi-digraph')
+        print(G.nodes)
 
         for u, data in G.nodes(data = True):
             if type(u) == str:
@@ -337,6 +346,7 @@ class OSM_to_network(object):
                 q = u
             data['x'] = q[0]
             data['y'] = q[1]
+        # Return a copy of the graph G with the nodes relabeled using consecutive integers
         G = nx.convert_node_labels_to_integers(G)
         self.network = G
         

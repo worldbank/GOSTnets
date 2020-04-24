@@ -1175,8 +1175,13 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
 
     gdfnodes = node_gdf_from_graph(G2)
     gdfnodes_proj_buffer = gdfnodes.to_crs(measure_crs)
+    # Returns a GeoSeries of geometries representing all points within a given distance of each geometric object.
+    print("print gdfnodes_proj_buffer")
+    print(gdfnodes_proj_buffer)
     gdfnodes_proj_buffer = gdfnodes_proj_buffer.buffer(thresh)
     juncs_gdf = gpd.GeoDataFrame(pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)}), crs = measure_crs, geometry = 'geometry')
+    print("print juncs_gdf")
+    print(juncs_gdf)
     juncs_gdf['area'] = juncs_gdf.area
 
     juncs_gdf_2 = juncs_gdf.copy()
@@ -1552,6 +1557,29 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
     edges_projected = edges.to_crs(target)
     nodes_projected = node_gdf_from_graph(G).to_crs(target).set_index('node_ID')
 
+    long_edges, long_edge_IDs, unique_long_edges, new_nodes, new_edges = [], [], [], [], []
+
+    # Identify long edges
+    for idx, data in edges_projected.iterrows():
+
+        u = data['stnode']
+        v = data['endnode']
+
+        # load geometry
+        UTM_geom = data['Wkt']
+
+        # test geometry length
+        if UTM_geom.length > thresh:
+            long_edges.append((u, v, data))
+            long_edge_IDs.append((u, v))
+            # passes if the reverse edge exists
+            if (v, u) in long_edge_IDs:
+                pass
+            else:
+                unique_long_edges.append((u, v, data))
+
+    print('Identified %d unique edge(s) longer than %d. \nBeginning new node creation...' % (len(unique_long_edges), thresh))
+
     # define transforms for exchanging between source and target projections
 
     project_WGS_UTM = partial(
@@ -1564,31 +1592,9 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
                 pyproj.Proj(init=target),
                 pyproj.Proj(init=source))
 
-    long_edges, long_edge_IDs, unique_long_edges, new_nodes, new_edges = [], [], [], [], []
-
-    # Identify long edges
-    for idx, data in edges_projected.iterrows():
-
-        u = data['stnode']
-        v = data['endnode']
-
-        # load geometry
-        UTM_geom = data['Wkt']
-
-        # test geomtry length
-        if UTM_geom.length > thresh:
-            long_edges.append((u, v, data))
-            long_edge_IDs.append((u,v))
-            if (v, u) in long_edge_IDs:
-                pass
-            else:
-                unique_long_edges.append((u, v, data))
-
-    print('Identified %d unique edge(s) longer than %d. \nBeginning new node creation...' % (len(unique_long_edges), thresh))
-
     # iterate through one long edge for each bidirectional long edge pair
 
-    j,o = 1, 0
+    j, o = 1, 0
 
     for u, v, data in unique_long_edges:
 
@@ -1599,6 +1605,8 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
             UTM_geom = linemerge(UTM_geom)
 
         # flip u and v if Linestring running from v to u, coordinate-wise
+
+        # defining equality statements here
         u_x_cond = round(UTM_geom.coords[0][0], 3) == round(nodes_projected.loc[u, 'geometry'].x, 3)
         u_y_cond = round(UTM_geom.coords[0][1], 3) == round(nodes_projected.loc[u, 'geometry'].y, 3)
 
@@ -1683,8 +1691,8 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
     for d in long_edges:
         G2.remove_edge(d[0],d[1])
 
-    print('%d new edges added and %d removed to bring total edges to %d' % (len(new_edges),len(long_edges),G2.number_of_edges()))
-    print('%d new nodes added to bring total nodes to %d' % (len(new_nodes),G2.number_of_nodes()))
+    print('%d new edges added and %d removed to bring total edges to %d' % (len(new_edges), len(long_edges), G2.number_of_edges()))
+    print('%d new nodes added to bring total nodes to %d' % (len(new_nodes), G2.number_of_nodes()))
 
     return G2
 
