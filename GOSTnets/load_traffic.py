@@ -61,6 +61,13 @@ class OSM_to_network(object):
 
         in_df = self.roads_raw
 
+        # if the dataframe already has min_speed, max_speed, and mean speed columns, these should be deleted
+        cols = [c for c in in_df.columns if c.lower()[-6:] != '_speed']
+        in_df = in_df[cols]
+
+        #print("print in_df")
+        #print(in_df)
+
         print(len(filenames))
         print(filenames[0])
 
@@ -100,7 +107,10 @@ class OSM_to_network(object):
 
         print("adding the traffic speeds to the edges")
         # doing a left join so that all of the original edges remain
-        roads_raw_w_traffic = in_df.merge(traffic_simplified, how="left", left_on = ['stnode','endnode'], right_on = ['FROM_NODE','TO_NODE'])
+        roads_raw_w_traffic = in_df.merge(traffic_simplified, how = "left", left_on = ['stnode','endnode'], right_on = ['FROM_NODE','TO_NODE'])
+
+        #print("print roads_raw_w_traffic")
+        #print(roads_raw_w_traffic)
 
         # calculate the percentage of roads that have a mapbox speed
         # count the number of rows that have a Mapbox speed of 0 or more
