@@ -197,7 +197,8 @@ def node_gdf_from_graph(G, crs = 'epsg:4326', attr_list = None, geometry_tag = '
                 'x':data[geometry_tag].x,
                 'y':data[geometry_tag].y}
             except:
-                print((u, data))
+                #print((u, data))
+                pass
 
         for i in non_geom_attr_list:
             try:
@@ -1161,7 +1162,7 @@ def convert_to_MultiDiGraph(G):
 
 #### NETWORK SIMPLIFICATION ####
 
-def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 25):
+def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
     """
     simplifies topology of networks by simplifying node clusters into single nodes.
 
@@ -1182,6 +1183,7 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
     juncs_gdf = gpd.GeoDataFrame(pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)}), crs = measure_crs, geometry = 'geometry')
     print("print juncs_gdf")
     print(juncs_gdf)
+    # do the areas differ by row?
     juncs_gdf['area'] = juncs_gdf.area
 
     juncs_gdf_2 = juncs_gdf.copy()
@@ -1189,10 +1191,11 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
     juncs_gdf = juncs_gdf_2
     juncs_gdf = juncs_gdf.reset_index()
     juncs_gdf['obj_ID'] = juncs_gdf.index
-    juncs_gdf['obj_ID'] = 'new_obj_'+juncs_gdf['obj_ID'].astype(str)
+    juncs_gdf['obj_ID'] = 'new_obj_' + juncs_gdf['obj_ID'].astype(str)
 
     juncs_gdf_unproj = juncs_gdf.to_crs(in_crs)
     juncs_gdf_unproj['centroid'] = juncs_gdf_unproj.centroid
+    # You are joining the point centroids to the point buffers
     juncs_gdf_bound = gpd.sjoin(juncs_gdf_unproj, gdfnodes, how='left', op='intersects', lsuffix='left', rsuffix='right')
     juncs_gdf_bound = juncs_gdf_bound[['obj_ID','centroid','node_ID']]
 
@@ -1348,7 +1351,7 @@ def custom_simplify(G, strict=True):
 
         return paths_to_simplify
 
-    def is_endpoint(G, node, strict=True):
+    def is_endpoint(G, node, strict = True):
         """
         Return True if the node is a "real" endpoint of an edge in the network, \
         otherwise False. OSM data includes lots of nodes that exist only as points \
@@ -1387,7 +1390,7 @@ def custom_simplify(G, strict=True):
         #elif G.out_degree(node)==0 or G.in_degree(node)==0:
             #return 'no in or out'
 
-        elif not (n==2 and (d==2 or d==4)):
+        elif not (n == 2 and (d == 2 or d == 4)):
             # else, if it does NOT have 2 neighbors AND either 2 or 4 directed
             # edges, it is an endpoint. either it has 1 or 3+ neighbors, in which
             # case it is a dead-end or an intersection of multiple streets or it has
@@ -1465,7 +1468,7 @@ def custom_simplify(G, strict=True):
     all_edges_to_add = []
 
     # construct a list of all the paths that need to be simplified
-    paths = get_paths_to_simplify(G, strict=strict)
+    paths = get_paths_to_simplify(G, strict = strict)
 
     start_time = time.time()
     for path in paths:

@@ -677,9 +677,9 @@ class OSM_to_network(object):
         def convert(x):
             u = x.stnode
             v = x.endnode
-            data = {'Wkt':x.Wkt,
-                   'id':x.id,
+            data = {'id':x.id,
                    'osm_id':x.osm_id,
+                   'geometry':x.Wkt,
                    'infra_type':x.infra_type,
                    'min_speed':x.min_speed,
                    'max_speed':x.max_speed,
@@ -690,19 +690,29 @@ class OSM_to_network(object):
 
         edge_bunch = edges.apply(lambda x: convert(x), axis = 1).tolist()
 
+        def convert_node(x):
+            osm_id = x.osm_id
+            data = {'geometry': x.geometry}
+            return (osm_id, data)
+
+        node_bunch = nodes.apply(lambda x: convert_node(x), axis = 1).tolist()
+
         print('print edge bunch')
         print(edge_bunch[:10])
 
+        print('print node bunch')
+        print(node_bunch[:10])
+
         G = nx.MultiDiGraph()
         #G.add_nodes_from(node_bunch)
-        G.add_nodes_from(nodes)
+        G.add_nodes_from(node_bunch)
         G.add_edges_from(edge_bunch)
 
         #print('print edges in Multi-digraph')
         #print(G.edges)
 
-        print('print nodes in Multi-digraph')
-        print(G.nodes)
+        # print('print nodes in Multi-digraph')
+        # print(G.nodes)
 
         # is it really necessary to have seperate 'x' and 'y' columns?
         # for u, data in G.nodes(data = True):

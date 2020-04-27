@@ -11,7 +11,7 @@ from shapely.geometry import LineString, MultiLineString, Point
 from .core import *
 
 
-def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:3857'}, WGS = {'init': 'epsg:4326'}, junctdist = 50, verbose = False):   
+def clean_network(G, wpath = '', output_file_name = '', UTM = 'epsg:3857', WGS = {'init': 'epsg:4326'}, junctdist = 50, verbose = False):   
     """
     Topologically simplifies an input graph object by collapsing junctions and removing interstital nodes
     :param G: a graph object containing nodes and edges. Edges should have a property called 'Wkt' containing geometry objects describing the roads.
@@ -29,7 +29,7 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:385
     print('finished with simplify_junctions')
 
     # ensures all streets are two-way
-    a = add_missing_reflected_edges(a)
+    #a = add_missing_reflected_edges(a)
 
     print('finished with add_missing_reflected_edges')
     
@@ -38,7 +38,7 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:385
     #     save(a, 'a', wpath)
     
     # Finds and deletes interstital nodes based on node degree
-    b = custom_simplify(a)
+    #b = custom_simplify(a)
 
     print('finished with custom_simplify')
     
