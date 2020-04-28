@@ -1175,15 +1175,32 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
     G2 = G.copy()
 
     gdfnodes = node_gdf_from_graph(G2)
-    gdfnodes_proj_buffer = gdfnodes.to_crs(measure_crs)
+
+    # only buffer non Mapbox traffic junctions
+    non_traffic_gdfnodes = gdfnodes.copy
+
+    drop_list = []
+    for u, v, data in G.edges(data = True):
+          if data['mean_speed'] > 0:
+            drop_list.append(u)
+            drop_list.append(v)
+
+    drop_list = list(set(drop_list))
+
+    non_traffic_gdfnodes = non_traffic_gdfnodes[~non_traffic_gdfnodes['node_ID'].isin(drop_list)]
+
+
+    print("done generating node list of non-mapbox traffic nodes")
+
+    gdfnodes_proj_buffer = non_traffic_gdfnodes.to_crs(measure_crs)
     # Returns a GeoSeries of geometries representing all points within a given distance of each geometric object.
     print("print gdfnodes_proj_buffer")
     print(gdfnodes_proj_buffer)
     gdfnodes_proj_buffer = gdfnodes_proj_buffer.buffer(thresh)
+    # a union of all of the buffers, therefore will likely result in fewer rows
     juncs_gdf = gpd.GeoDataFrame(pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)}), crs = measure_crs, geometry = 'geometry')
     print("print juncs_gdf")
     print(juncs_gdf)
-    # do the areas differ by row?
     juncs_gdf['area'] = juncs_gdf.area
 
     juncs_gdf_2 = juncs_gdf.copy()
@@ -1196,7 +1213,7 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
     juncs_gdf_unproj = juncs_gdf.to_crs(in_crs)
     juncs_gdf_unproj['centroid'] = juncs_gdf_unproj.centroid
     # You are joining the point centroids to the point buffers
-    juncs_gdf_bound = gpd.sjoin(juncs_gdf_unproj, gdfnodes, how='left', op='intersects', lsuffix='left', rsuffix='right')
+    juncs_gdf_bound = gpd.sjoin(juncs_gdf_unproj, gdfnodes, how = 'left', op = 'intersects', lsuffix = 'left', rsuffix = 'right')
     juncs_gdf_bound = juncs_gdf_bound[['obj_ID','centroid','node_ID']]
 
     node_map = juncs_gdf_bound[['obj_ID','node_ID']]
@@ -1221,10 +1238,10 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
 
     for u, v, data in G2.edges(data = True):
 
-        if type(data['Wkt']) == LineString:
-            l = data['Wkt']
+        if type(data['geometry']) == LineString:
+            l = data['geometry']
         else:
-            l = loads(data['Wkt'])
+            l = loads(data['geometry'])
 
         line_to_be_edited = l.coords
 
@@ -1239,9 +1256,9 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
                 new_point_v = centroid_dict[new_ID_v]
 
                 if len(line_to_be_edited) > 2:
-                    data['Wkt'] = LineString([new_point_u, *line_to_be_edited[1:-1], new_point_v])
+                    data['geometry'] = LineString([new_point_u, * line_to_be_edited[1:-1], new_point_v])
                 else:
-                    data['Wkt'] = LineString([new_point_u, new_point_v])
+                    data['geometry'] = LineString([new_point_u, new_point_v])
                 data['Type'] = 'dual_destruction'
 
                 new_edges.append((new_ID_u,new_ID_v,data))
@@ -1255,7 +1272,7 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
 
                 new_point = centroid_dict[new_ID_u]
                 coords = [new_point, *line_to_be_edited[1:]]
-                data['Wkt'] = LineString(coords)
+                data['geometry'] = LineString(coords)
                 data['Type'] = 'origin_destruction'
 
                 new_edges.append((new_ID_u,v,data))
@@ -1267,7 +1284,7 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
 
                 new_point = centroid_dict[new_ID_v]
                 coords = [*line_to_be_edited[:-1], new_point]
-                data['Wkt'] = LineString(coords)
+                data['geometry'] = LineString(coords)
                 data['Type'] = 'destination_destruction'
 
                 new_edges.append((u,new_ID_v,data))
@@ -1321,12 +1338,23 @@ def custom_simplify(G, strict=True):
         paths_to_simplify : list
         """
 
+        #identify only nodes that are part of edges that don't have traffic
+        node_list = []
+        for u, v, data in G.edges(data = True):
+              if not data['mean_speed'] > 0:
+                node_list.append(u)
+                node_list.append(v)
+
         # first identify all the nodes that are endpoints
         start_time = time.time()
-        endpoints = set([node for node in G.nodes() if is_endpoint(G, node, strict=strict)])
+        #endpoints = set([node for node in G.nodes() if is_endpoint(G, node, strict = strict)])
+        endpoints = set([node for node in node_list if is_endpoint(G, node, strict = strict)])
 
-        start_time = time.time()
+        #start_time = time.time()
         paths_to_simplify = []
+
+        # print('print endpoints')
+        # print(endpoints)
 
         # for each endpoint node, look at each of its successor nodes
         for node in endpoints:
@@ -1335,7 +1363,7 @@ def custom_simplify(G, strict=True):
                     # if the successor is not an endpoint, build a path from the
                     # endpoint node to the next endpoint node
                     try:
-                        path = build_path(G, successor, endpoints, path=[node, successor])
+                        path = build_path(G, successor, endpoints, path = [node, successor])
                         paths_to_simplify.append(path)
                     except RuntimeError:
                         # recursion errors occur if some connected component is a
@@ -1381,6 +1409,9 @@ def custom_simplify(G, strict=True):
         n = len(neighbors)
         d = G.degree(node)
 
+        # print('print neighbors')
+        # print(neighbors)
+
         if node in neighbors:
             # if the node appears in its list of neighbors, it self-loops. this is
             # always an endpoint.
@@ -1390,6 +1421,7 @@ def custom_simplify(G, strict=True):
         #elif G.out_degree(node)==0 or G.in_degree(node)==0:
             #return 'no in or out'
 
+        #elif not (n == 2 and (d == 2 or d == 4)):
         elif not (n == 2 and (d == 2 or d == 4)):
             # else, if it does NOT have 2 neighbors AND either 2 or 4 directed
             # edges, it is an endpoint. either it has 1 or 3+ neighbors, in which
@@ -1470,6 +1502,9 @@ def custom_simplify(G, strict=True):
     # construct a list of all the paths that need to be simplified
     paths = get_paths_to_simplify(G, strict = strict)
 
+    print("print paths")
+    print(paths[:5])
+
     start_time = time.time()
     for path in paths:
 
@@ -1497,9 +1532,9 @@ def custom_simplify(G, strict=True):
 
         for key in edge_attributes:
             # don't touch the length attribute, we'll sum it at the end
-            if key == 'Wkt':
-                edge_attributes['Wkt'] = list(edge_attributes['Wkt'])
-            elif key != 'length' and key != 'Wkt':      # if len(set(edge_attributes[key])) == 1 and not key == 'length':
+            if key == 'geometry':
+                edge_attributes['geometry'] = list(edge_attributes['geometry'])
+            elif key != 'length' and key != 'geometry':      # if len(set(edge_attributes[key])) == 1 and not key == 'length':
                 # if there's only 1 unique value in this attribute list,
                 # consolidate it to the single value (the zero-th)
                 edge_attributes[key] = edge_attributes[key][0]
@@ -1508,8 +1543,16 @@ def custom_simplify(G, strict=True):
                 edge_attributes[key] = list(set(edge_attributes[key]))
 
         # construct the geometry and sum the lengths of the segments
-        edge_attributes['geometry'] = LineString([Point((G.nodes[node]['x'], G.nodes[node]['y'])) for node in path])
-        edge_attributes['length'] = sum(edge_attributes['length'])
+        #edge_attributes['geometry'] = LineString([Point((G.nodes[node]['x'], G.nodes[node]['y'])) for node in path])
+
+        try:
+          edge_attributes['geometry'] = LineString([G.nodes[node]['geometry'] for node in path])
+          edge_attributes['length'] = sum(edge_attributes['length'])
+        except:
+          print('failed, print nodes')
+          for node in path:
+              print(node)
+              print(G.nodes[node])
 
         # add the nodes and edges to their lists for processing at the end
         all_nodes_to_remove.extend(path[1:-1])

@@ -23,15 +23,22 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = 'epsg:3857', WGS =
     :param verbose: if True, saves down intermediate stages for dissection
     """
 
-    # Squeezes clusters of nodes down to a single node if they are within the snapping tolerance
-    a = simplify_junctions(G, UTM, WGS, junctdist)
+    # Finds and deletes interstital nodes based on node degree
+    a = custom_simplify(G)
 
+    print('finished with custom_simplify')
+
+    # Squeezes clusters of nodes down to a single node if they are within the snapping tolerance
+    b = simplify_junctions(a, UTM, WGS, junctdist)
+
+    # to-do: new lengths need to be calculated for edges that are affected by simplify_junctions
     print('finished with simplify_junctions')
 
     # ensures all streets are two-way
+    # why isn't this done after custom_simplify? and shouldn't it just be done if the road isn't one-way?
     #a = add_missing_reflected_edges(a)
 
-    print('finished with add_missing_reflected_edges')
+    #print('finished with add_missing_reflected_edges')
     
     # save progress
     # if verbose is True: 
@@ -44,8 +51,8 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = 'epsg:3857', WGS =
     
     # rectify geometry
     # for u, v, data in b.edges(data = True):
-    #     if type(data['Wkt']) == list:
-    #             data['Wkt'] = unbundle_geometry(data['Wkt'])
+    #     if type(data['geometry']) == list:
+    #             data['geometry'] = unbundle_geometry(data['geometry'])
 
     print('finished with rectify geometry')
 

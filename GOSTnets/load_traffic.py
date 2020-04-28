@@ -139,6 +139,9 @@ class OSM_to_network(object):
         roads = get_all_intersections_and_create_nodes_list[0]
         nodes = get_all_intersections_and_create_nodes_list[1]
 
+        # reset index
+        nodes = nodes.reset_index(drop=True)
+
         #roads = self.get_all_intersections_and_create_nodes(in_df_roads_raw, in_df_nodes_raw, unique_id = 'osm_id', verboseness = verbose)
 
         # add new key column that has a unique id
@@ -156,7 +159,7 @@ class OSM_to_network(object):
 
         # compute the length per edge
         roads['length'] = roads.geometry.apply(lambda x : self.line_length(x))
-        roads.rename(columns={'geometry':'Wkt'}, inplace=True)
+        #roads.rename(columns = {'geometry':'Wkt'}, inplace = True)
 
         if outFile != '':
             roads.to_csv(outFile)
@@ -237,20 +240,25 @@ class OSM_to_network(object):
                     #create a node
                     #all_nodes.append([osm_id_from, { 'x' : osm_coords_from[0], 'y' : osm_coords_from[1] }])
                     all_nodes.append([osm_id_from, Point(osm_coords_from[0], osm_coords_from[1])])
-                    osm_coords_to = list(x[2].coords)[n_idx+1]
                     #print(n_idx)
                     #print(len(x[1]) - 1)
                     if n_idx == (len(x[1]) - 2):
                         #print('last element')
-                        #print(osm_coords_to)
                         #create a node
+                        osm_coords_to = list(x[2].coords)[n_idx+1]
+                        #print(osm_coords_to)
                         #all_nodes.append([osm_id_to, { 'x' : osm_coords_to[0], 'y' : osm_coords_to[1]} ])
-                        all_nodes.append([osm_id_from, Point(osm_coords_from[0], osm_coords_from[1])])
+                        all_nodes.append([osm_id_to, Point(osm_coords_to[0], osm_coords_to[1])])
                     edge = LineString([osm_coords_from, osm_coords_to])
-                    attr = {'osm_id':x[0], 'infra_type':x[3], 'Wkt':edge}
+                    attr = {'osm_id':x[0], 'infra_type':x[3], 'geometry':edge}
                     #Create an edge from the list of nodes in both directions
                     #print(f'adding edge with {osm_id_from}')
                     all_edges.append([osm_id_from, osm_id_to, attr])
+                    if osm_id_from == 4082624672:
+                      print('found stnode 4082624672')
+                      print(osm_id_from)
+                      print(osm_id_to)
+                      print(x[0])
                     #all_edges.append([osm_id_to, osm_id_from, attr])
                 except:
                     logging.warning(f"Error adding edge between nodes {osm_id_from} and {osm_id_to}")
@@ -260,6 +268,9 @@ class OSM_to_network(object):
         print(len(all_edges))
 
         all_nodes_pd = pd.DataFrame(all_nodes, columns = ['osm_id', 'geometry'])
+
+        # it may be possible to get duplicate nodes if two lines share the same node, therefore remove duplicates but keep the first occurance
+        all_nodes_pd.drop_duplicates(subset = "osm_id", keep = 'first', inplace = True) 
         all_nodes_gdf = gpd.GeoDataFrame(all_nodes_pd, geometry = 'geometry')
 
         for edge in all_edges:
@@ -535,7 +546,7 @@ class OSM_to_network(object):
                             print(node_geom)
                             print(list(node_geom.coords))
 
-                            mini_gdf = gpd.GeoDataFrame({'osm_id': new_node_id, 'geometry': [node_geom] }, crs = 'epsg:4326')
+                            mini_gdf = gpd.GeoDataFrame({'osm_id': new_node_id, 'geometry': [node_geom]}, crs = 'epsg:4326')
 
                             print(f"appending node with osm_id: {new_node_id} and geometry: {node_geom}")
                             
@@ -679,7 +690,21 @@ class OSM_to_network(object):
             v = x.endnode
             data = {'id':x.id,
                    'osm_id':x.osm_id,
-                   'geometry':x.Wkt,
+                   'geometry':x.geometry,
+                   'infra_type':x.infra_type,
+                   'min_speed':x.min_speed,
+                   'max_speed':x.max_speed,
+                   'mean_speed':x.mean_speed,
+                   #'key': x.key,
+                   'length':x.length}
+            return (u, v, data)
+
+        def convert_reflected(x):
+            u = x.endnode
+            v = x.stnode
+            data = {'id':x.id,
+                   'osm_id':x.osm_id,
+                   'geometry':x.geometry,
                    'infra_type':x.infra_type,
                    'min_speed':x.min_speed,
                    'max_speed':x.max_speed,
@@ -689,6 +714,9 @@ class OSM_to_network(object):
             return (u, v, data)
 
         edge_bunch = edges.apply(lambda x: convert(x), axis = 1).tolist()
+
+        # now add reflected edges
+        edge_bunch_reflected = edges.apply(lambda x: convert_reflected(x), axis = 1).tolist()
 
         def convert_node(x):
             osm_id = x.osm_id
@@ -707,6 +735,7 @@ class OSM_to_network(object):
         #G.add_nodes_from(node_bunch)
         G.add_nodes_from(node_bunch)
         G.add_edges_from(edge_bunch)
+        G.add_edges_from(edge_bunch_reflected)
 
         #print('print edges in Multi-digraph')
         #print(G.edges)
