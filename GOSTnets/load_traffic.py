@@ -225,7 +225,9 @@ class OSM_to_network(object):
 
         for x in h.highways:
             #print('looping 1')
+            #print(f'print count: {count}')
             for n_idx in range(0, (len(x[1]) - 1)):
+                #print(f'print n_idx: {n_idx}')
                 try:
                     osm_id_from = x[1][n_idx].ref
                 except:
@@ -236,6 +238,7 @@ class OSM_to_network(object):
                     osm_id_to   = x[1][n_idx+1]
                 try:
                     osm_coords_from = list(x[2].coords)[n_idx]
+                    osm_coords_to = list(x[2].coords)[n_idx+1]
                     #print(osm_coords_from[0])
                     #create a node
                     #all_nodes.append([osm_id_from, { 'x' : osm_coords_from[0], 'y' : osm_coords_from[1] }])
@@ -245,7 +248,6 @@ class OSM_to_network(object):
                     if n_idx == (len(x[1]) - 2):
                         #print('last element')
                         #create a node
-                        osm_coords_to = list(x[2].coords)[n_idx+1]
                         #print(osm_coords_to)
                         #all_nodes.append([osm_id_to, { 'x' : osm_coords_to[0], 'y' : osm_coords_to[1]} ])
                         all_nodes.append([osm_id_to, Point(osm_coords_to[0], osm_coords_to[1])])
@@ -254,14 +256,10 @@ class OSM_to_network(object):
                     #Create an edge from the list of nodes in both directions
                     #print(f'adding edge with {osm_id_from}')
                     all_edges.append([osm_id_from, osm_id_to, attr])
-                    if osm_id_from == 4082624672:
-                      print('found stnode 4082624672')
-                      print(osm_id_from)
-                      print(osm_id_to)
-                      print(x[0])
                     #all_edges.append([osm_id_to, osm_id_from, attr])
                 except:
-                    logging.warning(f"Error adding edge between nodes {osm_id_from} and {osm_id_to}")
+                    #logging.warning(f"Error adding edge between nodes {osm_id_from} and {osm_id_to}")
+                    print(f"Error adding edge between nodes {osm_id_from} and {osm_id_to}")
 
         print('finished building node edge lists')
         print('all_edges length')
