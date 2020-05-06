@@ -1176,19 +1176,15 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
 
     gdfnodes = node_gdf_from_graph(G2)
 
-    # only buffer non Mapbox traffic junctions
-    non_traffic_gdfnodes = gdfnodes.copy
-
     drop_list = []
     for u, v, data in G.edges(data = True):
           if data['mean_speed'] > 0:
-            drop_list.append(u)
-            drop_list.append(v)
+              drop_list.append(u)
+              drop_list.append(v)
 
     drop_list = list(set(drop_list))
 
-    non_traffic_gdfnodes = non_traffic_gdfnodes[~non_traffic_gdfnodes['node_ID'].isin(drop_list)]
-
+    non_traffic_gdfnodes = gdfnodes[~gdfnodes['node_ID'].isin(drop_list)]
 
     print("done generating node list of non-mapbox traffic nodes")
 
@@ -1338,12 +1334,15 @@ def custom_simplify(G, strict=True):
         paths_to_simplify : list
         """
 
-        #identify only nodes that are part of edges that don't have traffic
         node_list = []
+        no_traffic_node_list = []
         for u, v, data in G.edges(data = True):
+              node_list.append(u)
+              node_list.append(u)
+              #identify only nodes that are part of edges that don't have traffic
               if not data['mean_speed'] > 0:
-                node_list.append(u)
-                node_list.append(v)
+                  no_traffic_node_list.append(u)
+                  no_traffic_node_list.append(v)
 
         # first identify all the nodes that are endpoints
         start_time = time.time()
@@ -1358,24 +1357,26 @@ def custom_simplify(G, strict=True):
 
         # for each endpoint node, look at each of its successor nodes
         for node in endpoints:
-            for successor in G.successors(node):
-                if successor not in endpoints:
-                    # if the successor is not an endpoint, build a path from the
-                    # endpoint node to the next endpoint node
-                    try:
-                        path = build_path(G, successor, endpoints, path = [node, successor])
-                        paths_to_simplify.append(path)
-                    except RuntimeError:
-                        # recursion errors occur if some connected component is a
-                        # self-contained ring in which all nodes are not end points.
-                        # could also occur in extremely long street segments (eg, in
-                        # rural areas) with too many nodes between true endpoints.
-                        # handle it by just ignoring that component and letting its
-                        # topology remain intact (this should be a rare occurrence)
-                        # RuntimeError is what Python <3.5 will throw, Py3.5+ throws
-                        # RecursionError but it is a subtype of RuntimeError so it
-                        # still gets handled
-                        pass
+            if node in no_traffic_node_list:
+                for successor in G.successors(node):
+                    if node in no_traffic_node_list:
+                        if successor not in endpoints:
+                            # if the successor is not an endpoint, build a path from the
+                            # endpoint node to the next endpoint node
+                            try:
+                                path = build_path(G, successor, endpoints, no_traffic_node_list, path = [node, successor])
+                                paths_to_simplify.append(path)
+                            except RuntimeError:
+                                # recursion errors occur if some connected component is a
+                                # self-contained ring in which all nodes are not end points.
+                                # could also occur in extremely long street segments (eg, in
+                                # rural areas) with too many nodes between true endpoints.
+                                # handle it by just ignoring that component and letting its
+                                # topology remain intact (this should be a rare occurrence)
+                                # RuntimeError is what Python <3.5 will throw, Py3.5+ throws
+                                # RecursionError but it is a subtype of RuntimeError so it
+                                # still gets handled
+                                pass
 
         return paths_to_simplify
 
@@ -1453,7 +1454,7 @@ def custom_simplify(G, strict=True):
             # if none of the preceding rules returned true, then it is not an endpoint
             return False
 
-    def build_path(G, node, endpoints, path):
+    def build_path(G, node, endpoints, no_traffic_node_list, path):
         """
         Recursively build a path of nodes until you hit an endpoint node.
 
@@ -1470,14 +1471,15 @@ def custom_simplify(G, strict=True):
                 # if this successor is already in the path, ignore it, otherwise add
                 # it to the path
                 path.append(successor)
-                if successor not in endpoints:
-                    # if this successor is not an endpoint, recursively call
-                    # build_path until you find an endpoint
-                    path = build_path(G, successor, endpoints, path)
-                else:
-                    # if this successor is an endpoint, we've completed the path,
-                    # so return it
-                    return path
+                if node in no_traffic_node_list:
+                    if successor not in endpoints:
+                        # if this successor is not an endpoint, recursively call
+                        # build_path until you find an endpoint
+                        path = build_path(G, successor, endpoints, no_traffic_node_list, path)
+                    else:
+                        # if this successor is an endpoint, we've completed the path,
+                        # so return it
+                        return path
 
         if (path[-1] not in endpoints) and (path[0] in G.successors(path[-1])):
             # if the end of the path is not actually an endpoint and the path's
@@ -1511,6 +1513,10 @@ def custom_simplify(G, strict=True):
         # add the interstitial edges we're removing to a list so we can retain
         # their spatial geometry
         edge_attributes = {}
+        print('print path[:-1]')
+        print(path[:-1])
+        print('print path[1:]')
+        print(path[1:])
         for u, v in zip(path[:-1], path[1:]):
 
             # there shouldn't be multiple edges between interstitial nodes
