@@ -259,13 +259,16 @@ class OSM_to_network(object):
                         self.highways.append(info)
                 except:
                     print('hit exception')
-                    nodes = [x for x in w.nodes if x.location.valid()]
-                    if len(nodes) > 1:
-                        shp = LineString([Point(x.location.x, x.location.y) for x in nodes])
-                        info = [w.id, nodes, shp, w.tags['highway']]
-                        self.highways.append(info)
-                    else:
-                        self.broken_highways.append(w)
+                    try:
+                        nodes = [x for x in w.nodes if x.location.valid()]
+                        if len(nodes) > 1:
+                            shp = LineString([Point(x.location.x, x.location.y) for x in nodes])
+                            info = [w.id, nodes, shp, w.tags['highway']]
+                            self.highways.append(info)
+                        else:
+                            self.broken_highways.append(w.id)
+                    except:
+                        print("way %s may not have nodes" % w.id)
                     logging.warning("Error Processing OSM Way %s" % w.id)
 
         h = HighwayExtractor()
