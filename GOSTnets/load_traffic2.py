@@ -22,6 +22,8 @@ from geopy.distance import vincenty
 from boltons.iterutils import pairwise
 from shapely.wkt import loads,dumps
 
+import osmnx as ox
+
 
 def generate_traffic_metrics(self, *filenames):
         """
@@ -94,9 +96,10 @@ class OSM_to_network(object):
         #self.roads_raw = self.fetch_roads_and_ferries(osmFile) if includeFerries else self.fetch_roads(osmFile)
         #self.traffic_simplified_df = self.generate_traffic_metrics(*filenames)
 
-        fetch_roads_list = self.fetch_roads_w_traffic(osmFile, traffic_simplified_df)
-        self.roads_raw = fetch_roads_list[0]
-        self.nodes_raw = fetch_roads_list[1]
+        self.network = self.fetch_roads_w_traffic(osmFile, traffic_simplified_df)
+        #fetch_roads_list = self.fetch_roads_w_traffic(osmFile, traffic_simplified_df)
+        #self.roads_raw = fetch_roads_list[0]
+        #self.nodes_raw = fetch_roads_list[1]
 
         # next step is to do network clean
         # look into if it is easier to do this with GDF inputs instead of graph
@@ -231,6 +234,52 @@ class OSM_to_network(object):
         """
 
         self.roads_raw = self.roads_raw.loc[self.roads_raw.infra_type.isin(acceptedRoads)]
+        
+    def add_complete_edges(self,G, all_edges):
+        # the list of values OSM uses in its 'oneway' tag to denote True
+        # https://www.geofabrik.de/de/data/geofabrik-osm-gis-standard-0.7.pdf
+        osm_oneway_values = ["yes", "true", "1", "-1", "T", "F"]
+        
+        for edge in all_edges:
+            if ("oneway" in edge[2] and edge[2]["oneway"] in osm_oneway_values):
+                if edge[2]["oneway"] == "-1" or edge[2]["oneway"] == "T":
+                    # paths with a one-way value of -1 or T are one-way, but in the
+                    # reverse direction of the nodes' order, see osm documentation
+                    #not tested
+                    print('a reverse one way')
+                    #data["nodes"] = list(reversed(data["nodes"]))
+                    edge[2]["oneway"] = "one_way"
+                    G.add_edges_from([(edge[1],edge[0],edge[2])])
+                else:
+                    # add this path (in only one direction) to the graph
+                    #print('a one way edge')
+                    edge[2]["oneway"] = "one_way"
+                    G.add_edges_from([(edge[0],edge[1],edge[2])])
+
+            #add later
+            elif ("junction" in edge[2] and edge[2]["junction"] == "roundabout"):
+                #roundabout are also oneway but not tagged as is
+                #_add_path(G, data, one_way=True)
+                edge[2]["oneway"] = "one_way"
+                G.add_edges_from([(edge[0],edge[1],edge[2])])
+
+            # else, this path is not tagged as one-way or it is a walking network
+            # (you can walk both directions on a one-way street)
+            else:
+                # add this path (in both directions) to the graph and set its
+                # 'oneway' attribute to False. if this is a walking network, this
+                # may very well be a one-way street (as cars/bikes go), but in a
+                # walking-only network it is a bi-directional edge
+                #print('adding a reverse edge')
+                #print([edge[1],edge[0],edge[2]])
+                #all_edges.append([edge[1],edge[0],edge[2]])
+                G.add_edges_from([(edge[1],edge[0],edge[2])])
+                G.add_edges_from([(edge[0],edge[1],edge[2])])
+        
+        print('done pre-processing edges')
+        #G.add_edges_from(all_edges)
+
+        return G
 
     def fetch_roads_w_traffic(self, data_path, traffic_simplified_df):
         import osmium, logging
@@ -255,7 +304,16 @@ class OSM_to_network(object):
                     wkb = wkbfab.create_linestring(w)
                     shp = wkblib.loads(wkb, hex=True)
                     if 'highway' in w.tags:
-                        info = [w.id, nodes, shp, w.tags['highway']]
+                        #info = [w.id, nodes, shp, w.tags['highway']]
+                        info = {'osmid':w.id, 'nodes':nodes, 'shp':shp, 'highway':w.tags['highway']}
+                        if 'maxspeed' in w.tags:
+                            #info.append(w.tags['maxspeed'])
+                            info['maxspeed']=w.tags['maxspeed']
+                        if 'oneway' in w.tags:
+                            #info.append(w.tags['oneway'])
+                            info['oneway']=w.tags['oneway']
+                        if 'junction' in w.tags:
+                            info['junction']=w.tags['junction']
                         self.highways.append(info)
                 except:
                     print('hit exception')
@@ -263,7 +321,13 @@ class OSM_to_network(object):
                         nodes = [x for x in w.nodes if x.location.valid()]
                         if len(nodes) > 1:
                             shp = LineString([Point(x.location.x, x.location.y) for x in nodes])
-                            info = [w.id, nodes, shp, w.tags['highway']]
+                            info = {'osmid':w.id, 'nodes':nodes, 'shp':shp, 'highway':w.tags['highway']}
+                            if 'maxspeed' in w.tags:
+                                info['maxspeed']=w.tags['maxspeed']
+                            if 'oneway' in w.tags:
+                                info['oneway']=w.tags['oneway']
+                            if 'junction' in w.tags:
+                                info['junction']=w.tags['junction']
                             self.highways.append(info)
                         else:
                             self.broken_highways.append(w.id)
@@ -287,19 +351,22 @@ class OSM_to_network(object):
             highway_node_list = []
             highway_edge_list = []
             traffic_node_matches = 0
-            for n_idx in range(0, (len(x[1]) - 1)):
+            #if 'oneway' in x.keys():
+                #print('print x["oneway"]')
+                #print(x['oneway'])
+            for n_idx in range(0, (len(x['nodes']) - 1)):
                 #print(f'print n_idx: {n_idx}')
                 try:
-                    osm_id_from = x[1][n_idx].ref
+                    osm_id_from = x['nodes'][n_idx].ref
                 except:
-                    osm_id_from = x[1][n_idx]
+                    osm_id_from = x['nodes'][n_idx]
                 try:
-                    osm_id_to   = x[1][n_idx+1].ref
+                    osm_id_to   = x['nodes'][n_idx+1].ref
                 except:
-                    osm_id_to   = x[1][n_idx+1]
+                    osm_id_to   = x['nodes'][n_idx+1]
                 try:
-                    osm_coords_from = list(x[2].coords)[n_idx]
-                    osm_coords_to = list(x[2].coords)[n_idx+1]
+                    osm_coords_from = list(x['shp'].coords)[n_idx]
+                    osm_coords_to = list(x['shp'].coords)[n_idx+1]
 
                     #print(f'print osm_id_from: {osm_id_from}')
                     if len(traffic_simplified_df.loc[(traffic_simplified_df.FROM_NODE == osm_id_from) | (traffic_simplified_df.TO_NODE == osm_id_from)]):
@@ -308,17 +375,29 @@ class OSM_to_network(object):
                     #print(osm_coords_from[0])
                     #create a node
                     #all_nodes.append([osm_id_from, { 'x' : osm_coords_from[0], 'y' : osm_coords_from[1] }])
-                    highway_node_list.append([osm_id_from, Point(osm_coords_from[0], osm_coords_from[1])])
+                    #highway_node_list.append([osm_id_from, Point(osm_coords_from[0], osm_coords_from[1])])
+                    highway_node_list.append([osm_id_from, {'x': osm_coords_from[0], 'y': osm_coords_from[1]}])
                     #print(n_idx)
                     #print(len(x[1]) - 1)
-                    if n_idx == (len(x[1]) - 2):
+                    if n_idx == (len(x['nodes']) - 2):
                         #print('last element')
                         #create a node
                         #print(osm_coords_to)
                         #all_nodes.append([osm_id_to, { 'x' : osm_coords_to[0], 'y' : osm_coords_to[1]} ])
-                        highway_node_list.append([osm_id_to, Point(osm_coords_to[0], osm_coords_to[1])])
+                        #highway_node_list.append([osm_id_to, Point(osm_coords_to[0], osm_coords_to[1])])
+                        highway_node_list.append([osm_id_to, {'x': osm_coords_to[0], 'y': osm_coords_to[1]}])
                     edge = LineString([osm_coords_from, osm_coords_to])
-                    attr = {'osm_id':x[0], 'infra_type':x[3], 'geometry':edge}
+                    #attr = {'osmid':x['osmid'], 'infra_type':x['highway'], 'geometry':edge}
+                    attr = {'osmid':x['osmid'], 'infra_type':x['highway']}
+                    # if maxspeed tag
+                    if 'maxspeed' in x.keys():
+                        attr['maxspeed'] = x['maxspeed']
+                    # if oneway tag
+                    if 'oneway' in x.keys():
+                        attr['oneway'] = x['oneway']
+                    # if oneway tag
+                    if 'junction' in x.keys():
+                        attr['junction'] = x['junction']
                     #Create an edge from the list of nodes in both directions
                     #print(f'adding edge with {osm_id_from}')
                     highway_edge_list.append([osm_id_from, osm_id_to, attr])
@@ -337,28 +416,32 @@ class OSM_to_network(object):
                         traffic_match = traffic_simplified_df.loc[(traffic_simplified_df.FROM_NODE == hwy[0]) & (traffic_simplified_df.TO_NODE == hwy[1])].iloc[0]
                         #print(f'print traffic_match: {traffic_match}')
                         #print(f'print hwy[2]: {hwy[2]}')
-                        hwy[2]['min_speed'] = traffic_match['min_speed']
-                        hwy[2]['max_speed'] = traffic_match['max_speed']
-                        hwy[2]['mean_speed'] = traffic_match['mean_speed']
+                        hwy[2]['traffic_min_speed'] = traffic_match['min_speed']
+                        hwy[2]['traffic_max_speed'] = traffic_match['max_speed']
+                        hwy[2]['traffic_mean_speed'] = traffic_match['mean_speed']
                         all_edges.append(hwy)
                     elif len(traffic_simplified_df.loc[(traffic_simplified_df.FROM_NODE == hwy[1]) & (traffic_simplified_df.TO_NODE == hwy[0])]) > 0:
                         traffic_match = traffic_simplified_df.loc[(traffic_simplified_df.FROM_NODE == hwy[1]) & (traffic_simplified_df.TO_NODE == hwy[0])].iloc[0]
-                        hwy[2]['min_speed'] = traffic_match['min_speed']
-                        hwy[2]['max_speed'] = traffic_match['max_speed']
-                        hwy[2]['mean_speed'] = traffic_match['mean_speed']
+                        hwy[2]['traffic_min_speed'] = traffic_match['min_speed']
+                        hwy[2]['traffic_max_speed'] = traffic_match['max_speed']
+                        hwy[2]['traffic_mean_speed'] = traffic_match['mean_speed']
                         all_edges.append(hwy)
                     else:
                         all_edges.append(hwy)
             else:
+                for node_item in highway_node_list:
+                    all_nodes.append(node_item)
                 # add complete edge and only 1st and end node
                 #print(f'print 1st hwy node: {highway_node_list[0]}')
-                all_nodes.append(highway_node_list[0])
+                #all_nodes.append(highway_node_list[0])
                 #print(f'print last hwy node: {highway_node_list[-1]}')
-                all_nodes.append(highway_node_list[-1])
+                #all_nodes.append(highway_node_list[-1])
                 #all_edges.append()
                 #print('print hwy')
                 #print(x[2])
-                all_edges.append([highway_node_list[0][0], highway_node_list[-1][0], {'osm_id':x[0], 'infra_type':x[3], 'geometry':x[2]}])
+                #all_edges.append([highway_node_list[0][0], highway_node_list[-1][0], {'osm_id':x[0], 'infra_type':x[3], 'geometry':x[2]}])
+                for hwy in highway_edge_list:
+                    all_edges.append(hwy)
 
         print('finished building node edge lists')
         print('all_edges length')
@@ -367,29 +450,44 @@ class OSM_to_network(object):
         #print('print all_nodes')
         #print(all_nodes)
 
-        all_nodes_pd = pd.DataFrame(all_nodes, columns = ['osm_id', 'geometry'])
+        #all_nodes_pd = pd.DataFrame(all_nodes, columns = ['osm_id', 'geometry'])
 
         # it may be possible to get duplicate nodes if two lines share the same node, therefore remove duplicates but keep the first occurance
-        all_nodes_pd.drop_duplicates(subset = "osm_id", keep = 'first', inplace = True) 
-        all_nodes_gdf = gpd.GeoDataFrame(all_nodes_pd, geometry = 'geometry')
+        #all_nodes_pd.drop_duplicates(subset = "osm_id", keep = 'first', inplace = True) 
+        #all_nodes_gdf = gpd.GeoDataFrame(all_nodes_pd, geometry = 'geometry')
 
         # flatten all_edges to list
-        for edge in all_edges:
+        #for edge in all_edges:
           #print(edge[2])
-          for k, v in edge[2].items():
+          #for k, v in edge[2].items():
               #print(v)
-              edge.append(v) 
-          edge.pop(2)
+              #edge.append(v) 
+          #edge.pop(2)
           #print(edge)
 
-        all_edges_df = pd.DataFrame(all_edges, columns = ['stnode', 'endnode', 'osm_id', 'infra_type', 'geometry', 'min_speed', 'max_speed', 'mean_speed'])
-        all_edges_gdf = gpd.GeoDataFrame(all_edges_df, geometry = 'geometry')
+        #all_edges_df = pd.DataFrame(all_edges, columns = ['stnode', 'endnode', 'osm_id', 'infra_type', 'geometry', 'min_speed', 'max_speed', 'mean_speed'])
+        #all_edges_gdf = gpd.GeoDataFrame(all_edges_df, geometry = 'geometry')
 
-        print('finished building node and edge GeoDataFrames')
-        print('all_edges_gdf length')
-        print(len(all_edges_gdf))
+        #print('finished building node and edge GeoDataFrames')
+        #print('all_edges_gdf length')
+        #print(len(all_edges_gdf))
+        
+        G = nx.MultiDiGraph(crs='epsg:4326')
+        # add each osm node to the graph
+        print('adding nodes')
+        G.add_nodes_from(all_nodes)
+        print('adding edges')
+        # add each osm way (ie, a path of edges) to the graph
+        G = self.add_complete_edges(G, all_edges)
+        
 
-        return [all_edges_gdf, all_nodes_gdf]
+        # add length (great circle distance between nodes) attribute to each edge to
+        # use as weight
+        if len(G.edges) > 0:
+            G = ox.utils_graph.add_edge_lengths(G)
+
+        #return [all_edges_gdf, all_nodes_gdf]
+        return G
 
     def fetch_roads(self, data_path):
         """

@@ -1178,7 +1178,7 @@ def simplify_junctions(G, measure_crs, in_crs = 'epsg:4326', thresh = 25):
 
     drop_list = []
     for u, v, data in G.edges(data = True):
-          if data['mean_speed'] > 0:
+          if 'traffic_mean_speed' in data.keys():
               drop_list.append(u)
               drop_list.append(v)
 
