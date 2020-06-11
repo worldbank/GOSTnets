@@ -29,7 +29,7 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = 'epsg:3857', WGS =
     #print('finished with custom_simplify')
 
     # Squeezes clusters of nodes down to a single node if they are within the snapping tolerance
-    b = simplify_junctions(G, UTM, WGS, junctdist)
+    #b = simplify_junctions(G, UTM, WGS, junctdist)
 
     # to-do: new lengths need to be calculated for edges that are affected by simplify_junctions
     print('finished with simplify_junctions')
@@ -45,7 +45,7 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = 'epsg:3857', WGS =
     #     save(a, 'a', wpath)
     
     # Finds and deletes interstital nodes based on node degree
-    #b = custom_simplify(a)
+    c = custom_simplify(G)
 
     print('finished with custom_simplify')
     

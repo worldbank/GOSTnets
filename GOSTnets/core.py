@@ -1340,7 +1340,7 @@ def custom_simplify(G, strict=True):
               node_list.append(u)
               node_list.append(u)
               #identify only nodes that are part of edges that don't have traffic
-              if not data['mean_speed'] > 0:
+              if not 'traffic_mean_speed' in data.keys():
                   no_traffic_node_list.append(u)
                   no_traffic_node_list.append(v)
 
@@ -1351,9 +1351,12 @@ def custom_simplify(G, strict=True):
 
         #start_time = time.time()
         paths_to_simplify = []
+        
+        print('print node_list')
+        print(len(node_list))
 
-        # print('print endpoints')
-        # print(endpoints)
+        print('print no_traffic_node_list')
+        print(len(no_traffic_node_list))
 
         # for each endpoint node, look at each of its successor nodes
         for node in endpoints:
@@ -1505,22 +1508,24 @@ def custom_simplify(G, strict=True):
     paths = get_paths_to_simplify(G, strict = strict)
 
     print("print paths")
-    print(paths[:5])
+    print(paths[:3])
 
     start_time = time.time()
+    
     for path in paths:
 
         # add the interstitial edges we're removing to a list so we can retain
         # their spatial geometry
         edge_attributes = {}
-        print('print path[:-1]')
-        print(path[:-1])
-        print('print path[1:]')
-        print(path[1:])
+        #print('print path[:-1]')
+        #print(path[:-1])
+        #print('print path[1:]')
+        #print(path[1:])
         for u, v in zip(path[:-1], path[1:]):
 
             # there shouldn't be multiple edges between interstitial nodes
             if not G.number_of_edges(u, v) == 1:
+                print(f'Multiple edges between "{u}" and "{v}" found when simplifying')
                 pass
             # the only element in this list as long as above check is True
             # (MultiGraphs use keys (the 0 here), indexed with ints from 0 and
@@ -1552,10 +1557,11 @@ def custom_simplify(G, strict=True):
         #edge_attributes['geometry'] = LineString([Point((G.nodes[node]['x'], G.nodes[node]['y'])) for node in path])
 
         try:
-          edge_attributes['geometry'] = LineString([G.nodes[node]['geometry'] for node in path])
+          #edge_attributes['geometry'] = LineString([G.nodes[node]['geometry'] for node in path])
+          edge_attributes["geometry"] = LineString([Point((G.nodes[node]["x"], G.nodes[node]["y"])) for node in path])
           edge_attributes['length'] = sum(edge_attributes['length'])
         except:
-          print('failed, print nodes')
+          print('failed to combine edges, print nodes')
           for node in path:
               print(node)
               print(G.nodes[node])
@@ -1575,6 +1581,9 @@ def custom_simplify(G, strict=True):
     G.remove_nodes_from(set(all_nodes_to_remove))
 
     msg = 'Simplified graph (from {:,} to {:,} nodes and from {:,} to {:,} edges) in {:,.2f} seconds'
+    
+    G.graph["simplified"] = True
+    
     return G
 
 def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = None):

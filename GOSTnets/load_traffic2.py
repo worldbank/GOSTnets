@@ -405,6 +405,28 @@ class OSM_to_network(object):
                 except:
                     #logging.warning(f"Error adding edge between nodes {osm_id_from} and {osm_id_to}")
                     print(f"Error adding edge between nodes {osm_id_from} and {osm_id_to}")
+                    print(x)
+                    try:
+                        # detected an error that is rare. If there are nodes that are on-top of each other, then a seperate
+                        # coord won't appear in the shp of coord, and there won't be the same number of coords as the index length
+                        # this will produce an error when trying to create a line between each node using the coords list
+                        # However still need to add the osm_coords_from node so the previous line has it's to node
+                        print('try to list coords')
+                        print(list(x['shp'].coords))
+                        print('length of nodes')
+                        print(len(x['nodes']))
+                        print('print index')
+                        print(n_idx)
+                        print(list(x['shp'].coords)[n_idx])
+                        # However still need to add the osm_coords_from node so the previous line has it's to node
+                        osm_coords_from = list(x['shp'].coords)[n_idx]
+                        highway_node_list.append([osm_id_from, {'x': osm_coords_from[0], 'y': osm_coords_from[1]}])
+                        #osm_coords_to = list(x['shp'].coords)[n_idx+1]
+                        #if len(traffic_simplified_df.loc[(traffic_simplified_df.FROM_NODE == osm_id_from) | (traffic_simplified_df.TO_NODE == osm_id_from)]):
+                            #traffic_node_matches += 1
+                        print('checkpoint reached')
+                    except:
+                        print('checkpoint not reached')
 
             if traffic_node_matches > 0:
                 #print(f'traffic node matches: {traffic_node_matches}')
@@ -479,12 +501,6 @@ class OSM_to_network(object):
         print('adding edges')
         # add each osm way (ie, a path of edges) to the graph
         G = self.add_complete_edges(G, all_edges)
-        
-
-        # add length (great circle distance between nodes) attribute to each edge to
-        # use as weight
-        if len(G.edges) > 0:
-            G = ox.utils_graph.add_edge_lengths(G)
 
         #return [all_edges_gdf, all_nodes_gdf]
         return G
