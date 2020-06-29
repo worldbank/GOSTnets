@@ -18,7 +18,7 @@ pip install GOSTnets
 ```
 conda create --name test python=3.6
 conda activate test
-conda install -c conda-forge rtree geopandas rasterio geojson
+conda install -c conda-forge rtree geopandas rasterio geojson git
 git clone https://github.com/worldbank/GOSTnets.git
 python setup.py build
 python setup.py install
