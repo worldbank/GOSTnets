@@ -100,10 +100,12 @@ def create_G(osm_file, verbose=False, project="", densify=True):
                     if verbose:
                         logging.warning(f"Error adding edge between nodes {osm_id_from} and {osm_id_to}")
         #Create and populate the networkx graph
-        G = nx.MultiDiGraph()
-        G.add_nodes_from([[osm_id, {'shape':shp, 'x':x, 'y':y}] for osm_id, shp, x, y in h.nodes])
+        G = nx.MultiDiGraph()        
+        used_nodes = [[osm_id, {'shape':shp, 'x':x, 'y':y}] for osm_id, shp, x, y in h.nodes]        
+        G.add_nodes_from(used_nodes)
         G.add_edges_from(all_h)
     else:
+        all_nodes = []
         for x in h.highways:
             edge = x[2]
             if project != '':
@@ -111,12 +113,36 @@ def create_G(osm_file, verbose=False, project="", densify=True):
             else:
                 edge_proj = edge
             osm_node_from = x[1][0]
-            osm_node_to = x[1][1]
-            attr = {'osm_id':x[0], 'Wkt':edge, 'length':edge_proj.length, 'infra_type':x[3], 'osm_nodes':x[2]}
+            osm_node_to = x[1][-1]
+            all_nodes.append(osm_node_from)
+            all_nodes.append(osm_node_to)
+            attr = {'osm_id':x[0], 'Wkt':edge, 'length':edge_proj.length, 'infra_type':x[3], 'osm_nodes':x[1]}
             all_h.append([osm_node_from, osm_node_to, attr])
             all_h.append([osm_node_to, osm_node_from, attr])
         # create nodes dataset from 
-        G = nx.MultiDiGraph()        
-        G.add_nodes_from([[osm_id, {'shape':shp, 'x':x, 'y':y}] for osm_id, shp, x, y in h.nodes])
+        all_nodes = list(set(all_nodes))
+        #used_nodes = [[osm_id, {'shape':shp, 'x':x, 'y':y}] for osm_id, shp, x, y in h.nodes]
+        
+        nodes_df = nodes_df[nodes_df['osm_id'].isin(all_nodes)]
+        used_nodes = [[row['osm_id'], {'shape':row['geometry'], 'x':row['x'], 'y':row['y']}] for idx, row in nodes_df.iterrows()]        
+        G = nx.MultiDiGraph()              
+        G.add_nodes_from(used_nodes)
         G.add_edges_from(all_h)
     return(G)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

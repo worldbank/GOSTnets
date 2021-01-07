@@ -26,7 +26,9 @@ gost_speed_dict = {
                 'secondary_link':25,
                 'tertiary':30,
                 'tertiary_link': 25,
-                'unclassified':20
+                'unclassified':20,
+                'service':10,
+                'track':5
                 }
 
 def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', largest_G = False):
@@ -86,7 +88,8 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
 
     return G
 
-def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, u_tag = 'stnode', v_tag = 'endnode', geometry_tag = 'Wkt', largest_G = False):
+def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, u_tag = 'stnode', v_tag = 'endnode', 
+                                 geometry_tag = 'Wkt', largest_G = False):
     """
     Function for generating a G object from a saved .csv of edges
 
@@ -309,9 +312,7 @@ def edge_gdf_from_graph(G, crs = {'init' :'epsg:4326'}, attr_list = None, geomet
     return edges_gdf
 
 def graph_nodes_intersecting_polygon(G, polygons, crs = None):
-
-    """
-    Function for generating GeoDataFrame from Graph. Note: ensure any GeoDataFrames are in the same projection before using function, or pass a crs
+    """Function for generating GeoDataFrame from Graph. Note: ensure any GeoDataFrames are in the same projection before using function, or pass a crs
 
     :param G: a Graph object OR node geodataframe
     :param crs: a crs object of form {'init':'epsg:XXXX'}. If passed, matches both inputs to this crs.

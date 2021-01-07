@@ -7,6 +7,7 @@ import numpy as np
 import shapely.wkb as wkblib
 
 from shapely.geometry import Point, LineString
+from . import core
 
 def simplify_mapbox_csv(csv_file, simplification="basic"):
     """ Generate a simplified csv_file from mapbox traffic. 
@@ -30,13 +31,54 @@ def simplify_mapbox_csv(csv_file, simplification="basic"):
     traffic_simplified.columns = ['FROM_NODE', "TO_NODE"]
     traffic_simplified = traffic_simplified.join(traffic_vals)
     return(traffic_simplified)
+
+def attach_traffic_data_ways(G, mb_traffic, geom_tag="Wkt", mb_from_column="FROM_NODE", mb_to_column="TO_NODE",
+                                mb_speed_cols = ["min_speed","max_speed","mean_speed"]):
+    """ Attach traffic data to the ways from the mapbox data, defaulted to attach 
+        information from the function simplify_mapbox_csv
+        
+    :param G:
+        networkx object to which traffic data is attached
     
-def attach_traffic_data(G, traffic_data, 
+    
+    """
+    
+    cur_highways = core.edge_gdf_from_graph(G, geometry_tag = geom_tag)  
+    # Create columns in highways edges dataset
+    for col in mb_speed_cols:
+        cur_highways[col] = 0
+    # iterate through the highways dataset
+    for idx, row in cur_highways.iterrows():
+        nodes = row['osm_nodes']
+        all_speeds = {}
+        # iterate through the osm_node pairs for the current edge
+        for nIdx in range(0, len(nodes) - 1):
+            st_node = nodes[nIdx]
+            end_node = nodes[nIdx + 1]
+            try:
+                # Extract the speed for the traffic for the current OSM pairs
+                cur_speed = mb_traffic.loc[(mb_traffic[mb_from_column] == st_node) & 
+                                           (mb_traffic[mb_to_column] == end_node)].iloc[0]
+                for col in mb_speed_cols:
+                    try:
+                        all_speeds[col].append(cur_speed[col])
+                    except:
+                        all_speeds[col] = [cur_speed[col]]
+            except:
+                pass           
+        # For the current edge, re-attach the speeds to the edges dataset
+        for col in all_speeds.keys():
+            cur_highways.loc[idx,col] = np.mean(all_speeds[col])
+    return(cur_highways)
+
+    
+def attach_traffic_data_dense(G, traffic_data, 
                         left_on_fields = ['stnode','endnode'],
                         right_on_fields = ['FROM_NODE','TO_NODE'],
                         length_field = "length",
                         speed_field = "min_speed"):
-    """ Attach the traffic information from the traffic csv to the G networkx object
+    """ Attach the traffic information from the traffic csv to the G networkx object. 
+        USED FOR THE DENSE NETWORK WHEN EDGES ARE DEFINED EXPLICITLY THE SAME AS THE MAPBOX DATA
     
     :param G:
         networkX multiDiGraph
