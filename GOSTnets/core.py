@@ -501,7 +501,7 @@ def generate_isochrones(G, origins, thresh, weight = None, stacking = False):
 
     return G
 
-def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=False, weight = 'time', measure_crs = 'epsg:4326'):
+def make_iso_polys(G, origins, trip_times, edge_buff=25, node_buff=50, infill=False, weight = 'time', measure_crs = 'epsg:4326'):
     """
     Function for adding a time value to edge dictionaries
 
@@ -522,11 +522,13 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
     else:
         raise ValueError('Ensure isochrone centers ("origins" object) is a list containing at least one node ID!')
 
-    isochrone_polys, nodez, tt = [], [], []
+    isochrone_polys, tt, nodez = [], [], []
 
     for trip_time in sorted(trip_times, reverse=True):
 
         for _node_ in origins:
+
+            #print(f"print _node_: {_node_}")
 
             subgraph = nx.ego_graph(G, _node_, radius = trip_time, distance = weight)
             node_points = [Point((data['x'], data['y'])) for node, data in subgraph.nodes(data=True)]
@@ -539,8 +541,10 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
                 edge_lines = []
 
                 for n_fr, n_to in subgraph.edges():
-                    f = nodes_gdf.loc[str(n_fr)].geometry
-                    t = nodes_gdf.loc[str(n_to)].geometry
+                    #f = nodes_gdf.loc[str(n_fr)].geometry
+                    #t = nodes_gdf.loc[str(n_to)].geometry
+                    f = nodes_gdf.loc[n_fr].geometry
+                    t = nodes_gdf.loc[n_to].geometry
                     edge_lines.append(LineString([f,t]))
 
                 edge_gdf = gpd.GeoDataFrame({'geoms':edge_lines}, geometry = 'geoms', crs = default_crs)
@@ -565,11 +569,11 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
 
                 isochrone_polys.append(new_iso)
                 tt.append(trip_time)
-                nodez.append(str(_node_))
+                nodez.append(_node_)
             else:
                 pass
 
-    gdf = gpd.GeoDataFrame({'geometry':isochrone_polys,'thresh':tt,'nodez':_node_}, crs = measure_crs, geometry = 'geometry')
+    gdf = gpd.GeoDataFrame({'geometry':isochrone_polys,'thresh':tt,'nodez':nodez}, crs = measure_crs, geometry = 'geometry')
     gdf = gdf.to_crs(default_crs)
 
     return gdf
