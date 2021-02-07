@@ -11,7 +11,7 @@ setup(
                       'geopandas>=0.4.0',
                       'networkx',
                       'numpy',
-                      'osmnx',
+                      'osmnx>=1.0.1',
                       'pandas>=0.23.5',
                       'pyproj>=2.4.2',
                       'scipy',

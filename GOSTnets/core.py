@@ -738,11 +738,13 @@ def make_iso_polys_original(G, origins, trip_times, edge_buff=10, node_buff=25, 
     else:
         raise ValueError('Ensure isochrone centers ("origins" object) is a list containing at least one node ID!')
 
-    isochrone_polys, nodez, tt = [], [], []
+    isochrone_polys, tt, nodez = [], [], []
 
     for trip_time in sorted(trip_times, reverse=True):
 
         for _node_ in origins:
+
+            #print(f"print _node_: {_node_}")
 
             subgraph = nx.ego_graph(G, _node_, radius = trip_time, distance = weight)
             node_points = [Point((data['x'], data['y'])) for node, data in subgraph.nodes(data=True)]
@@ -785,7 +787,7 @@ def make_iso_polys_original(G, origins, trip_times, edge_buff=10, node_buff=25, 
             else:
                 pass
 
-    gdf = gpd.GeoDataFrame({'geometry':isochrone_polys,'thresh':tt,'nodez':_node_}, crs = measure_crs, geometry = 'geometry')
+    gdf = gpd.GeoDataFrame({'geometry':isochrone_polys,'thresh':tt,'nodez':nodez}, crs = measure_crs, geometry = 'geometry')
     gdf = gdf.to_crs(default_crs)
 
     return gdf
