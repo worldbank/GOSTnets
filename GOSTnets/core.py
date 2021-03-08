@@ -323,7 +323,7 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
         if single_edge == False:
             attr_list.append('oneway')
 
-    def add_edge_attributes(data,stnode=u, endnode=v):
+    def add_edge_attributes(data, stnode=u, endnode=v):
         if geometry_tag in data:
             # if it has a geometry attribute (a list of line segments), add them
             # to the list of lines to plot
@@ -333,10 +333,10 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
         else:
             # if it doesn't have a geometry attribute, the edge is a straight
             # line from node to node
-            x1 = G.nodes[u][xCol]
-            y1 = G.nodes[u][yCol]
-            x2 = G.nodes[v][xCol]
-            y2 = G.nodes[v][yCol]
+            x1 = G.nodes[stnode][xCol]
+            y1 = G.nodes[stnode][yCol]
+            x2 = G.nodes[endnode][xCol]
+            y2 = G.nodes[endnode][yCol]
             geom = LineString([(x1, y1), (x2, y2)])
 
         new_column_info = {
@@ -354,11 +354,13 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
 
     if single_edge == False:
             
+
         for u, v, data in G.edges(data=True):
 
             new_column_info = add_edge_attributes(data, stnode=u, endnode=v)
 
             edges.append(new_column_info)
+
     
     else:
 
@@ -640,12 +642,11 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
     for trip_time in sorted(trip_times, reverse=True):
         count = 0
         for _node_ in origins:
-
             subgraph = nx.ego_graph(G, _node_, radius = trip_time, distance = weight)
             #subgraph = nx.ego_graph(G_service0002, _node_, radius = 3600, distance = 'length')
             node_points = [Point((data['x'], data['y'])) for node, data in subgraph.nodes(data=True)]
 
-            if len(node_points) >= 1:
+            if len(node_points) > 1:
                 count += 1
                 if count == 1:
                     # create initial GDFs
@@ -2655,6 +2656,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     ## STAGE 0: initialization
     
     nodes = node_gdf_from_graph(G)
+    nodes = nodes.rename(columns={'node_ID': node_key_col})
     edges = edge_gdf_from_graph(G, single_edge=True)
     
     graph_crs = edges.crs
@@ -2863,13 +2865,15 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     print("Updating internal nodes...")
     nodes_meter, _new_nodes = update_nodes(nodes_meter, list(pp_column), ptype='pp', measure_crs=measure_crs)
 
-    #print("print _new_nodes")
-    #print(_new_nodes)
+    print("print _new_nodes")
+    print(_new_nodes)
 
     pois_meter["pp_id"] = _new_nodes[node_key_col]
 
     #print("nodes_meter")
     #print(nodes_meter)
+
+    #return nodes_meter, _new_nodes
    
     nodes_coord = nodes_meter['geometry'].map(lambda x: x.coords[0])
     
@@ -2878,14 +2882,6 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     
     #nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col].astype(int)))
     nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col]))
-
-    # debugging: make sure nodes 9990045207 and 3874047473 exist
-    # print("debugging: make sure nodes 9990045207 and 3874047473 exist")
-    # print(nodes_meter.loc[nodes_meter.node_ID == 9990045207])
-    # print(nodes_meter.loc[nodes_meter.node_ID == 3874047473])
-    # so now print coords
-    # print(nodes_meter.loc[nodes_meter.node_ID == 9990045207].geometry)
-    # print(nodes_meter.loc[nodes_meter.node_ID == 3874047473].geometry)
 
     # 1-3: update internal edges (split line segments)
     print("Updating internal edges...")
@@ -2966,8 +2962,6 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     
     #print("print nodes")
     #print(nodes)
-
-    #return nodes, edges
 
     # Makes bi-directional graph from edges 
     print("making a new graph from edges and nodes")
