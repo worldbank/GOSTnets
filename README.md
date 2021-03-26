@@ -8,17 +8,17 @@ Build, process, and analyze networks. GOSTNets is built on top of geopandas, net
 Eventually we will have the tool available on pip and conda, but for now, please use the setup.py in this repository
 ### From PyPi
 ```
-conda create --name test python=3.6
+conda create --name test python=3.8
 conda activate test
-conda install -c conda-forge rtree geopandas rasterio geojson
+conda install -c conda-forge rtree=0.9.3 geopandas rasterio geojson
 pip install GOSTnets
 ```
 
 ### From Source
 ```
-conda create --name test python=3.6
+conda create --name test python=3.8
 conda activate test
-conda install -c conda-forge rtree geopandas rasterio geojson git
+conda install -c conda-forge rtree=0.9.3 geopandas rasterio geojson git
 git clone https://github.com/worldbank/GOSTnets.git
 python setup.py build
 python setup.py install
