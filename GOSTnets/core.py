@@ -352,15 +352,13 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
         
         return new_column_info
 
-    if single_edge == False:
-            
+    if single_edge == True:
 
         for u, v, data in G.edges(data=True):
 
             new_column_info = add_edge_attributes(data, stnode=u, endnode=v)
 
             edges.append(new_column_info)
-
     
     else:
 
