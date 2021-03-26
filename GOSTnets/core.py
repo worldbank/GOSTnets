@@ -320,7 +320,7 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
         if 'geometry' in keys:
             keys.remove('geometry')
         attr_list = keys
-        if single_edge == False:
+        if single_edge == True:
             attr_list.append('oneway')
 
     def add_edge_attributes(data, stnode=u, endnode=v):
