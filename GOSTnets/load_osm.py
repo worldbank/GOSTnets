@@ -82,9 +82,9 @@ class OSM_to_network(object):
 
     def filterRoads(self, acceptedRoads = ['primary','primary_link','secondary','secondary_link','motorway','motorway_link','trunk','trunk_link']):
         """
-        Extract certain times of roads from the OSM before the netowrkX conversion 
+        Extract certain times of roads from the OSM before the netowrkX conversion
 
-        :param acceptedRoads: [ optional ] acceptedRoads [ list of strings ] 
+        :param acceptedRoads: [ optional ] acceptedRoads [ list of strings ]
         :returns: None - the raw roads are filtered based on the list of accepted roads
         """
 
@@ -172,6 +172,17 @@ class OSM_to_network(object):
                     highway = feature.GetField('highway')
                     roads.append([osm_id,highway,shapely_geo])
 
+            data = driver.Open(data_path)
+            sql_lyr_ferries = data.ExecuteSQL("SELECT * FROM multipolygons WHERE multipolygons.amenity = 'ferry_terminal'")
+
+            for feature in sql_lyr_ferries:
+                osm_id = feature.GetField('osm_id')
+                shapely_geo = ops.linemerge(loads(feature.geometry().ExportToWkt()).boundary)
+                if shapely_geo is None:
+                    continue
+                highway = 'pier'
+                roads.append([osm_id,highway,shapely_geo])
+
             if len(roads) > 0:
                 road_gdf = gpd.GeoDataFrame(roads,columns=['osm_id','infra_type','geometry'],crs={'init': 'epsg:4326'})
                 return road_gdf
@@ -191,7 +202,7 @@ class OSM_to_network(object):
         :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
         :returns: Length of line in kilometers
         """
-        
+
         if line.geometryType() == 'MultiLineString':
             return sum(line_length(segment) for segment in line)
 
@@ -237,7 +248,7 @@ class OSM_to_network(object):
             count += 1
             intersections = shape_input.iloc[list(idx_osm.intersection(line.bounds))]
             intersections = dict(zip(list(intersections[f'{unique_id}']),list(intersections.geometry)))
-            if key1 in intersections: 
+            if key1 in intersections:
                 intersections.pop(key1)
             # Find intersecting lines
             for key2, line2 in intersections.items():
@@ -312,7 +323,7 @@ class OSM_to_network(object):
 
         edges = edges_1.copy()
         node_bunch = list(set(list(edges['u']) + list(edges['v'])))
-        
+
         def convert(x):
             u = x.u
             v = x.v
@@ -339,5 +350,5 @@ class OSM_to_network(object):
             data['y'] = q[1]
         G = nx.convert_node_labels_to_integers(G)
         self.network = G
-        
+
         return G
