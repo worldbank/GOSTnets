@@ -18,7 +18,8 @@ from osgeo import ogr
 from rtree import index
 from shapely import speedups
 from shapely.geometry import LineString, MultiLineString, MultiPoint, Point
-from geopy.distance import geodesic
+#from geopy.distance import geodesic
+from geopy import distance
 from boltons.iterutils import pairwise
 from shapely.wkt import loads,dumps
 
@@ -207,7 +208,7 @@ class OSM_to_network(object):
             return sum(line_length(segment) for segment in line)
 
         return sum(
-                    vincenty(tuple(reversed(a)), tuple(reversed(b)), ellipsoid=ellipsoid).kilometers
+                    distance.geodesic(tuple(reversed(a)), tuple(reversed(b)), ellipsoid=ellipsoid).km
                     for a, b in pairwise(line.coords)
         )
 
