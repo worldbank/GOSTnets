@@ -353,7 +353,7 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
         
         return new_column_info
 
-    if single_edge == True:
+    if single_edge == False:
 
         for u, v, data in G.edges(data=True):
 
@@ -1410,7 +1410,8 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
     gdfnodes = node_gdf_from_graph(G2)
     gdfnodes_proj_buffer = gdfnodes.to_crs(measure_crs)
     gdfnodes_proj_buffer = gdfnodes_proj_buffer.buffer(thresh)
-    juncs_gdf = gpd.GeoDataFrame(pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)}), crs = measure_crs, geometry = 'geometry')
+    juncs_pd = pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)})
+    juncs_gdf = gpd.GeoDataFrame(juncs_pd, crs = measure_crs, geometry = 'geometry')
     juncs_gdf['area'] = juncs_gdf.area
 
     juncs_gdf_2 = juncs_gdf.copy()
@@ -2360,8 +2361,8 @@ def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col 
     #     pyproj.Proj(init=target_crs))
 
     # pyproj >= 2.1.0
-    wgs84 = pyproj.CRS(source)
-    utm = pyproj.CRS(target)
+    wgs84 = pyproj.CRS(source_crs)
+    utm = pyproj.CRS(target_crs)
     project_WGS_UTM = pyproj.Transformer.from_crs(wgs84, utm, always_xy=True).transform
 
     G_copy = G.copy()
@@ -2387,7 +2388,10 @@ def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col 
 
         else:
             # define basics from data dictionary
-            infra_type = data['infra_type']
+            try:
+                infra_type = data['infra_type']
+            except:
+                infra_type = data['highway']
             #extract the geometry of the geom_col, if there is no explicit geometry, load the wkt
             try:
                 geom = data[geom_col]
@@ -2450,12 +2454,16 @@ def clip(G, bound, source_crs = 'epsg:4326', target_crs = 'epsg:4326', geom_col 
 
     # Select only largest remaining graph
     if largest_G == True:
-        list_of_Gs = list((nx.strongly_connected_component_subgraphs(G_copy)))
-        list_length = list(len(i) for i in list_of_Gs)
-        m = max(list_length)
-        t = [i for i, j in enumerate(list_length) if j == m][0]
-        max_G = list_of_Gs[t]
-        G_copy = max_G
+        # compatible with NetworkX 2.4
+        list_of_subgraphs = list(G_copy.subgraph(c).copy() for c in nx.strongly_connected_components(G_copy))
+        max_graph = None
+        max_edges = 0
+        for i in list_of_subgraphs:
+            if i.number_of_edges() > max_edges:
+                max_edges = i.number_of_edges()
+                max_graph = i
+        # set your graph equal to the largest sub-graph
+        G_copy = max_graph
 
     return G_copy
 

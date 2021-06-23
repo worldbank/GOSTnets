@@ -66,24 +66,20 @@ class OsmObject():
         # old way in OSMNX
         # df = ox.pois_from_polygon(polygon = self.bbox, amenities = self.tags)
 
-        # note that even as of Dec, 2020 the code below will be depreciated, as OSMNX deleted the poi module in favor of the new geometries module
+        # note that even as of Dec, 2020 the code below will be depreciated, as OSMNX deleted the poi modeule in favor of the new geometries module
         #df = ox.pois_from_polygon(polygon = self.bbox, tags = {'amenity':self.current_amenity} )
 
         df = ox.geometries_from_polygon(self.bbox, self.tags)
         
         points = df.copy()
-        # needs to be changed because OSMNX now creates a multi-index
-        #points = points.loc[points['element_type'] == 'node']
-        points = points.iloc[points.index.get_level_values('element_type') == 'node']
+        points = points.loc[points['element_type'] == 'node']
         
         polygons = df.copy()
-        #polygons = polygons.loc[polygons['element_type'] == 'way']
-        polygons = points.iloc[points.index.get_level_values('element_type') == 'way']
+        polygons = polygons.loc[polygons['element_type'] == 'way']
         polygons['geometry'] = polygons.centroid
 
         multipolys = df.copy()
-        #multipolys = multipolys.loc[multipolys['element_type'] == 'relation']
-        multipolys = points.iloc[points.index.get_level_values('element_type') == 'relation']
+        multipolys = multipolys.loc[multipolys['element_type'] == 'relation']
         multipolys['geometry'] = multipolys['geometry'].apply(lambda x: self.RelationtoPoint(x))
 
         df = pd.concat([pd.DataFrame(points),pd.DataFrame(polygons),pd.DataFrame(multipolys)], ignore_index=True)
