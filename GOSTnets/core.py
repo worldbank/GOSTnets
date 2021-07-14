@@ -891,9 +891,9 @@ def example_node(G, n=1):
     for j in i:
         print(j)
 
-def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'highway', speed_dict = None, walk_speed = 4.5, factor = 1, default = None):
+def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'highway', output_time_col = 'time', speed_dict = None, walk_speed = 4.5, factor = 1, default = None):
     """
-    Function for adding a time value to edge dictionaries. Ensure any GeoDataFrames / graphs are in the same projection before using function, or pass a crs.
+    Function for adding a time value to graph edges. Ensure any graphs are in the same projection before using function, or pass a crs.
 
     DEFAULT SPEEDS:
 
@@ -916,6 +916,7 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
     :param distance_tag: the key in the dictionary for the field currently
                containing a distance in meters
     :param road_col: key for the road type in the edge data dictionary
+    :param road_col: key for the time value in the output graph
     :param graph_type: set to either 'drive' or 'walk'. IF walk - will set time = walking time across all segment, using the supplied walk_speed. IF drive - will use a speed dictionary for each road type, or defaults as per the note below.
     :param speed_dict: speed dictionary to use. If not supplied, reverts to
                defaults
@@ -928,7 +929,7 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
     if type(G) == nx.classes.multidigraph.MultiDiGraph or type(G) == nx.classes.digraph.DiGraph:
         pass
     else:
-        raise ValueError('Expecting a graph or geodataframe for G!')
+        raise ValueError('Expecting a graph for G!')
 
     import warnings
 
@@ -991,7 +992,7 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
         # perform conversion
         kmph = (orig_len / 1000) / speed
         in_seconds = kmph * 60 * 60
-        data['time'] = in_seconds
+        data[output_time_col] = in_seconds
 
         # And state the mode, too
         data['mode'] = graph_type
@@ -2660,6 +2661,10 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     
     pd.options.mode.chained_assignment = None
 
+    # check if POIs are not MultiPolygon
+    if pois.geom_type.str.contains('MultiPoint').sum() > 0:
+        raise ValueError("POIs must not be MultiPoint")
+
     ## STAGE 0: initialization
     
     nodes = node_gdf_from_graph(G)
@@ -2733,7 +2738,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
                                  crs=gdfs[0].crs)
         return nodes, new_nodes  # all nodes, newly added nodes only
 
-    def update_edges(edges, new_lines, replace):
+    def update_edges(edges, new_lines, replace=True, nodes_meter=None, pois_meter=None):
         """
         Update edge info by adding new_lines; or,
         replace existing ones with new_lines (n-split segments).
@@ -2791,6 +2796,19 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             edges = edges.drop(kne_idxs, axis=0)
         # for connection: filter invalid links
         else:
+            unvalid_pos = np.where(new_edges['length'] > threshold)[0]
+            unvalid_new_edges = new_edges.iloc[unvalid_pos]
+            print("print unvalid lines over threshold")
+            print(unvalid_new_edges)
+
+            print(f"node count before: {nodes_meter.count()[0]}")
+            nodes_meter = nodes_meter[~nodes_meter['node_ID'].isin(unvalid_new_edges.stnode)]
+            print(f"node count after: {nodes_meter.count()[0]}")
+
+            print(f"pois_meter count before: {pois_meter.count()[0]}")
+            pois_meter = pois_meter[~pois_meter['node_ID'].isin(unvalid_new_edges.stnode)]
+            print(f"pois_meter count after: {pois_meter.count()[0]}")
+
             valid_pos = np.where(new_edges['length'] <= threshold)[0]
             n = len(new_edges)
             n_fault = n - len(valid_pos)
@@ -2798,11 +2816,16 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             print("Remove edge projections greater than threshold: {}/{} ({:.2f}%)".format(n_fault, n, f_pct))
             new_edges = new_edges.iloc[valid_pos]  # use 'iloc' here
 
+            
+
         dfs = [edges, new_edges]
         edges = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=False, sort=False), crs=dfs[0].crs)
 
-        # all edges, newly added edges only
-        return edges, new_edges
+        if nodes_meter is not None:
+            return edges, new_edges, nodes_meter, pois_meter
+        else:
+            # all edges, newly added edges only
+            return edges, new_edges
 
     # 0-2: configurations
     # set poi arguments
@@ -2815,6 +2838,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     pois_meter = pois.to_crs(measure_crs)
     nodes_meter = nodes.to_crs(measure_crs)
     edges_meter = edges.to_crs(measure_crs)
+
+    
 
     #print("print edges_meter")
     #print(edges_meter)
@@ -2831,6 +2856,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # print(nodes_meter.loc[nodes_meter.node_ID == 2385764797])
     
     nodes_meter, _ = update_nodes(nodes_meter, pois_meter, ptype='poi', measure_crs=measure_crs)
+
 
     # print("print nodes_meter 2385764797 in between")
     # print(nodes_meter.loc[nodes_meter.node_ID == 2385764797])
@@ -2917,7 +2943,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #pps_gdf = nodes_meter[nodes_meter['highway'] == node_highway_pp]
     #new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pps_gdf['geometry'])]
     new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pois_meter['pp'])]
-    edges_meter, new_footway_edges = update_edges(edges_meter, new_lines, replace=False)
+    edges_meter, new_footway_edges, nodes_meter, pois_meter = update_edges(edges_meter, new_lines, replace=False, nodes_meter=nodes_meter, pois_meter=pois_meter)
 
     # print("print nodes_meter")
     # print(nodes_meter)
