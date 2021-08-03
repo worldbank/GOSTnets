@@ -69,7 +69,7 @@ class OsmObject():
         # note that even as of Dec, 2020 the code below will be depreciated, as OSMNX deleted the poi modeule in favor of the new geometries module
         #df = ox.pois_from_polygon(polygon = self.bbox, tags = {'amenity':self.current_amenity} )
 
-        df = ox.geometries_from_polygon(self.bbox, self.tags)
+        df = ox.geometries_from_polygon(self.bbox, self.tags).reset_index()
         
         points = df.copy()
         points = points.loc[points['element_type'] == 'node']
