@@ -2802,11 +2802,11 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             print(unvalid_new_edges)
 
             print(f"node count before: {nodes_meter.count()[0]}")
-            nodes_meter = nodes_meter[~nodes_meter['node_ID'].isin(unvalid_new_edges.stnode)]
+            nodes_meter = nodes_meter[~nodes_meter['osmid'].isin(unvalid_new_edges.stnode)]
             print(f"node count after: {nodes_meter.count()[0]}")
 
             print(f"pois_meter count before: {pois_meter.count()[0]}")
-            pois_meter = pois_meter[~pois_meter['node_ID'].isin(unvalid_new_edges.stnode)]
+            pois_meter = pois_meter[~pois_meter['osmid'].isin(unvalid_new_edges.stnode)]
             print(f"pois_meter count after: {pois_meter.count()[0]}")
 
             valid_pos = np.where(new_edges['length'] <= threshold)[0]
