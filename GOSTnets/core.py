@@ -226,7 +226,18 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
     # https://stackoverflow.com/questions/54497929/networkx-setting-node-attributes-from-dataframe
     node_attr = nodes_df.set_index(node_tag).to_dict('index')
     #https://stackoverflow.com/questions/9442724/how-can-i-use-if-else-in-a-dictionary-comprehension
-    node_attr = {(int(item[0]) if item[0].isnumeric() else item[0]):item[1] for item in node_attr.items() }
+
+    #node_attr = {(int(item[0]) if item[0].isnumeric() else item[0]):item[1] for item in node_attr.items() }
+
+    def selector(x):
+        if isinstance(x, int):
+            return x
+        elif x.isnumeric():
+            return int(x)
+        else:
+            return x
+
+    node_attr = { selector(item[0]):item[1] for item in node_attr.items()}
 
     nx.set_node_attributes(G, node_attr)
 
@@ -2857,8 +2868,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         else:
             unvalid_pos = np.where(new_edges['length'] > threshold)[0]
             unvalid_new_edges = new_edges.iloc[unvalid_pos]
-            print("print unvalid lines over threshold")
-            print(unvalid_new_edges)
+            #print("print unvalid lines over threshold")
+            #print(unvalid_new_edges)
 
             print(f"node count before: {nodes_meter.count()[0]}")
             nodes_meter = nodes_meter[~nodes_meter[node_key_col].isin(unvalid_new_edges.stnode)]
@@ -2958,7 +2969,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     nodes_meter, _new_nodes = update_nodes(nodes_meter, list(pp_column), ptype='pp', measure_crs=measure_crs)
 
     print("print _new_nodes")
-    print(_new_nodes)
+    #print(_new_nodes)
 
     pois_meter["pp_id"] = _new_nodes[node_key_col]
 
