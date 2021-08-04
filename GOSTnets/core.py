@@ -33,6 +33,17 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
 
     node_bunch = list(set(list(edges[u_tag]) + list(edges[v_tag])))
 
+    node_bunch2 = []
+
+    for node in node_bunch:
+        #print(type(node))
+        if isinstance(node, int):
+            node_bunch2.append(node)
+        elif node.isnumeric():
+            node_bunch2.append(int(node))
+        else:
+            node_bunch2.append(node)
+
     col_list = list(edges.columns)
     drop_cols = [u_tag, v_tag, geometry_tag]
     attr_list = [col_entry for col_entry in col_list if col_entry not in drop_cols]
@@ -40,6 +51,21 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
     def convert(x, attr_list):
         u = x[u_tag]
         v = x[v_tag]
+
+        if isinstance(u, int):
+            u = u
+        elif u.isnumeric():
+            u = int(u)
+        else:
+            u = u
+
+        if isinstance(v, int):
+            v = v
+        elif v.isnumeric():
+            v = int(v)
+        else:
+            v = v
+
         data = {'Wkt':loads(x[geometry_tag])}
         for i in attr_list:
             data[i] = x[i]
@@ -50,15 +76,20 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
 
     G = nx.MultiDiGraph()
 
-    G.add_nodes_from(node_bunch)
+    G.add_nodes_from(node_bunch2)
     G.add_edges_from(edge_bunch)
 
-    for u, data in G.nodes(data = True):
-        q = tuple(float(x) for x in u[1:-1].split(','))
-        data['x'] = q[0]
-        data['y'] = q[1]
+    # print("print node bunch")
+    # print(G.nodes)
 
-    G = nx.convert_node_labels_to_integers(G)
+    # for u, data in G.nodes(data = True):
+    #     q = tuple(float(x) for x in u[1:-1].split(','))
+    #     #q = tuple(x for x in u[1:-1].split(','))
+    #     data['x'] = q[0]
+    #     data['y'] = q[1]
+
+    #G = nx.convert_node_labels_to_integers(G)
+
 
     if largest_G == True:
         list_of_subgraphs = list(nx.strongly_connected_component_subgraphs(G))
@@ -90,6 +121,8 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
       specify column containing v node ID if not labelled 'endnode'
     :param geometry_tag: 
       specify column containing geometry if not labelled 'Wkt'
+    :param largest_G: 
+      If largest_G is true, then only the largest graph will be returned
     :param discard_node_col:
       default is empty, all columns in the nodes_df will be copied to the nodes in the graph. If a list is filled, all the columns specified will be dropped.
     :checks:
@@ -144,6 +177,21 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
     def convert_edges(x):
         u = x[u_tag]
         v = x[v_tag]
+
+        if isinstance(u, int):
+            u = u
+        elif u.isnumeric():
+            u = int(u)
+        else:
+            u = u
+
+        if isinstance(v, int):
+            v = v
+        elif v.isnumeric():
+            v = int(v)
+        else:
+            v = v
+
         data = {geometry_tag:loads(str(x[geometry_tag]))}
         for i in attr_list:
             data[i] = x[i]
@@ -177,6 +225,9 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
     # This way works, as of Networkx 2.0
     # https://stackoverflow.com/questions/54497929/networkx-setting-node-attributes-from-dataframe
     node_attr = nodes_df.set_index(node_tag).to_dict('index')
+    #https://stackoverflow.com/questions/9442724/how-can-i-use-if-else-in-a-dictionary-comprehension
+    node_attr = {(int(item[0]) if item[0].isnumeric() else item[0]):item[1] for item in node_attr.items() }
+
     nx.set_node_attributes(G, node_attr)
 
     # we want to keep the original node labels
@@ -336,6 +387,7 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
             # line from node to node
             x1 = G.nodes[stnode][xCol]
             y1 = G.nodes[stnode][yCol]
+            #print(endnode)
             x2 = G.nodes[endnode][xCol]
             y2 = G.nodes[endnode][yCol]
             geom = LineString([(x1, y1), (x2, y2)])
@@ -1148,7 +1200,11 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
 
         for o in range(0, len(origins)):
             origin = origins[o]
-            results_dict = nx.single_source_dijkstra_path_length(G, origin, cutoff = None, weight = weight)
+
+            try:
+                results_dict = nx.single_source_dijkstra_path_length(G, origin, cutoff = None, weight = weight)
+            except:
+                print(f"error: printing origin: {origin}")
 
             for d in range(0, len(destinations)):
                 destination = destinations[d]
@@ -2600,7 +2656,7 @@ def utm_of_graph(G):
     utm_crs = f"+proj=utm +zone={utm_zone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
     return utm_crs
 
-def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', poi_key_col=None, path=None, threshold=500, knn=5, measure_crs='epsg:3857'):
+def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', poi_key_col=None, path=None, threshold=500, knn=5, measure_crs='epsg:3857', factor = 1):
     """
     Connect and integrate a set of POIs into an existing road network.
 
@@ -2648,6 +2704,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
                    slow down the process.
     :measure_crs (int): 
       preferred EPSG in meter units. Suggested to use the correct UTM projection.
+    :param factor: allows you to scale up / down unit of returned new_footway_edges if other than meters. Set to 1000 if length in km.
     :returns:
       G (graph): the original gdf with POIs and PPs appended and with connection edges appended
                               and existing edges updated (if PPs are present)
@@ -2779,6 +2836,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         # update features (a bit slow)
         # length is only calculated and added to new lines
         new_edges['length'] = [l.length for l in new_lines]
+        if factor > 1:
+            new_edges['length'] = [l.length / factor for l in new_lines]
         # try to apply below to just new lines?
         new_edges[u_tag] = new_edges['geometry'].map(
             lambda x: nodes_id_dict.get(list(x.coords)[0], None))
@@ -2802,11 +2861,11 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             print(unvalid_new_edges)
 
             print(f"node count before: {nodes_meter.count()[0]}")
-            nodes_meter = nodes_meter[~nodes_meter['node_ID'].isin(unvalid_new_edges.stnode)]
+            nodes_meter = nodes_meter[~nodes_meter[node_key_col].isin(unvalid_new_edges.stnode)]
             print(f"node count after: {nodes_meter.count()[0]}")
 
             print(f"pois_meter count before: {pois_meter.count()[0]}")
-            pois_meter = pois_meter[~pois_meter['node_ID'].isin(unvalid_new_edges.stnode)]
+            pois_meter = pois_meter[~pois_meter[poi_key_col].isin(unvalid_new_edges.stnode)]
             print(f"pois_meter count after: {pois_meter.count()[0]}")
 
             valid_pos = np.where(new_edges['length'] <= threshold)[0]
