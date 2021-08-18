@@ -104,7 +104,7 @@ def combo_csv_to_graph(fpath, u_tag = 'u', v_tag = 'v', geometry_tag = 'Wkt', la
 
     return G
 
-def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag = 'stnode', v_tag = 'endnode', geometry_tag = 'Wkt', largest_G = False, discard_node_col=[], checks=False, add_missing_reflected_edges=None):
+def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag = 'stnode', v_tag = 'endnode', geometry_tag = 'Wkt', largest_G = False, discard_node_col=[], checks=False, add_missing_reflected_edges=False, oneway_tag=None):
 
     """
     Function for generating a G object from a saved .csv of edges
@@ -197,7 +197,10 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
             data[i] = x[i]
         
         if add_missing_reflected_edges:
-            if x[add_missing_reflected_edges] == False:
+            if oneway_tag:
+                if x[oneway_tag] == False:
+                    edge_bunch_reverse_edges.append((v, u, data))
+            else:
                 edge_bunch_reverse_edges.append((v, u, data))
 
         return (u, v, data)
@@ -1379,6 +1382,43 @@ def save(G, savename, wpath, pickle = True, edges = True, nodes = True):
 
 def add_missing_reflected_edges(G, one_way_tag=None):
     """
+    function for adding any missing reflected edges - makes all edges bidirectional. This is essential for routing with simplified graphs
+
+    :param G: a graph object
+    :param one_way_tag: if exists, then values that are True are one-way and will not be reflected
+    """
+    #unique_edges = []
+    missing_edges = []
+
+#     for u, v in G.edges(data = False):
+#         unique_edges.append((u,v))
+
+    for u, v, data in G.edges(data = True):
+        if one_way_tag:
+            # print("print one_way_tag")
+            # print(one_way_tag)
+            # print("print data")
+            # print(data)
+            # print("data[one_way_tag]")
+            # print(data[one_way_tag])
+            if data[one_way_tag] == False:
+                #print("2-way road")
+                #if (v, u) not in unique_edges:
+                    #print("appending to missing_edges")
+                missing_edges.append((v,u,data))
+        else:
+            #if (v, u) not in unique_edges:
+            missing_edges.append((v,u,data))
+
+    G2 = G.copy()
+    G2.add_edges_from(missing_edges)
+    print(G2.number_of_edges())
+    return G2
+
+def add_missing_reflected_edges_old(G, one_way_tag=None):
+    """
+    to-do: delete this function, it is slower, creating a unique edge list slows things down with a big graph
+
     function for adding any missing reflected edges - makes all edges bidirectional. This is essential for routing with simplified graphs
 
     :param G: a graph object
@@ -2840,7 +2880,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         # for connection (to external poi): append new lines
         else:
             new_edges = gpd.GeoDataFrame(pois[[poi_key_col]], geometry=new_lines, columns=[poi_key_col, 'geometry'], crs=measure_crs)
-            new_edges['oneway'] = False
+            new_edges['oneway'] = True
             new_edges['highway'] = edge_highway
 
         # https://stackoverflow.com/questions/61955960/shapely-linestring-length-units
@@ -3068,7 +3108,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # now the edges_and_nodes_gdf_to_graph function has the ability to add reverse edges from a single-way GDF using the add_missing_reflected_edges flag. 
     # This is much faster than using the add_missing_reflected_edges after a graph is already created
-    G = edges_and_nodes_gdf_to_graph(nodes, edges, node_tag = node_key_col, u_tag = u_tag, v_tag = v_tag, geometry_tag = 'geometry', discard_node_col=['coords'], add_missing_reflected_edges="oneway")
+    G = edges_and_nodes_gdf_to_graph(nodes, edges, node_tag = node_key_col, u_tag = u_tag, v_tag = v_tag, geometry_tag = 'geometry', discard_node_col=['coords'], add_missing_reflected_edges=True, oneway_tag="oneway")
     #G = add_missing_reflected_edges(G, one_way_tag="oneway")
 
     # set graph crs
