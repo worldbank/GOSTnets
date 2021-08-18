@@ -2886,7 +2886,6 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             print("Remove edge projections greater than threshold: {}/{} ({:.2f}%)".format(n_fault, n, f_pct))
             new_edges = new_edges.iloc[valid_pos]  # use 'iloc' here
 
-            
 
         dfs = [edges, new_edges]
         edges = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=False, sort=False), crs=dfs[0].crs)
@@ -2908,8 +2907,6 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     pois_meter = pois.to_crs(measure_crs)
     nodes_meter = nodes.to_crs(measure_crs)
     edges_meter = edges.to_crs(measure_crs)
-
-    
 
     #print("print edges_meter")
     #print(edges_meter)
@@ -3068,6 +3065,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # Makes bi-directional graph from edges 
     print("making a new graph from edges and nodes")
+
     # now the edges_and_nodes_gdf_to_graph function has the ability to add reverse edges from a single-way GDF using the add_missing_reflected_edges flag. 
     # This is much faster than using the add_missing_reflected_edges after a graph is already created
     G = edges_and_nodes_gdf_to_graph(nodes, edges, node_tag = node_key_col, u_tag = u_tag, v_tag = v_tag, geometry_tag = 'geometry', discard_node_col=['coords'], add_missing_reflected_edges="oneway")
@@ -3077,3 +3075,79 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     G.crs = graph_crs
 
     return G, pois_meter, new_footway_edges  # modified graph, snapped POIs, new edges
+
+
+def add_intersection_delay(G, intersection_delay=7, time_col = 'time', highway_col='highway', filter=['projected_footway','motorway']):
+    """
+    Find node intersections. For all intersection nodes, if directed edge is going into the intersection then add delay to the edge.
+    If the highest rank road at an intersection intersects a lower rank road, then the highest rank road does not get delayed.
+
+    :param G: a base network object (nx.MultiDiGraph)
+    :param intersection_delay: The number of seconds to delay travel time at intersections
+    :filter: The filter is a list of highway values where the type of highway does not get an intersection delay.
+    :returns: a base network object (nx.MultiDiGraph)
+    """
+
+    highway_rank = {
+                'motorway': 1,
+                'motorway_link': 1,
+                'trunk': 1,
+                'trunk_link': 1,
+                'primary': 2,
+                'primary_link': 2,
+                'secondary': 3,
+                'secondary_link':3,
+                'tertiary': 4,
+                'tertiary_link': 4,
+                'unclassified': 5,
+                'residential': 5,
+                'track': 5
+                }
+
+    G_copy = G.copy()
+
+    node_intersection_list = []
+
+    for node in G.nodes:
+        #print(G_reflected_time.degree(node))
+        # if degree is greater than 2, then it is an intersection
+        if G.degree(node) > 2:
+            node_intersection_list.append(node)
+
+    for intersection in node_intersection_list:
+            
+        pred_node_dict = {}
+        for pred_node in G.predecessors(intersection):
+            for edge in G[pred_node][intersection]:
+                #print(pred_node, intersection)
+                new_key = G_copy[pred_node][intersection][edge].get(highway_col)
+                # it's possible that the highway can have more than one classification in a list
+                if isinstance(new_key, list):
+                    new_key = new_key[0]
+                pred_node_dict[pred_node] = highway_rank.get(new_key)
+                
+        # update all 'None' values to 5
+        pred_node_dict = {k:(5 if v==None else v) for k, v in pred_node_dict.items() }
+        pred_node_dict = dict(sorted(pred_node_dict.items(), key=lambda item: item[1], reverse=False))
+        #print(pred_node_dict)
+        
+        first_element_value = pred_node_dict[next(iter(pred_node_dict))]
+        res = Counter(pred_node_dict.values())
+        if res[first_element_value] <= 2:
+            #print('skip')
+            # remove all elements with same value
+            pred_node_dict = {key:val for key, val in pred_node_dict.items() if val != first_element_value}
+        else:
+            pred_node_dict = pred_node_dict
+        
+        #print(f"print pred_node_dict again: {pred_node_dict}")
+        for pred_node,value in pred_node_dict.items():
+        #for pred_node in G.predecessors(intersection):
+            #print(pred_node)
+            #print(intersection)
+            #print(G[pred_node][intersection])
+            for edge in G[pred_node][intersection]:
+                if G_copy[pred_node][intersection][edge].get(highway_col) not in filter:
+                    G_copy[pred_node][intersection][edge][time_col] = G[pred_node][intersection][edge][time_col] + intersection_delay
+
+    return G_copy
