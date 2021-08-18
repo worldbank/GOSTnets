@@ -3080,7 +3080,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 def add_intersection_delay(G, intersection_delay=7, time_col = 'time', highway_col='highway', filter=['projected_footway','motorway']):
     """
     Find node intersections. For all intersection nodes, if directed edge is going into the intersection then add delay to the edge.
-    If the highest rank road at an intersection intersects a lower rank road, then the highest rank road does not get delayed.
+    If the highest rank road at an intersection intersects a lower rank road, then the highest rank road does not get delayed. This assumes the highest rank road has the right-of-way.
 
     :param G: a base network object (nx.MultiDiGraph)
     :param intersection_delay: The number of seconds to delay travel time at intersections
