@@ -102,7 +102,7 @@ class OSM_to_network(object):
         if data_path.split('.')[-1] == 'pbf':
             driver = ogr.GetDriverByName("OSM")
             data = driver.Open(data_path)
-            sql_lyr = data.ExecuteSQL("SELECT osm_id,highway FROM lines WHERE highway IS NOT NULL")
+            sql_lyr = data.ExecuteSQL("SELECT osm_id, highway, other_tags FROM lines WHERE highway IS NOT NULL")
             roads = []
 
             for feature in sql_lyr:
@@ -112,10 +112,22 @@ class OSM_to_network(object):
                     if shapely_geo is None:
                         continue
                     highway = feature.GetField("highway")
-                    roads.append([osm_id,highway,shapely_geo])
+                                        
+                    if feature.GetField('other_tags'):
+                        other_tags = feature.GetField('other_tags')
+                        other_tags_dict = dict((x.strip('"'), y.strip('"'))
+                            for x, y in (element.split('=>') 
+                            for element in other_tags.split(',')))
+            
+                        if other_tags_dict.get('oneway') == 'yes':
+                            one_way = True
+                        else:
+                            one_way = False
+                            
+                    roads.append([osm_id,highway,one_way,shapely_geo])
 
             if len(roads) > 0:
-                road_gdf = gpd.GeoDataFrame(roads,columns=['osm_id','infra_type','geometry'],crs={'init': 'epsg:4326'})
+                road_gdf = gpd.GeoDataFrame(roads,columns=['osm_id','infra_type', 'one_way','geometry'],crs={'init': 'epsg:4326'})
                 return road_gdf
 
         elif data_path.split('.')[-1] == 'shp':
@@ -244,6 +256,7 @@ class OSM_to_network(object):
             key1 = row[f'{unique_id}']
             line = row.geometry
             infra_type = row.infra_type
+            one_way = row.one_way
             if count % 1000 == 0 and verboseness == True:
                 print("Processing %s of %s" % (count, tLength))
             count += 1
@@ -275,12 +288,12 @@ class OSM_to_network(object):
             if len(hits) != 0:
                 try:
                     out = shapely.ops.split(line, MultiPoint(hits))
-                    new_lines.append([{'geometry': LineString(x), 'osm_id':key1,'infra_type':infra_type} for x in out.geoms])
+                    new_lines.append([{'geometry': LineString(x), 'osm_id':key1,'infra_type':infra_type, 'one_way':one_way} for x in out.geoms])
                 except:
                     pass
             else:
                 new_lines.append([{'geometry': line, 'osm_id':key1,
-                        'infra_type':infra_type}])
+                        'infra_type':infra_type,'one_way':one_way}])
 
         # Create one big list and treat all the cutted lines as unique lines
         flat_list = []
@@ -331,6 +344,7 @@ class OSM_to_network(object):
             data = {'Wkt':x.Wkt,
                    'id':x.id,
                    'infra_type':x.infra_type,
+                   'one_way':x.one_way,
                    'osm_id':x.osm_id,
                    'key': x.key,
                    'length':x.length}
