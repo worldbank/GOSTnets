@@ -1380,7 +1380,7 @@ def save(G, savename, wpath, pickle = True, edges = True, nodes = True):
     if pickle == True:
         nx.write_gpickle(G, os.path.join(wpath, '%s.pickle' % savename))
 
-def add_missing_reflected_edges(G, one_way_tag=None):
+def add_missing_reflected_edges(G, one_way_tag = None, verbose = False):
     """
     function for adding any missing reflected edges - makes all edges bidirectional. This is essential for routing with simplified graphs
 
@@ -1393,7 +1393,14 @@ def add_missing_reflected_edges(G, one_way_tag=None):
 #     for u, v in G.edges(data = False):
 #         unique_edges.append((u,v))
 
+    edgeLength = G.number_of_edges()
+    count = 0
+    start = time.time()
     for u, v, data in G.edges(data = True):
+        if count % 10000 == 0 and verbose == True:
+                print("Processing %s of %s" % (count, edgeLength))
+                print('seconds elapsed: ' + str(time.time() - start))
+        count += 1
         if one_way_tag:
             # print("print one_way_tag")
             # print(one_way_tag)
@@ -1412,7 +1419,7 @@ def add_missing_reflected_edges(G, one_way_tag=None):
 
     G2 = G.copy()
     G2.add_edges_from(missing_edges)
-    print(G2.number_of_edges())
+    print(f"completed processing {G2.number_of_edges()} edges")
     return G2
 
 def add_missing_reflected_edges_old(G, one_way_tag=None):
