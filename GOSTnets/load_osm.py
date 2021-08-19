@@ -247,6 +247,7 @@ class OSM_to_network(object):
         # Find all the intersecting lines to prepare for cutting
         count = 0
         tLength = shape_input.shape[0]
+        start = time.time()
         inters_done = {}
         new_lines = []
         allCounts = []
@@ -259,6 +260,7 @@ class OSM_to_network(object):
             one_way = row.one_way
             if count % 1000 == 0 and verboseness == True:
                 print("Processing %s of %s" % (count, tLength))
+                print('seconds elapsed: ' + str(time.time() - start))
             count += 1
             intersections = shape_input.iloc[list(idx_osm.intersection(line.bounds))]
             intersections = dict(zip(list(intersections[f'{unique_id}']),list(intersections.geometry)))
