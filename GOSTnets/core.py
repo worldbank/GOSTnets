@@ -1510,7 +1510,7 @@ def convert_to_MultiDiGraph(G):
 
 #### NETWORK SIMPLIFICATION ####
 
-def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 25):
+def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 25, verbose = False):
     """
     simplifies topology of networks by simplifying node clusters into single nodes.
 
@@ -1561,7 +1561,16 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
     edges_to_be_destroyed = []
     new_edges = []
 
+    count = 0
+    start = time.time()
+    edgeLength = G2.number_of_edges()
+
     for u, v, data in G2.edges(data = True):
+
+        if count % 10000 == 0 and verbose == True:
+            print("Processing %s of %s" % (count, edgeLength))
+            print('seconds elapsed: ' + str(time.time() - start))
+        count += 1
 
         if type(data['Wkt']) == LineString:
             l = data['Wkt']
@@ -2820,7 +2829,7 @@ def utm_of_graph(G):
     utm_crs = f"+proj=utm +zone={utm_zone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
     return utm_crs
 
-def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', poi_key_col=None, path=None, threshold=500, knn=5, measure_crs='epsg:3857', factor = 1):
+def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', poi_key_col=None, path=None, threshold=500, knn=5, measure_crs='epsg:3857', factor = 1, verbose = False):
     """
     Connect and integrate a set of POIs into an existing road network.
 
@@ -2893,7 +2902,9 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     edges = edge_gdf_from_graph(G, single_edge=True)
     
     graph_crs = edges.crs
-    
+
+    start = time.time()
+
     # 0-1: helper functions
     
     # find nearest edge
@@ -3069,14 +3080,22 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     Rtree = rtree.index.Index()
     [Rtree.insert(fid, geom.bounds) for fid, geom in edges_meter['geometry'].iteritems()]
 
+    if verbose == True:
+        print("finished Building rtree")
+        print('seconds elapsed: ' + str(time.time() - start))
+
     ## STAGE 1: interpolation
     # 1-1: update external nodes (pois)
 
     # print("print nodes_meter 2385764797 before")
     # print(nodes_meter.loc[nodes_meter.node_ID == 2385764797])
     
+    print("updating external nodes (pois)")
     nodes_meter, _ = update_nodes(nodes_meter, pois_meter, ptype='poi', measure_crs=measure_crs)
 
+    if verbose == True:
+        print("finished updating external nodes (pois)")
+        print('seconds elapsed: ' + str(time.time() - start))
 
     # print("print nodes_meter 2385764797 in between")
     # print(nodes_meter.loc[nodes_meter.node_ID == 2385764797])
@@ -3086,16 +3105,33 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     print("Projecting POIs to the network...")
     pois_meter['near_idx'] = [list(Rtree.nearest(point.bounds, knn))
                               for point in pois_meter['geometry']]  # slow
+
+    if verbose == True:
+        print("finished pois_meter['near_idx']")
+        print('seconds elapsed: ' + str(time.time() - start))
                               
     pois_meter['near_lines'] = [edges_meter['geometry'][near_idx]
                                 for near_idx in pois_meter['near_idx']]  # very slow
+
+    if verbose == True:
+        print("finished pois_meter['near_lines']")
+        print('seconds elapsed: ' + str(time.time() - start))
                                 
     pois_meter['kne_idx'], knes = zip(
         *[find_kne(point, near_lines) for point, near_lines in
           zip(pois_meter['geometry'], pois_meter['near_lines'])])  # slow
 
+    if verbose == True:
+        print("finished pois_meter['kne_idx']")
+        print('seconds elapsed: ' + str(time.time() - start))
+
     # each POI point gets assigned a projected point
+    print("assigning a projected point to each POI")
     pois_meter['pp'] = [get_pp(point, kne) for point, kne in zip(pois_meter['geometry'], knes)]
+
+    if verbose == True:
+        print("finished assigning a projected point to each POI")
+        print('seconds elapsed: ' + str(time.time() - start))
 
     pp_column = pois_meter[['pp']]
 
@@ -3117,6 +3153,10 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # update nodes
     print("Updating internal nodes...")
     nodes_meter, _new_nodes = update_nodes(nodes_meter, list(pp_column), ptype='pp', measure_crs=measure_crs)
+
+    if verbose == True:
+        print("finished Updating internal nodes")
+        print('seconds elapsed: ' + str(time.time() - start))
 
     print("print _new_nodes")
     #print(_new_nodes)
@@ -3151,7 +3191,12 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # print("edges_meter before") 
     # print(edges_meter.loc[edges_meter.endnode == 3874047473])
 
+    print("Updating update_edges")
     edges_meter, _ = update_edges(edges_meter, new_lines, replace=True)
+
+    if verbose == True:
+        print("finished Updating update_edges")
+        print('seconds elapsed: ' + str(time.time() - start))
 
     # print("edges_meter after")
     # print(edges_meter.loc[edges_meter.endnode == 3874047473])
@@ -3164,6 +3209,10 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pps_gdf['geometry'])]
     new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pois_meter['pp'])]
     edges_meter, new_footway_edges, nodes_meter, pois_meter = update_edges(edges_meter, new_lines, replace=False, nodes_meter=nodes_meter, pois_meter=pois_meter)
+
+    if verbose == True:
+        print("finished Updating external links")
+        print('seconds elapsed: ' + str(time.time() - start))
 
     # print("print nodes_meter")
     # print(nodes_meter)
