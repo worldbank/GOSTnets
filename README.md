@@ -52,9 +52,9 @@ Documentation available at [readthedocs](https://gostnets.readthedocs.io/)
 Plenty of examples and tutorials using Jupyter Notebooks live inside of the Implementations folder within the [GOST_PublicGoods Github repo](https://github.com/worldbank/GOST_PublicGoods)
 
 ### how to autobuild docs:
-in the docs/source dir, run: 
+in the docs dir, run: 
 ```
-sphinx-apidoc -f -o . ../../GOSTnets
+sphinx-apidoc -f -o source/ ../GOSTnets
 ```
 in the docs dir, run:
 ```
