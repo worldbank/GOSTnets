@@ -3102,16 +3102,28 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # 1-2: update internal nodes (interpolated pps)
     # locate nearest edge (kne) and projected point (pp)
-    print("Projecting POIs to the network...")
-    pois_meter['near_idx'] = [list(Rtree.nearest(point.bounds, knn))
-                              for point in pois_meter['geometry']]  # slow
+    print("Projecting POIs to the network...2")
+    #pois_meter['near_idx'] = [list(Rtree.nearest(point.bounds, knn))
+                              #for point in pois_meter['geometry']]  # slow
+
+    
+                              
+    #pois_meter['near_lines'] = [edges_meter['geometry'][near_idx]
+                                #for near_idx in pois_meter['near_idx']]  # very slow
+
+
+    def nearest_edge(row):
+        near_idx = list(Rtree.nearest(row['geometry'].bounds, knn))
+        near_lines = edges_meter['geometry'][near_idx]
+        return near_idx, near_lines     
+        
+    pois_meter['near_idx'], pois_meter['near_lines'] = zip(*pois_meter.apply(nearest_edge, axis=1))
 
     if verbose == True:
         print("finished pois_meter['near_idx']")
         print('seconds elapsed: ' + str(time.time() - start))
-                              
-    pois_meter['near_lines'] = [edges_meter['geometry'][near_idx]
-                                for near_idx in pois_meter['near_idx']]  # very slow
+
+
 
     if verbose == True:
         print("finished pois_meter['near_lines']")
@@ -3182,9 +3194,18 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # A nearest edge may have more than one projected point on it
     line_pps_dict = {k: MultiPoint(list(v)) for k, v in pois_meter.groupby(['kne_idx'])['pp']}
 
+    if verbose == True:
+        print("finished creating line_pps_dict")
+        print('seconds elapsed: ' + str(time.time() - start))
+
+    print("creating new_lines")
     # new_lines becomes a list of lists
     # need to make sure that new line geometries's coordinate order match the stnode and endnode order
     new_lines = [split_line(edges_meter['geometry'][idx], pps) for idx, pps in line_pps_dict.items()]  # bit slow
+
+    if verbose == True:
+        print("finished creating new_lines")
+        print('seconds elapsed: ' + str(time.time() - start))
 
     #return nodes_id_dict, new_lines, line_pps_dict, edges_meter, nodes_meter
 

@@ -115,14 +115,23 @@ class OSM_to_network(object):
                                         
                     if feature.GetField('other_tags'):
                         other_tags = feature.GetField('other_tags')
-                        other_tags_dict = dict((x.strip('"'), y.strip('"'))
-                            for x, y in (element.split('=>') 
-                            for element in other_tags.split(',')))
-            
-                        if other_tags_dict.get('oneway') == 'yes':
-                            one_way = True
-                        else:
-                            one_way = False
+                        # print("print other tags")
+                        # print(other_tags)
+
+                        # there may be rare cases where there can be a comma within the value of an other tag, if so we just have to skip
+                        try:
+                            other_tags_dict = dict((x.strip('"'), y.strip('"'))
+                                for x, y in (element.split('=>') 
+                                for element in other_tags.split(',')))
+
+                            if other_tags_dict.get('oneway') == 'yes':
+                                one_way = True
+                            else:
+                                one_way = False
+                        except:
+                            print(f"skipping over reading other tags of osm_id: {osm_id}")
+                            one_way = False          
+                        
                             
                     roads.append([osm_id,highway,one_way,shapely_geo])
 
