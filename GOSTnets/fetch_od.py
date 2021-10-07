@@ -21,9 +21,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
     :param infile_2: string for folder path containing input data of the destinations. This can also be a geodataframe of the data instead.
     :param lat_name: Latitude column name.
     :param lon_name: Longitude column name
-    :param UID:   Origin Unique Identifier column name (e.g. District, Name, Object ID...).
-            This is mainly helpful for joining the output back to the input data / a shapefile,
-            and is non-essential in terms of the calculation. It can be text or a number.
+    :param UID:   Origin Unique Identifier column name (e.g. District, Name, Object ID...). This is mainly helpful for joining the output back to the input data / a shapefile, and is non-essential in terms of the calculation. It can be text or a number.
     :param Pop: Population / weighting column name
     :param call_type: Server call type - "OSRM" for OSRM, "MB" for Mapbox, "MBT" for Mapbox traffic, or "Euclid" for Euclidean distances (as the crow flies)
     :param MB_Token: Mapbox private key if using the "MB" or "MBT" call types

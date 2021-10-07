@@ -4,18 +4,10 @@ GOSTnets package
 Submodules
 ----------
 
-GOSTnets.core module
---------------------
+GOSTnets.calculate\_od\_raw module
+----------------------------------
 
-.. automodule:: GOSTnets.core
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-GOSTnets.calculate\_od module
------------------------------
-
-.. automodule:: GOSTnets.calculate_od
+.. automodule:: GOSTnets.calculate_od_raw
    :members:
    :undoc-members:
    :show-inheritance:
@@ -24,6 +16,30 @@ GOSTnets.conversion\_utils module
 ---------------------------------
 
 .. automodule:: GOSTnets.conversion_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+GOSTnets.core module
+--------------------
+
+.. automodule:: GOSTnets.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+GOSTnets.fetch\_od module
+-------------------------
+
+.. automodule:: GOSTnets.fetch_od
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+GOSTnets.fetch\_pois module
+---------------------------
+
+.. automodule:: GOSTnets.fetch_pois
    :members:
    :undoc-members:
    :show-inheritance:
@@ -59,7 +75,6 @@ GOSTnets.osm\_parser module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

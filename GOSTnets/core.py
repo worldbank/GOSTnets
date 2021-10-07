@@ -2659,25 +2659,16 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
     """
     Taken from OSMNX
 
-    Project a GeoDataFrame from its current CRS to another.
-    If to_crs is None, project to the UTM CRS for the UTM zone in which the
+    Project a GeoDataFrame from its current CRS to another. If to_crs is None, project to the UTM CRS for the UTM zone in which the
     GeoDataFrame's centroid lies. Otherwise project to the CRS defined by
     to_crs. The simple UTM zone calculation in this function works well for
     most latitudes, but may not work for some extreme northern locations like
     Svalbard or far northern Norway.
-    Parameters
-    ----------
-    gdf : geopandas.GeoDataFrame
-        the GeoDataFrame to be projected
-    to_crs : string or pyproj.CRS
-        if None, project to UTM zone in which gdf's centroid lies, otherwise
-        project to this CRS
-    to_latlong : bool
-        if True, project to settings.default_crs and ignore to_crs
-    Returns
-    -------
-    gdf_proj : geopandas.GeoDataFrame
-        the projected GeoDataFrame
+
+    :param gdf: geopandas.GeoDataFrame the GeoDataFrame to be projected
+    :param to_crs: string or pyproj.CRS if None, project to UTM zone in which gdf's centroid lies, otherwise project to this CRS
+    :param to_latlong: bool if True, project to settings.default_crs and ignore to_crs
+    :return: the projected GeoDataFrame
     """
     if gdf.crs is None or len(gdf) < 1:
         raise ValueError("GeoDataFrame must have a valid CRS and cannot be empty")
@@ -2717,17 +2708,10 @@ def gn_project_graph(G, to_crs=None):
     If to_crs is None, project the graph to the UTM CRS for the UTM zone in
     which the graph's centroid lies. Otherwise, project the graph to the CRS
     defined by to_crs.
-    Parameters
-    ----------
-    G : networkx.MultiDiGraph
-        the graph to be projected
-    to_crs : string or pyproj.CRS
-        if None, project graph to UTM zone in which graph centroid lies,
-        otherwise project graph to this CRS
-    Returns
-    -------
-    G_proj : networkx.MultiDiGraph
-        the projected graph
+
+    :param G: networkx.MultiDiGraph the graph to be projected
+    :param to_crs: string or pyproj.CRS if None, project graph to UTM zone in which graph centroid lies, otherwise project graph to this CRS
+    :return: networkx.MultiDiGraph the projected graph
     """
     # STEP 1: PROJECT THE NODES
     gdf_nodes = ox.utils_graph.graph_to_gdfs(G, edges=False)
@@ -2840,49 +2824,21 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     
     Credit for original code: Yuwen Chang, 2020-08-16
 
-    Note:
-        1. Make sure all three input GeoDataFrames have defined crs attribute.
-           Try something like `gdf.crs` or `gdf.crs = 'epsg:4326'`.
-           They will then be converted into epsg:3857 or specified measure_crs for processing.
+    1. Make sure all three input GeoDataFrames have defined crs attribute. Try something like `gdf.crs` or `gdf.crs = 'epsg:4326'`. They will then be converted into epsg:3857 or specified measure_crs for processing.
 
-    :pois (GeoDataFrame): 
-      a gdf of POI (geom: Point)
-    :nodes (GeoDataFrame): 
-      a gdf of road network nodes (geom: Point)
-    :edges (GeoDataFrame): 
-      a gdf of road network edges (geom: LineString)
-    :node_key_col (str): 
-      The node tag id in the returned graph
-    :poi_key_col (str): 
-      a unique key column of pois should be provided,
-                       e.g., 'index', 'osmid', 'poi_number', etc.
-                       Currently, this will be renamed into 'osmid' in the output.
-                       [NOTE] For use in pandana, you may want to ensure this
-                              column is numeric-only to avoid processing errors.
-                              Preferably use unique integers (int or str) only,
-                              and be aware not to intersect with the node key,
-                              'osmid' if you use OSM data, in the nodes gdf.
-    :path (str): 
-      directory path to use for saving files (nodes and edges).
-                      Outputs will NOT be saved if this arg is not specified.
-    :threshold (int): 
-      the max length of a POI connection edge, POIs with
-                         connection edge beyond this length will be removed.
-                         The unit is in meters as crs epsg is set to 3857 by
-                         default during processing.
-    :knn (int): 
-      k nearest neighbors to query for the nearest edge.
-                   Consider increasing this number up to 10 if the connection
-                   output is slightly unreasonable. But higher knn number will
-                   slow down the process.
-    :measure_crs (int): 
-      preferred EPSG in meter units. Suggested to use the correct UTM projection.
+    :param pois (GeoDataFrame): a gdf of POI (geom: Point)
+    :param nodes (GeoDataFrame): a gdf of road network nodes (geom: Point)
+    :param edges (GeoDataFrame): a gdf of road network edges (geom: LineString)
+    :param node_key_col (str): The node tag id in the returned graph
+    :param poi_key_col (str): a unique key column of pois should be provided, e.g., 'index', 'osmid', 'poi_number', etc. Currently, this will be renamed into 'osmid' in the output. [NOTE] For use in pandana, you may want to ensure this column is numeric-only to avoid processing errors. Preferably use unique integers (int or str) only, and be aware not to intersect with the node key, 'osmid' if you use OSM data, in the nodes gdf.
+
+    :param path (str): directory path to use for saving files (nodes and edges). Outputs will NOT be saved if this arg is not specified.
+    :param threshold (int): the max length of a POI connection edge, POIs withconnection edge beyond this length will be removed. The unit is in meters as crs epsg is set to 3857 by default during processing.
+    :param knn (int): k nearest neighbors to query for the nearest edge. Consider increasing this number up to 10 if the connection output is slightly unreasonable. But higher knn number will slow down the process.
+    :param measure_crs (int):  preferred EPSG in meter units. Suggested to use the correct UTM projection.
     :param factor: allows you to scale up / down unit of returned new_footway_edges if other than meters. Set to 1000 if length in km.
-    :returns:
-      G (graph): the original gdf with POIs and PPs appended and with connection edges appended
-                              and existing edges updated (if PPs are present)
-        pois_meter (GeoDataFrame): gdf of the POIs along with extra columns, such as the associated nearest lines and PPs
-        new_footway_edges (GeoDataFrame): gdf of the new footway edges that connect the POIs to the orginal graph
+    :return: G (graph): the original gdf with POIs and PPs appended and with connection edges appended and existing edges updated (if PPs are present)pois_meter (GeoDataFrame): gdf of the POIs along with extra columns, such as the associated nearest lines and PPs new_footway_edges (GeoDataFrame): gdf of the new footway edges that connect the POIs to the orginal graph
+
 
     """
     import rtree
