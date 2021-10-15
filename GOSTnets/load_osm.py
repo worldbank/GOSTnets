@@ -239,7 +239,7 @@ class OSM_to_network(object):
 
         :param shape_input: Input GeoDataFrame
         :param idx_osm: The geometry index name
-        :param idx_osm: The unique id field name
+        :param unique_id: The unique id field name
         :returns: returns processed GeoDataFrame
         """
 
@@ -266,7 +266,7 @@ class OSM_to_network(object):
             key1 = row[f'{unique_id}']
             line = row.geometry
             infra_type = row.infra_type
-            one_way = row.one_way
+            one_way = row.get('one_way')
             if count % 1000 == 0 and verboseness == True:
                 print("Processing %s of %s" % (count, tLength))
                 print('seconds elapsed: ' + str(time.time() - start))
