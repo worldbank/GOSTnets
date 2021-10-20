@@ -70,6 +70,10 @@ class OsmObject():
         #df = ox.pois_from_polygon(polygon = self.bbox, tags = {'amenity':self.current_amenity} )
 
         df = ox.geometries_from_polygon(self.bbox, self.tags).reset_index()
+
+        print(f"is df empty: {df.empty}")
+        if df.empty == True:
+            return df
         
         points = df.copy()
         points = points.loc[points['element_type'] == 'node']

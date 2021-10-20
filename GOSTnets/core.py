@@ -2832,7 +2832,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     :param node_key_col (str): The node tag id in the returned graph
     :param poi_key_col (str): a unique key column of pois should be provided, e.g., 'index', 'osmid', 'poi_number', etc. Currently, this will be renamed into 'osmid' in the output. [NOTE] For use in pandana, you may want to ensure this column is numeric-only to avoid processing errors. Preferably use unique integers (int or str) only, and be aware not to intersect with the node key, 'osmid' if you use OSM data, in the nodes gdf.
 
-    :param path (str): directory path to use for saving files (nodes and edges). Outputs will NOT be saved if this arg is not specified.
+    :param path (str): directory path to use for saving optional shapefiles (nodes and edges). Outputs will NOT be saved if this arg is not specified.
     :param threshold (int): the max length of a POI connection edge, POIs withconnection edge beyond this length will be removed. The unit is in meters as crs epsg is set to 3857 by default during processing.
     :param knn (int): k nearest neighbors to query for the nearest edge. Consider increasing this number up to 10 if the connection output is slightly unreasonable. But higher knn number will slow down the process.
     :param measure_crs (int):  preferred EPSG in meter units. Suggested to use the correct UTM projection.
@@ -2867,9 +2867,11 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     def find_kne(point, lines):
         dists = np.array(list(map(lambda l: l.distance(point), lines)))
         kne_pos = dists.argsort()[0]
-        kne = lines.iloc[[kne_pos]]
-        kne_idx = kne.index[0]
-        return kne_idx, kne.values[0]
+        #kne = lines.iloc[[kne_pos]]
+        kne = lines[kne_pos]
+        #kne_idx = kne.index[0]
+        #return kne_idx, kne.values[0]
+        return kne_pos, kne
 
     def get_pp(point, line):
         """Get the projected point (pp) of 'point' on 'line'."""
@@ -3073,16 +3075,11 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         near_lines = edges_meter['geometry'][near_idx]
         return near_idx, near_lines     
         
+    # https://stackoverflow.com/questions/33802940/python-pandas-meaning-of-asterisk-sign-in-expression
     pois_meter['near_idx'], pois_meter['near_lines'] = zip(*pois_meter.apply(nearest_edge, axis=1))
 
     if verbose == True:
-        print("finished pois_meter['near_idx']")
-        print('seconds elapsed: ' + str(time.time() - start))
-
-
-
-    if verbose == True:
-        print("finished pois_meter['near_lines']")
+        print("finished pois_meter['near_idx'] and pois_meter['near_lines']")
         print('seconds elapsed: ' + str(time.time() - start))
                                 
     pois_meter['kne_idx'], knes = zip(
