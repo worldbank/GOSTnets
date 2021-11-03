@@ -2868,7 +2868,9 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         dists = np.array(list(map(lambda l: l.distance(point), lines)))
         kne_pos = dists.argsort()[0]
         #kne = lines.iloc[[kne_pos]]
-        kne = lines[kne_pos]
+        #kne = lines[kne_pos]
+        kne = lines.iloc[kne_pos]
+
         #kne_idx = kne.index[0]
         #return kne_idx, kne.values[0]
         return kne_pos, kne
