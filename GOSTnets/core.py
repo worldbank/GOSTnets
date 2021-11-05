@@ -1171,7 +1171,7 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
 
     return G
 
-def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted_origins = False):
+def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted_origins = False, one_way_roads_exist = False):
     """
     Function for generating an origin: destination matrix
 
@@ -1181,6 +1181,7 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
     :param destinations: a list of the node IDs to treat as destinations
     :param weight: use edge weight of 'time' unless otherwise specified
     :param weighted_origins: equals 'true' if the origins have weights. If so, the input to 'origins' must be dictionary instead of a list, where the keys are the origin IDs and the values are the weighted demands.
+    :one_way_roads_exist: If the value is 'True', then even if there are more origins than destinations, it will not do a flip during processing.
     :returns: a numpy matrix of format OD[o][d] = shortest time possible
     """
     
@@ -1203,11 +1204,12 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
 
     else:
         flip = 0
-        if len(origins) > len(destinations):
-            flip = 1
-            o_2 = destinations
-            destinations = origins
-            origins = o_2
+        if one_way_roads_exist == False:
+            if len(origins) > len(destinations):
+                flip = 1
+                o_2 = destinations
+                destinations = origins
+                origins = o_2
 
         #origins will be number or rows, destinations will be number of columns
         OD = np.zeros((len(origins), len(destinations)))
