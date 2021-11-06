@@ -227,7 +227,15 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
     # add nodes' attributes to graph using nodes_df
     # This way works, as of Networkx 2.0
     # https://stackoverflow.com/questions/54497929/networkx-setting-node-attributes-from-dataframe
-    node_attr = nodes_df.set_index(node_tag).to_dict('index')
+    node_attr = nodes_df.set_index(node_tag)
+
+    #perform checks if x and y columns are fully populated, if not then copy them from the geometry column
+    if node_attr.x.isnull().values.any() or node_attr.x.isnull().values.any():
+        node_attr['x'] = node_attr.geometry.x
+        node_attr['y'] = node_attr.geometry.y
+
+    node_attr_dict = node_attr.to_dict('index')
+
     #https://stackoverflow.com/questions/9442724/how-can-i-use-if-else-in-a-dictionary-comprehension
 
     #node_attr = {(int(item[0]) if item[0].isnumeric() else item[0]):item[1] for item in node_attr.items() }
@@ -240,9 +248,11 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
         else:
             return x
 
-    node_attr = { selector(item[0]):item[1] for item in node_attr.items()}
 
-    nx.set_node_attributes(G, node_attr)
+    node_attr_dict = { selector(item[0]):item[1] for item in node_attr_dict.items()}
+
+
+    nx.set_node_attributes(G, node_attr_dict)
 
     # we want to keep the original node labels
     #G = nx.convert_node_labels_to_integers(G)
@@ -1015,6 +1025,7 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
         # Note that this is a MultiDiGraph so there could
         # be multiple indices here, I naively assume this is not
         # the case
+        #actually saves the length in meters
         data['length'] = orig_len
 
         # get appropriate speed limit
@@ -2069,7 +2080,7 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
                     add_dist_to_node_col = True, time_it = False):
     """
     snaps points to a graph at very high speed
-    :param G: a graph object.
+    :param G: a graph object, or the node geodataframe of a graph
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
     :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
     :param target_crs: The measure crs how distances between points are calculated. The returned point GeoDataFrame's CRS does not get modified. The crs object in format 'epsg:32638'
@@ -2083,11 +2094,17 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
 
     in_df = point_gdf.copy()
 
-    # check in in_df has a geometry column, or else provide warning
+    # check if in_df has a geometry column, or else provide warning
     if not set(['geometry']).issubset(in_df.columns):
         raise Exception('input point_gdf should have a geometry column')
 
-    node_gdf = node_gdf_from_graph(G)
+    if isinstance(G,nx.classes.multidigraph.MultiDiGraph) == True:
+        node_gdf = node_gdf_from_graph(G)
+    else:
+        node_gdf = G
+
+    if node_gdf.x.isnull().values.any() or node_gdf.y.isnull().values.any():
+        raise Exception("some of the graph's x or y values contains null values, exiting")
 
     if add_dist_to_node_col is True:
 
@@ -2153,7 +2170,7 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
                     add_dist_to_node_col = True, time_it = False):
     """
     snaps points to a graph at a faster speed than pandana_snap.
-    :param G: a graph object
+    :param G: a graph object, or the node geodataframe of a graph
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
     :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
     :param target_crs: The measure crs how distances between points are calculated. The returned point GeoDataFrame's CRS does not get modified. The crs object in format 'epsg:32638'
@@ -2172,7 +2189,13 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
     if not set(['geometry']).issubset(in_df.columns):
         raise Exception('input point_gdf should have a geometry column')
 
-    node_gdf = node_gdf_from_graph(G)
+    if isinstance(G,nx.classes.multidigraph.MultiDiGraph) == True:
+        node_gdf = node_gdf_from_graph(G)
+    else:
+        node_gdf = G
+
+    if node_gdf.x.isnull().values.any() or node_gdf.y.isnull().values.any():
+        raise Exception("some of the graph's x or y values contains null values, exiting")
 
     if add_dist_to_node_col is True:
 
