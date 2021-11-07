@@ -967,7 +967,7 @@ def example_node(G, n=1):
     for j in i:
         print(j)
 
-def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'highway', output_time_col = 'time', speed_dict = None, walk_speed = 4.5, factor = 1, default = None):
+def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'highway', output_time_col = 'time', speed_dict = None, walk_speed = 4.5, factor = 1, default = 20):
     """
     Function for adding a time value to graph edges. Ensure any graphs are in the same projection before using function, or pass a crs.
 
@@ -985,7 +985,8 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
                'secondary_link':25,
                'tertiary':30,
                'tertiary_link': 25,
-               'unclassified':20
+               'unclassified':20,
+               'projected_footway':3.5
                }
 
     :param G: a graph containing one or more nodes
@@ -993,12 +994,12 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
                containing a distance in meters
     :param road_col: key for the road type in the edge data dictionary
     :param road_col: key for the time value in the output graph
-    :param graph_type: set to either 'drive' or 'walk'. IF walk - will set time = walking time across all segment, using the supplied walk_speed. IF drive - will use a speed dictionary for each road type, or defaults as per the note below.
+    :param graph_type: set to either 'drive' or 'walk'. IF walk - will set time = walking time across all segments, using the supplied walk_speed. IF drive - will use a speed dictionary for each road type, or defaults as per the note below.
     :param speed_dict: speed dictionary to use. If not supplied, reverts to
                defaults
     :param walk_speed: specify a walkspeed in km/h
     :param factor: allows you to scale up / down distances if saved in a unit other than meters. Set to 1000 if length in km.
-    :param default: if highway type not in the speed_dict, use this road class as an in-fill value for time.
+    :param default: if highway type not in the speed_dict, use this speed as the default. If default is None, then the conversion will be skipped
     :returns: The original graph with a new data property for the edges called 'time'
     """
 
@@ -1047,7 +1048,8 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
                 'secondary_link':25,
                 'tertiary':30,
                 'tertiary_link': 25,
-                'unclassified':20
+                'unclassified':20,
+                'projected_footway':3.5
                 }
 
             highwayclass = data[road_col]
@@ -1059,9 +1061,9 @@ def convert_network_to_time(G, distance_tag, graph_type = 'drive', road_col = 'h
                 speed = speed_dict[highwayclass]
             else:
                 if default == None:
-                    speed = 20
+                    continue
                 else:
-                    speed = speed_dict[default]
+                    speed = default
 
         else:
             raise ValueError('Expecting either a graph_type of "walk" or "drive"!')
@@ -2838,7 +2840,7 @@ def utm_of_graph(G):
     utm_crs = f"+proj=utm +zone={utm_zone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
     return utm_crs
 
-def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', poi_key_col=None, path=None, threshold=500, knn=5, measure_crs='epsg:3857', factor = 1, verbose = False):
+def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', poi_key_col=None, road_col = 'highway', path=None, threshold=500, knn=5, measure_crs='epsg:3857', factor = 1, verbose = False):
     """
     Connect and integrate a set of POIs into an existing road network.
 
@@ -2953,14 +2955,14 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         if ptype == 'pp':
             new_nodes = gpd.GeoDataFrame(new_points, columns=['geometry'], crs=measure_crs)
             n = len(new_nodes)
-            new_nodes['highway'] = node_highway_pp
+            new_nodes[road_col] = node_highway_pp
             new_nodes[node_key_col] = [int(osmid_prefix + i) for i in range(n)]
 
         # create gdf of new nodes (original POIs)
         elif ptype == 'poi':
             new_nodes = new_points[['geometry', poi_key_col]]
             new_nodes.columns = ['geometry', node_key_col]
-            new_nodes['highway'] = node_highway_poi
+            new_nodes[road_col] = node_highway_poi
 
         else:
             print("Unknown ptype when updating nodes.")
@@ -3007,7 +3009,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         else:
             new_edges = gpd.GeoDataFrame(pois[[poi_key_col]], geometry=new_lines, columns=[poi_key_col, 'geometry'], crs=measure_crs)
             new_edges['oneway'] = True
-            new_edges['highway'] = edge_highway
+            new_edges[road_col] = edge_highway
 
         # https://stackoverflow.com/questions/61955960/shapely-linestring-length-units
         # update features (a bit slow)
@@ -3021,17 +3023,17 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         new_edges[v_tag] = new_edges['geometry'].map(
             lambda x: nodes_id_dict.get(list(x.coords)[-1], None))
 
-        try:
-            # convert node_key_col to int if needed
-            new_edges[u_tag] = new_edges[u_tag].astype('int64')
-        except:
-            print('error, to nodes of new edges need to be an int or convertible to an int')
+        # try:
+        #     # convert node_key_col to int if needed
+        #     new_edges[u_tag] = new_edges[u_tag].astype('int64')
+        # except:
+        #     print('error, to nodes of new edges need to be an int or convertible to an int')
 
-        try:
-            # convert node_key_col to int if needed
-            new_edges[v_tag] = new_edges[v_tag].astype('int64')
-        except:
-            print('error, from nodes of new edges need to be an int or convertible to an int')
+        # try:
+        #     # convert node_key_col to int if needed
+        #     new_edges[v_tag] = new_edges[v_tag].astype('int64')
+        # except:
+        #     print('error, from nodes of new edges need to be an int or convertible to an int')
 
         new_edges[node_key_col] = ['_'.join(list(map(str, s))) for s in zip(new_edges[v_tag], new_edges[u_tag])]
 
