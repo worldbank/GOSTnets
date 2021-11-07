@@ -180,15 +180,15 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
 
         if isinstance(u, int):
             u = u
-        elif u.isnumeric():
-            u = int(u)
+        # elif u.isnumeric():
+        #     u = int(u)
         else:
             u = u
 
         if isinstance(v, int):
             v = v
-        elif v.isnumeric():
-            v = int(v)
+        # elif v.isnumeric():
+        #     v = int(v)
         else:
             v = v
 
@@ -2876,10 +2876,21 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     if pois.geom_type.str.contains('MultiPoint').sum() > 0:
         raise ValueError("POIs must not be MultiPoint")
 
+    # raise warning
+    if (pois[poi_key_col].dtype != 'int64' and pois[poi_key_col].dtype != 'int'):
+        print("POI keys are not ints, are you sure this is okay?")
+
     ## STAGE 0: initialization
     
     nodes = node_gdf_from_graph(G)
     nodes = nodes.rename(columns={'node_ID': node_key_col})
+
+    # try:
+    #     # convert node_key_col to int if needed
+    #     nodes[node_key_col] = nodes[node_key_col].astype('int64')
+    # except:
+    #     print('error, node_key_col needs to be an int or convertible to an int')
+
     edges = edge_gdf_from_graph(G, single_edge=True)
     
     graph_crs = edges.crs
@@ -2894,11 +2905,17 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         kne_pos = dists.argsort()[0]
         #kne = lines.iloc[[kne_pos]]
         #kne = lines[kne_pos]
+
+        kne_idx = lines.index[kne_pos]
+
         kne = lines.iloc[kne_pos]
 
         #kne_idx = kne.index[0]
         #return kne_idx, kne.values[0]
-        return kne_pos, kne
+        #return kne_pos, kne
+
+        # return the index of the nearest edge, and the geometry of the nearest edge
+        return kne_idx, kne
 
     def get_pp(point, line):
         """Get the projected point (pp) of 'point' on 'line'."""
@@ -2950,7 +2967,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
         # merge new nodes (it is safe to ignore the index for nodes)
         gdfs = [nodes, new_nodes]
-        nodespd = pd.concat(gdfs, ignore_index=True, sort=False)
+        #nodespd = pd.concat(gdfs, ignore_index=True, sort=False)
         nodes = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True, sort=False),
                                  crs=gdfs[0].crs)
         return nodes, new_nodes  # all nodes, newly added nodes only
@@ -3003,6 +3020,19 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             lambda x: nodes_id_dict.get(list(x.coords)[0], None))
         new_edges[v_tag] = new_edges['geometry'].map(
             lambda x: nodes_id_dict.get(list(x.coords)[-1], None))
+
+        try:
+            # convert node_key_col to int if needed
+            new_edges[u_tag] = new_edges[u_tag].astype('int64')
+        except:
+            print('error, to nodes of new edges need to be an int or convertible to an int')
+
+        try:
+            # convert node_key_col to int if needed
+            new_edges[v_tag] = new_edges[v_tag].astype('int64')
+        except:
+            print('error, from nodes of new edges need to be an int or convertible to an int')
+
         new_edges[node_key_col] = ['_'.join(list(map(str, s))) for s in zip(new_edges[v_tag], new_edges[u_tag])]
 
         # remember to reindex to prevent duplication when concat
@@ -3034,7 +3064,6 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             f_pct = n_fault / n * 100
             print("Remove edge projections greater than threshold: {}/{} ({:.2f}%)".format(n_fault, n, f_pct))
             new_edges = new_edges.iloc[valid_pos]  # use 'iloc' here
-
 
         dfs = [edges, new_edges]
         edges = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=False, sort=False), crs=dfs[0].crs)
@@ -3105,6 +3134,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # https://stackoverflow.com/questions/33802940/python-pandas-meaning-of-asterisk-sign-in-expression
     pois_meter['near_idx'], pois_meter['near_lines'] = zip(*pois_meter.apply(nearest_edge, axis=1))
 
+
     if verbose == True:
         print("finished pois_meter['near_idx'] and pois_meter['near_lines']")
         print('seconds elapsed: ' + str(time.time() - start))
@@ -3153,7 +3183,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     print("print _new_nodes")
     #print(_new_nodes)
 
-    pois_meter["pp_id"] = _new_nodes[node_key_col]
+    # doesn't work because dataframes don't match because there can be the same projected point for multiple pois
+    #pois_meter["pp_id"] = _new_nodes[node_key_col]
 
     #print("nodes_meter")
     #print(nodes_meter)
@@ -3165,8 +3196,15 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #print("print nodes_coord")
     #print(nodes_coord)
     
-    #nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col].astype(int)))
+    #nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col].astype('int64')))
     nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col]))
+
+    # nodes_id_dict = {}
+    # try:
+    #     nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col].astype('int64')))
+    # except:
+    #     print('error, nodes_id_dict nodes need to be an int or convertible to an int')
+
 
     # 1-3: update internal edges (split line segments)
     print("Updating internal edges...")
@@ -3177,6 +3215,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     if verbose == True:
         print("finished creating line_pps_dict")
         print('seconds elapsed: ' + str(time.time() - start))
+
 
     print("creating new_lines")
     # new_lines becomes a list of lists
@@ -3192,8 +3231,11 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # print("edges_meter before") 
     # print(edges_meter.loc[edges_meter.endnode == 3874047473])
 
+    
+    
     print("Updating update_edges")
     edges_meter, _ = update_edges(edges_meter, new_lines, replace=True)
+
 
     if verbose == True:
         print("finished Updating update_edges")
@@ -3201,7 +3243,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # print("edges_meter after")
     # print(edges_meter.loc[edges_meter.endnode == 3874047473])
-
+    
     ## STAGE 2: connection
     # 2-1: update external edges (projected footways connected to pois)
     # establish new_edges
@@ -3210,6 +3252,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pps_gdf['geometry'])]
     new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pois_meter['pp'])]
     edges_meter, new_footway_edges, nodes_meter, pois_meter = update_edges(edges_meter, new_lines, replace=False, nodes_meter=nodes_meter, pois_meter=pois_meter)
+
+    
 
     if verbose == True:
         print("finished Updating external links")
@@ -3232,6 +3276,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
       
     # preprocess for pandana
     nodes.index = nodes[node_key_col]  # IMPORTANT
+    nodes.index.name = None
     nodes['x'] = [p.x for p in nodes['geometry']]
     nodes['y'] = [p.y for p in nodes['geometry']]
 
@@ -3254,12 +3299,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     pois_meter = pois_meter.to_crs(graph_crs)
 
     new_footway_edges = new_footway_edges.to_crs(graph_crs)
-
-    # save and return shapefile optional
-    if path:
-        nodes.to_file(path+'/nodes.shp')
-        edges.to_file(path+'/edges.shp')
-        
+       
     #print("print edges")
     #print(edges)
     
@@ -3269,6 +3309,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # Makes bi-directional graph from edges 
     print("making a new graph from edges and nodes")
 
+
     # now the edges_and_nodes_gdf_to_graph function has the ability to add reverse edges from a single-way GDF using the add_missing_reflected_edges flag. 
     # This is much faster than using the add_missing_reflected_edges after a graph is already created
     G = edges_and_nodes_gdf_to_graph(nodes, edges, node_tag = node_key_col, u_tag = u_tag, v_tag = v_tag, geometry_tag = 'geometry', discard_node_col=['coords'], add_missing_reflected_edges=True, oneway_tag="oneway")
@@ -3276,6 +3317,14 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # set graph crs
     G.crs = graph_crs
+
+    # save and return shapefile optional
+    if path:
+        nodes = nodes.drop(['coords'], axis=1)
+        nodes.to_file(path+'/nodes.shp')
+        if 'Wkt' in edges.columns:
+            edges = edges.drop(['Wkt'], axis=1)
+        edges.to_file(path+'/edges.shp')
 
     return G, pois_meter, new_footway_edges  # modified graph, snapped POIs, new edges
 
