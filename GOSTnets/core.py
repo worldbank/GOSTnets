@@ -9,7 +9,7 @@ import numpy as np
 
 from scipy import spatial
 from functools import partial
-from shapely.wkt import loads
+from shapely.wkt import loads, dumps
 from shapely.geometry import Point, LineString, MultiLineString, MultiPoint, box
 from shapely.ops import linemerge, unary_union, transform
 from collections import Counter
@@ -368,7 +368,7 @@ def node_gdf_from_graph(G, crs = 'epsg:4326', attr_list = None, geometry_tag = '
 
     return nodes_gdf
 
-def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = 'geometry', xCol='x', yCol = 'y', single_edge = False):
+def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = 'geometry', xCol='x', yCol = 'y', oneway_tag = 'oneway', single_edge = False):
     """
     Function for generating a GeoDataFrame from a networkx Graph object
 
@@ -396,8 +396,8 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
             keys.remove('geometry')
         attr_list = keys
         if single_edge == True:
-            if 'oneway' not in keys:
-                attr_list.append('oneway')
+            if oneway_tag not in keys:
+                attr_list.append(oneway_tag)
 
     def add_edge_attributes(data, stnode=u, endnode=v):
         if geometry_tag in data:
@@ -451,13 +451,13 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
 
                     new_column_info = add_edge_attributes(data, stnode=u, endnode=v)
 
-                    new_column_info['oneway'] = False
+                    new_column_info[oneway_tag] = False
                     edges.append(new_column_info)
             else:
                 # one-way
                 new_column_info = add_edge_attributes(data, stnode=u, endnode=v)
 
-                new_column_info['oneway'] = True
+                new_column_info[oneway_tag] = True
                 edges.append(new_column_info)
 
     edges_df = pd.DataFrame(edges)
@@ -1197,7 +1197,14 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
     :one_way_roads_exist: If the value is 'True', then even if there are more origins than destinations, it will not do a flip during processing.
     :returns: a numpy matrix of format OD[o][d] = shortest time possible
     """
-    
+
+    # Error checking
+    G_edges = edge_gdf_from_graph(G)
+    if len(G_edges.loc[G_edges[weight].isnull()]) > 0:
+        raise ValueError('One or more of your edges has a null weight value')
+    if len(G_edges.loc[G_edges[weight]<.000001]) > 0:
+        raise ValueError('One or more of your edges has a 0 weight value')
+
     if weighted_origins == True:
         print('weighted_origins equals true')
         OD = np.zeros((len(origins), len(destinations)))
@@ -1232,8 +1239,9 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
 
             try:
                 results_dict = nx.single_source_dijkstra_path_length(G, origin, cutoff = None, weight = weight)
-            except:
+            except Exception as e:
                 print(f"error: printing origin: {origin}")
+                print(e)
 
             for d in range(0, len(destinations)):
                 destination = destinations[d]
@@ -2840,7 +2848,7 @@ def utm_of_graph(G):
     utm_crs = f"+proj=utm +zone={utm_zone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
     return utm_crs
 
-def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', poi_key_col=None, road_col = 'highway', path=None, threshold=500, knn=5, measure_crs='epsg:3857', factor = 1, verbose = False):
+def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='osmid', edge_key_col='osmid', poi_key_col=None, road_col = 'highway', oneway_tag = 'oneway', path=None, threshold=500, knn=5, measure_crs='epsg:3857', factor = 1, verbose = False):
     """
     Connect and integrate a set of POIs into an existing road network.
 
@@ -2857,8 +2865,9 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     :param nodes (GeoDataFrame): a gdf of road network nodes (geom: Point)
     :param edges (GeoDataFrame): a gdf of road network edges (geom: LineString)
     :param node_key_col (str): The node tag id in the returned graph
+    :param edge_key_col (str): The edge tag id in the returned graph
     :param poi_key_col (str): a unique key column of pois should be provided, e.g., 'index', 'osmid', 'poi_number', etc. Currently, this will be renamed into 'osmid' in the output. [NOTE] For use in pandana, you may want to ensure this column is numeric-only to avoid processing errors. Preferably use unique integers (int or str) only, and be aware not to intersect with the node key, 'osmid' if you use OSM data, in the nodes gdf.
-
+    :param poi_key_col (str): The tag to be used for oneway edges
     :param path (str): directory path to use for saving optional shapefiles (nodes and edges). Outputs will NOT be saved if this arg is not specified.
     :param threshold (int): the max length of a POI connection edge, POIs withconnection edge beyond this length will be removed. The unit is in meters as crs epsg is set to 3857 by default during processing.
     :param knn (int): k nearest neighbors to query for the nearest edge. Consider increasing this number up to 10 if the connection output is slightly unreasonable. But higher knn number will slow down the process.
@@ -2893,11 +2902,23 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # except:
     #     print('error, node_key_col needs to be an int or convertible to an int')
 
-    edges = edge_gdf_from_graph(G, single_edge=True)
+    edges = edge_gdf_from_graph(G, oneway_tag = oneway_tag, single_edge=True)
     
     graph_crs = edges.crs
 
     start = time.time()
+
+    # 0-2: configurations
+    # set poi arguments
+    node_highway_pp = 'projected_pap'  # POI Access Point
+    node_highway_poi = 'poi'
+    edge_highway = 'projected_footway'
+    osmid_prefix = 9990000000
+
+    # convert CRS
+    pois_meter = pois.to_crs(measure_crs)
+    nodes_meter = nodes.to_crs(measure_crs)
+    edges_meter = edges.to_crs(measure_crs)
 
     # 0-1: helper functions
     
@@ -2945,17 +2966,20 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             print('Error when splitting line: {}\n{}\n{}\n'.format(e, line, pps))
             return []
 
+
     def update_nodes(nodes, new_points, ptype, measure_crs='epsg:3857'):
         """Update nodes with a list (pp) or a GeoDataFrame (poi) of new_points.
         
         Args:
             ptype: type of Point list to append, 'pp' or 'poi'
         """
+        nonlocal osmid_prefix
+
         # create gdf of new nodes (projected PAPs)
         if ptype == 'pp':
             new_nodes = gpd.GeoDataFrame(new_points, columns=['geometry'], crs=measure_crs)
-            n = len(new_nodes)
             new_nodes[road_col] = node_highway_pp
+            n = len(new_nodes)
             new_nodes[node_key_col] = [int(osmid_prefix + i) for i in range(n)]
 
         # create gdf of new nodes (original POIs)
@@ -3004,11 +3028,18 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             cols.remove('geometry')  # don't include the old geometry
             new_edges = new_lines_gdf.merge(edges[cols], how='left', left_on='kne_idx', right_index=True)
             new_edges.drop('kne_idx', axis=1, inplace=True)
+
+            # round nodes
+            new_edges['geometry'] = new_edges.apply(lambda x: loads(dumps(x['geometry'], rounding_precision=3)), axis=1)
+
             new_lines = new_edges['geometry']  # now a flatten list
+            
         # for connection (to external poi): append new lines
         else:
             new_edges = gpd.GeoDataFrame(pois[[poi_key_col]], geometry=new_lines, columns=[poi_key_col, 'geometry'], crs=measure_crs)
-            new_edges['oneway'] = True
+            # round nodes
+            new_edges['geometry'] = new_edges.apply(lambda x: loads(dumps(x['geometry'], rounding_precision=3)), axis=1)
+            new_edges[oneway_tag] = True
             new_edges[road_col] = edge_highway
 
         # https://stackoverflow.com/questions/61955960/shapely-linestring-length-units
@@ -3018,10 +3049,22 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         if factor > 1:
             new_edges['length'] = [l.length / factor for l in new_lines]
         # try to apply below to just new lines?
-        new_edges[u_tag] = new_edges['geometry'].map(
-            lambda x: nodes_id_dict.get(list(x.coords)[0], None))
+        if replace:
+            new_edges[u_tag] = new_edges['geometry'].map(
+                lambda x: nodes_id_dict.get(list(x.coords)[0], None))
+        else:
+            new_edges[u_tag] = new_edges[poi_key_col]
+
         new_edges[v_tag] = new_edges['geometry'].map(
             lambda x: nodes_id_dict.get(list(x.coords)[-1], None))
+
+        print("debugging")
+        # debugging 
+        for x in new_edges['geometry']:
+            node_id_match = nodes_id_dict.get(list(x.coords)[0], None)
+            if node_id_match is None:
+                print(f" node_id_match is None, coords are: {list(x.coords)[0]}")
+
 
         # try:
         #     # convert node_key_col to int if needed
@@ -3035,7 +3078,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         # except:
         #     print('error, from nodes of new edges need to be an int or convertible to an int')
 
-        new_edges[node_key_col] = ['_'.join(list(map(str, s))) for s in zip(new_edges[v_tag], new_edges[u_tag])]
+        new_edges[edge_key_col] = ['_'.join(list(map(str, s))) for s in zip(new_edges[v_tag], new_edges[u_tag])]
 
         # remember to reindex to prevent duplication when concat
         start = edges.index[-1] + 1
@@ -3048,6 +3091,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         # for connection: filter invalid links
         else:
             unvalid_pos = np.where(new_edges['length'] > threshold)[0]
+            # do not add new edges if they are longer than the threshold or if the length equals 0, if the length equals 0 that means the poi was overlaying an edge itself, therefore no extra edge needs to be created
+            #unvalid_pos = np.where((new_edges['length'] > threshold) | (new_edges['length'] == 0))[0]
             unvalid_new_edges = new_edges.iloc[unvalid_pos]
             #print("print unvalid lines over threshold")
             #print(unvalid_new_edges)
@@ -3060,7 +3105,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             pois_meter = pois_meter[~pois_meter[poi_key_col].isin(unvalid_new_edges.stnode)]
             print(f"pois_meter count after: {pois_meter.count()[0]}")
 
-            valid_pos = np.where(new_edges['length'] <= threshold)[0]
+            #valid_pos = np.where(new_edges['length'] <= threshold)[0]
+            valid_pos = np.where((new_edges['length'] <= threshold) & (new_edges['length'] > 0))[0]
             n = len(new_edges)
             n_fault = n - len(valid_pos)
             f_pct = n_fault / n * 100
@@ -3076,17 +3122,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             # all edges, newly added edges only
             return edges, new_edges
 
-    # 0-2: configurations
-    # set poi arguments
-    node_highway_pp = 'projected_pap'  # POI Access Point
-    node_highway_poi = 'poi'
-    edge_highway = 'projected_footway'
-    osmid_prefix = 9990000000
-
-    # convert CRS
-    pois_meter = pois.to_crs(measure_crs)
-    nodes_meter = nodes.to_crs(measure_crs)
-    edges_meter = edges.to_crs(measure_crs)
+    
 
     #print("print edges_meter")
     #print(edges_meter)
@@ -3108,7 +3144,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     
     print("updating external nodes (pois)")
     nodes_meter, _ = update_nodes(nodes_meter, pois_meter, ptype='poi', measure_crs=measure_crs)
-
+    
     if verbose == True:
         print("finished updating external nodes (pois)")
         print('seconds elapsed: ' + str(time.time() - start))
@@ -3165,7 +3201,10 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     pp_column['coords'] = pp_column['pp'].map(lambda x: x.coords[0])
 
     # Get rid of any potential duplicates
-    pp_column.drop_duplicates(inplace=True, subset="coords") 
+    pp_column.drop_duplicates(inplace=True, subset="coords")
+
+    
+
     
     # discard pp that have the same coordinate of an existing node
     nodes_meter['coords'] = nodes_meter['geometry'].map(lambda x: x.coords[0])
@@ -3177,6 +3216,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # update nodes
     print("Updating internal nodes...")
     nodes_meter, _new_nodes = update_nodes(nodes_meter, list(pp_column), ptype='pp', measure_crs=measure_crs)
+    
 
     if verbose == True:
         print("finished Updating internal nodes")
@@ -3201,6 +3241,14 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col].astype('int64')))
     nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col]))
 
+    nodes_id_dict2 = {}
+    for (x,y),v in nodes_id_dict.items():
+        nodes_id_dict2[round(x,3),round(y,3)] = v
+
+    nodes_id_dict = nodes_id_dict2
+
+    #return nodes_id_dict
+
     # nodes_id_dict = {}
     # try:
     #     nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col].astype('int64')))
@@ -3214,6 +3262,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # A nearest edge may have more than one projected point on it
     line_pps_dict = {k: MultiPoint(list(v)) for k, v in pois_meter.groupby(['kne_idx'])['pp']}
 
+    #return nodes_id_dict, line_pps_dict, nodes_meter
+
     if verbose == True:
         print("finished creating line_pps_dict")
         print('seconds elapsed: ' + str(time.time() - start))
@@ -3223,6 +3273,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # new_lines becomes a list of lists
     # need to make sure that new line geometries's coordinate order match the stnode and endnode order
     new_lines = [split_line(edges_meter['geometry'][idx], pps) for idx, pps in line_pps_dict.items()]  # bit slow
+
 
     if verbose == True:
         print("finished creating new_lines")
@@ -3238,6 +3289,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     print("Updating update_edges")
     edges_meter, _ = update_edges(edges_meter, new_lines, replace=True)
 
+    #return edges_meter, _
 
     if verbose == True:
         print("finished Updating update_edges")
@@ -3292,8 +3344,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         print("Nodes count:", len(nodes_meter))
         print("Node coordinates key count:", len(nodes_id_dict))
     # - examine missing nodes
-    print("Missing 'from' nodes:", len(edges[edges[u_tag] == None]))
-    print("Missing 'to' nodes:", len(edges[edges[v_tag] == None]))
+    print("Missing 'from' nodes:", edges[u_tag].isnull().sum())
+    print("Missing 'to' nodes:", edges[v_tag].isnull().sum())
    
     # convert back to input graph CRS
     nodes = nodes.to_crs(graph_crs)
@@ -3311,11 +3363,12 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # Makes bi-directional graph from edges 
     print("making a new graph from edges and nodes")
 
+    #return nodes, edges
 
     # now the edges_and_nodes_gdf_to_graph function has the ability to add reverse edges from a single-way GDF using the add_missing_reflected_edges flag. 
     # This is much faster than using the add_missing_reflected_edges after a graph is already created
-    G = edges_and_nodes_gdf_to_graph(nodes, edges, node_tag = node_key_col, u_tag = u_tag, v_tag = v_tag, geometry_tag = 'geometry', discard_node_col=['coords'], add_missing_reflected_edges=True, oneway_tag="oneway")
-    #G = add_missing_reflected_edges(G, one_way_tag="oneway")
+    G = edges_and_nodes_gdf_to_graph(nodes, edges, node_tag = node_key_col, u_tag = u_tag, v_tag = v_tag, geometry_tag = 'geometry', discard_node_col=['coords'], add_missing_reflected_edges=True, oneway_tag=oneway_tag)
+    #G = add_missing_reflected_edges(G, one_way_tag=oneway_tag)
 
     # set graph crs
     G.crs = graph_crs
