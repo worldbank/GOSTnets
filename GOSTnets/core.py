@@ -1202,7 +1202,7 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
     G_edges = edge_gdf_from_graph(G)
     if len(G_edges.loc[G_edges[weight].isnull()]) > 0:
         raise ValueError('One or more of your edges has a null weight value')
-    if len(G_edges.loc[G_edges[weight]<.000001]) > 0:
+    if len(G_edges.loc[G_edges[weight]==0]) > 0:
         raise ValueError('One or more of your edges has a 0 weight value')
 
     if weighted_origins == True:
