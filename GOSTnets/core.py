@@ -2942,8 +2942,14 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     def get_pp(point, line):
         """Get the projected point (pp) of 'point' on 'line'."""
+        
         # project new Point to be interpolated
         pp = line.interpolate(line.project(point))  # PP as a Point
+
+        # reduce precision
+        #can't reduct it here because the split_function needs the point exactly on the line
+        #pp = loads(dumps(pp, rounding_precision=3))
+
         return pp
 
     def split_line(line, pps):
@@ -2957,7 +2963,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         # replaced anyway
         # we want the tolerance to be really small, I changed it to a bigger tolerance of .5 meters and it caused 
         # the end of the line to snap to the PP therefore creating a gap
-        line = snap(line, pps, 1e-8)  # slow?
+        line = snap(line, pps, 1e-4)  # slow?
 
         try:
             new_lines = list(split(line, pps))  # split into segments
@@ -3189,6 +3195,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     print("assigning a projected point to each POI")
     pois_meter['pp'] = [get_pp(point, kne) for point, kne in zip(pois_meter['geometry'], knes)]
 
+
     if verbose == True:
         print("finished assigning a projected point to each POI")
         print('seconds elapsed: ' + str(time.time() - start))
@@ -3198,25 +3205,32 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #print("print pp_column")
     #print(pp_column)
 
-    pp_column['coords'] = pp_column['pp'].map(lambda x: x.coords[0])
+    # This below is an advanced method to take care of an edge case where a projected point is found near an endpoint
+
+    #pp_column['coords'] = pp_column['pp'].map(lambda x: x.coords[0])
+    # The coords of the projected point are rounded and stored in the 'coords' column while the original geometry is retained. The original geometry
+    # will be needed for the split_line function as it needs high precision
+    pp_column['coords'] = pp_column['pp'].map(lambda x: dumps(x, rounding_precision=3))
 
     # Get rid of any potential duplicates
     pp_column.drop_duplicates(inplace=True, subset="coords")
 
-    
-
-    
     # discard pp that have the same coordinate of an existing node
-    nodes_meter['coords'] = nodes_meter['geometry'].map(lambda x: x.coords[0])
+    #nodes_meter['coords'] = nodes_meter['geometry'].map(lambda x: x.coords[0])
+
+    # reduce precision for the existing nodes in the graph and store them in the 'coords' column
+    nodes_meter['coords'] = nodes_meter.apply(lambda x: dumps(x['geometry'], rounding_precision=3), axis=1)
+    
     pp_column = pp_column.merge(nodes_meter['coords'], on='coords', how='left', indicator=True)
     pp_column = pp_column.query('_merge == "left_only"')
 
+    # now the projected points that are very close to an existing endpoint in the graph will not be added
+    # this will enable new projected edges to connected to existing endpoints in the graph instead of the newly created projected points
     pp_column = pp_column['pp']
 
     # update nodes
     print("Updating internal nodes...")
     nodes_meter, _new_nodes = update_nodes(nodes_meter, list(pp_column), ptype='pp', measure_crs=measure_crs)
-    
 
     if verbose == True:
         print("finished Updating internal nodes")
@@ -3232,6 +3246,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #print(nodes_meter)
 
     #return nodes_meter, _new_nodes
+
+    
    
     nodes_coord = nodes_meter['geometry'].map(lambda x: x.coords[0])
     
@@ -3285,7 +3301,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # print(edges_meter.loc[edges_meter.endnode == 3874047473])
 
     
-    
+    # replacing existing lines with split lines
     print("Updating update_edges")
     edges_meter, _ = update_edges(edges_meter, new_lines, replace=True)
 
