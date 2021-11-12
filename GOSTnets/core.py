@@ -3379,6 +3379,9 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # Makes bi-directional graph from edges 
     print("making a new graph from edges and nodes")
 
+    # not sure why, but there may be an edge case where en edge has the same to and from node and a length of 0
+    edges = edges.loc[edges['length']>0]
+
     #return nodes, edges
 
     # now the edges_and_nodes_gdf_to_graph function has the ability to add reverse edges from a single-way GDF using the add_missing_reflected_edges flag. 
