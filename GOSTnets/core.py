@@ -243,8 +243,8 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
     def selector(x):
         if isinstance(x, int):
             return x
-        elif x.isnumeric():
-            return int(x)
+        # elif x.isnumeric():
+        #     return int(x)
         else:
             return x
 
