@@ -2924,15 +2924,22 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # 0-1: helper functions
     
     # find nearest edge
-    def find_kne(point, lines):
+    def find_kne(point, lines, near_idx):
+        # getting the distances between the point and the lines
         dists = np.array(list(map(lambda l: l.distance(point), lines)))
         kne_pos = dists.argsort()[0]
         #kne = lines.iloc[[kne_pos]]
-        #kne = lines[kne_pos]
+        
 
-        kne_idx = lines.index[kne_pos]
+        #debugging
+        #return lines, kne_pos
 
-        kne = lines.iloc[kne_pos]
+        kne = lines[kne_pos]
+        #kne = lines.iloc[kne_pos]
+
+        kne_idx = near_idx[kne_pos]
+
+        
 
         #kne_idx = kne.index[0]
         #return kne_idx, kne.values[0]
@@ -3183,10 +3190,13 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     if verbose == True:
         print("finished pois_meter['near_idx'] and pois_meter['near_lines']")
         print('seconds elapsed: ' + str(time.time() - start))
+
+    #debug
+    #return pois_meter
                                 
     pois_meter['kne_idx'], knes = zip(
-        *[find_kne(point, near_lines) for point, near_lines in
-          zip(pois_meter['geometry'], pois_meter['near_lines'])])  # slow
+        *[find_kne(point, near_lines, near_idx) for point, near_lines, near_idx in
+          zip(pois_meter['geometry'], pois_meter['near_lines'], pois_meter['near_idx'])])  # slow
 
     if verbose == True:
         print("finished pois_meter['kne_idx']")
