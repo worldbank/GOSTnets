@@ -129,6 +129,8 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
       if True, will perfrom a validation checks and return the nodes_df with a 'node_in_edge_df' column
     :add_missing_reflected_edges:
       if contains a tag, then the oneway column is used to see whether reverse edges need to be added. This is much faster than using the add_missing_reflected_edges after a graph is already created.
+    :oneway_tag:
+      if oneway_tag exists, then missing reflected edges won't be added where an edge's oneway_tag equals True
     :returns: 
       a multidigraph object
     """
@@ -2874,9 +2876,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     :param measure_crs (int):  preferred EPSG in meter units. Suggested to use the correct UTM projection.
     :param factor: allows you to scale up / down unit of returned new_footway_edges if other than meters. Set to 1000 if length in km.
     :return: G (graph): the original gdf with POIs and PPs appended and with connection edges appended and existing edges updated (if PPs are present)pois_meter (GeoDataFrame): gdf of the POIs along with extra columns, such as the associated nearest lines and PPs new_footway_edges (GeoDataFrame): gdf of the new footway edges that connect the POIs to the orginal graph
-
-
     """
+
     import rtree
     import itertools
     from shapely.ops import snap, split
