@@ -2934,8 +2934,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         #debugging
         #return lines, kne_pos
 
-        kne = lines[kne_pos]
-        #kne = lines.iloc[kne_pos]
+        #kne = lines[kne_pos]
+        kne = lines.iloc[kne_pos]
 
         kne_idx = near_idx[kne_pos]
 
@@ -3183,16 +3183,20 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         near_lines = edges_meter['geometry'][near_idx]
         return near_idx, near_lines     
         
+    #debug
+    #return pois_meter, edges_meter
+
     # https://stackoverflow.com/questions/33802940/python-pandas-meaning-of-asterisk-sign-in-expression
-    pois_meter['near_idx'], pois_meter['near_lines'] = zip(*pois_meter.apply(nearest_edge, axis=1))
+    #pois_meter['near_idx'], pois_meter['near_lines'] = zip(*pois_meter.apply(nearest_edge, axis=1))
+
+    pois_meter['near_idx'], pois_meter['near_lines'] = list(map(list, zip(*pois_meter.apply(nearest_edge, axis=1))))
 
 
     if verbose == True:
         print("finished pois_meter['near_idx'] and pois_meter['near_lines']")
         print('seconds elapsed: ' + str(time.time() - start))
 
-    #debug
-    #return pois_meter
+    
                                 
     pois_meter['kne_idx'], knes = zip(
         *[find_kne(point, near_lines, near_idx) for point, near_lines, near_idx in
