@@ -1206,6 +1206,10 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
         raise ValueError('One or more of your edges has a null weight value')
     if len(G_edges.loc[G_edges[weight]==0]) > 0:
         raise ValueError('One or more of your edges has a 0 weight value')
+    if len(G_edges.loc[G_edges['stnode'].isnull()]) > 0:
+        raise ValueError('One or more of your edges has a null stnode')
+    if len(G_edges.loc[G_edges['endnode'].isnull()]) > 0:
+        raise ValueError('One or more of your edges has a null endnode')
 
     if weighted_origins == True:
         print('weighted_origins equals true')
