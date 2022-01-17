@@ -24,6 +24,46 @@ python setup.py build
 python setup.py install
 ```
 
+### From Docker
+
+#### pull image from DockerHub 
+
+Clone this repo in your local environment (for example in: C:\repos\GOSTnets). Then run the docker container:
+
+```
+docker run -i -t -p 8888:8888 -v ${PWD}:/home -v C:\repos\GOSTnets:/GOSTnets --name anaconda3_gostnets_c1 d3netxer/anaconda3_gostnets_v1
+```
+
+note in the docker command how you are mapping the 8888 port in the docker container to your local machine. You are also creating a volume to the GOSTnets repository code. You are also creating another volume in your present working directory, this is where your project code should be. Then within your container first activate the 'geo_env' anaconda environment ```conda activate geo_env```. Then use the following command to launch jupter notebook from the container:
+
+```
+jupyter notebook --ip='0.0.0.0' --port=8888 --no-browser --allow-root --notebook-dir=/home
+```
+
+It will read from your present working directory and the notebook will be exposed through the mapped 8888 port, for you to open with your browser. A tip is that a great development set-up is to your VS Code and install the docker extensions. Once the container is running you can attach to it using VS Code, then you are able to easily use VS Code to write your code and run commands in your docker container.
+
+#### Build GOSTnets container from scratch
+
+First you will run the continuumio/anaconda3 docker container:
+
+```
+docker run -i -t -p 8888:8888 -v ${PWD}:/home --name anaconda3 continuumio/anaconda3
+```
+
+Then inside the container you will install the dependencies (followed these instructions: https://geopandas.org/en/stable/getting_started/install.html)
+
+```
+conda create -n geo_env
+conda activate geo_env
+conda config --env --add channels conda-forge
+conda config --env --set channel_priority strict
+conda install python=3 geopandas rasterio geojson git gdal geopy boltons pulp jupyterlab osmnx
+```
+
+optional: you can also install graph-tool using Conda and these instructions: https://git.skewed.de/count0/graph-tool/-/wikis/installation-instructions
+
+Then you will commit your image.
+
 
 #### Optional Dependencies
 
