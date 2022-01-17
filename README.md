@@ -65,16 +65,16 @@ optional: you can also install graph-tool using Conda and these instructions: ht
 Then you will commit your image.
 
 
-#### Optional Dependencies
+### Optional Dependencies
 
-##### load_osm.py
+#### load_osm.py
 ```
 conda install -c conda-forge gdal
 pip install geopy
 pip install boltons
 ```
 
-##### optimization.py
+#### optimization.py
 ```
 pip install pulp
 ```
