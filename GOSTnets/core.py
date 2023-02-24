@@ -463,6 +463,12 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
                 edges.append(new_column_info)
 
     edges_df = pd.DataFrame(edges)
+
+    # make sure the all attributes are in edges_df, or else it may break for example if the 'tunnel' key appeared in the attr_list but does not appear in the edges_df
+    for attr in attr_list:
+        if attr not in edges_df.keys():
+            attr_list.remove(attr)
+
     edges_df = edges_df[['stnode','endnode',*attr_list,geometry_tag]]
     if type(edges_df.iloc[0][geometry_tag]) == str:
         edges_df[geometry_tag] = edges_df[geometry_tag].apply(str)
