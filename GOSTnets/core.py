@@ -1186,7 +1186,7 @@ def assign_traffic_times(G, mb_token, accepted_road_types = ['trunk','trunk_link
 
     return G
 
-def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted_origins = False, one_way_roads_exist = False):
+def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted_origins = False, one_way_roads_exist = False, verbose = False):
     """
     Function for generating an origin: destination matrix
 
@@ -1210,6 +1210,9 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
         raise ValueError('One or more of your edges has a null stnode')
     if len(G_edges.loc[G_edges['endnode'].isnull()]) > 0:
         raise ValueError('One or more of your edges has a null endnode')
+
+    count = 0
+    start = time.time()
 
     if weighted_origins == True:
         print('weighted_origins equals true')
@@ -1242,6 +1245,11 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
 
         for o in range(0, len(origins)):
             origin = origins[o]
+
+            if count % 1000 == 0 and verbose == True:
+                print("Processing %s of %s" % (count, origins))
+                print('seconds elapsed: ' + str(time.time() - start))
+            count += 1
 
             try:
                 results_dict = nx.single_source_dijkstra_path_length(G, origin, cutoff = None, weight = weight)
