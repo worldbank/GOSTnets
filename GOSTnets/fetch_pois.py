@@ -10,7 +10,7 @@ import networkx as nx
 from shapely.geometry import box
 from shapely.geometry import Polygon
 from shapely.wkt import loads
-from shapely.ops import cascaded_union
+from shapely.ops import unary_union
 
 ### Definitions
 
@@ -101,13 +101,15 @@ class OsmObject():
         for i in gdf.index:            
             row = gdf.loc[i]            
             if len(l) == 0:
-                l = l.append(row, ignore_index = True)            
+                #l = l.append(row, ignore_index = True)
+                l = pd.concat([l, row.to_frame().T], ignore_index = True)              
             else:
-                current_points = cascaded_union(l['buffer']) 
+                current_points = unary_union(l['buffer']) 
                 if row['buffer'].intersects(current_points):
                     pass                
                 else:
-                    l = l.append(row, ignore_index = True)        
+                    #l = l.append(row, ignore_index = True)
+                    l = pd.concat([l, row.to_frame().T], ignore_index = True)      
         gdf = gdf.to_crs(crs)        
         self.df = l
         return l
