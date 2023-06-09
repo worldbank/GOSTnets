@@ -287,10 +287,14 @@ class OSM_to_network(object):
                     # Get intersection
                     inter = line.intersection(line2)
                     # Save intersecting point
+                    # updating to be compatible with Shapely ver 2
+                    #if "Point" == inter.type:
                     if "Point" == inter.type:
                         idx_inters.insert(0, inter.bounds, inter)
                     elif "MultiPoint" == inter.type:
-                        for pt in inter:
+                        # updating to be compatible with Shapely ver 2
+                        #for pt in inter:
+                        for pt in inter.geoms:
                             idx_inters.insert(0, pt.bounds, pt)
 
             # cut lines where necessary and save all new linestrings to a list

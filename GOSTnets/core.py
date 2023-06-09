@@ -1253,7 +1253,7 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
             origin = origins[o]
 
             if count % 1000 == 0 and verbose == True:
-                print("Processing %s of %s" % (count, origins))
+                print("Processing %s of %s" % (count, len(origins)))
                 print('seconds elapsed: ' + str(time.time() - start))
             count += 1
 
@@ -1568,7 +1568,17 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
     gdfnodes = node_gdf_from_graph(G2)
     gdfnodes_proj_buffer = gdfnodes.to_crs(measure_crs)
     gdfnodes_proj_buffer = gdfnodes_proj_buffer.buffer(thresh)
-    juncs_pd = pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)})
+
+    # Get the version of Pandas
+    pandas_version = pd.__version__
+
+    # Compare the major version number
+    if int(pandas_version.split('.')[0]) >= 2:
+        # passing index to be compatible with Pandas ver 2.0
+        juncs_pd = pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)}, index=[0])
+    else:
+        juncs_pd = pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)})
+
     juncs_gdf = gpd.GeoDataFrame(juncs_pd, crs = measure_crs, geometry = 'geometry')
     juncs_gdf['area'] = juncs_gdf.area
 
@@ -2992,7 +3002,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         line = snap(line, pps, 1e-4)  # slow?
 
         try:
-            new_lines = list(split(line, pps))  # split into segments
+            # with Shapely ver 2, Geometry objects are not iterable, so you need to use the geoms property
+            new_lines = list(split(line, pps).geoms)  # split into segments
             return new_lines
         except TypeError as e:
             print('Error when splitting line: {}\n{}\n{}\n'.format(e, line, pps))
@@ -3042,6 +3053,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         Note:
             kne_idx refers to 'fid in Rtree'/'label'/'loc', not positional iloc
         """
+        
         # for interpolation (split by pp): replicate old line
         if replace:
             # create a flattened gdf with all line segs and corresponding kne_idx
@@ -3061,8 +3073,14 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             new_edges = new_lines_gdf.merge(edges[cols], how='left', left_on='kne_idx', right_index=True)
             new_edges.drop('kne_idx', axis=1, inplace=True)
 
+            #print('before')
+            #print(new_edges['geometry'])
+
             # round nodes
             new_edges['geometry'] = new_edges.apply(lambda x: loads(dumps(x['geometry'], rounding_precision=3)), axis=1)
+            
+            print('after')
+            print(new_edges['geometry'])
 
             new_lines = new_edges['geometry']  # now a flatten list
             
@@ -3156,13 +3174,14 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     
 
-    #print("print edges_meter")
+    print("print edges_meter")
     #print(edges_meter)
 
     # build rtree
     print("Building rtree...")
     Rtree = rtree.index.Index()
-    [Rtree.insert(fid, geom.bounds) for fid, geom in edges_meter['geometry'].iteritems()]
+    # items() now replaces iteritems() for a GeoSeries in GeoPandas
+    [Rtree.insert(fid, geom.bounds) for fid, geom in edges_meter['geometry'].items()]
 
     if verbose == True:
         print("finished Building rtree")
@@ -3337,6 +3356,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # replacing existing lines with split lines
     print("Updating update_edges")
     edges_meter, _ = update_edges(edges_meter, new_lines, replace=True)
+    #new_edges = update_edges(edges_meter, new_lines, replace=True)
+    #return(new_edges)
 
     #return edges_meter, _
 
