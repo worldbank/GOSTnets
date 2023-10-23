@@ -1259,9 +1259,10 @@ def calculate_OD(G, origins, destinations, fail_value, weight = 'time', weighted
 
             try:
                 results_dict = nx.single_source_dijkstra_path_length(G, origin, cutoff = None, weight = weight)
-            except Exception as e:
-                print(f"error: printing origin: {origin}")
-                print(e)
+            except:
+                results_dict = {}
+                # print(f"error: printing origin: {origin}")
+                # print(e)
 
             for d in range(0, len(destinations)):
                 destination = destinations[d]
@@ -1932,7 +1933,7 @@ def custom_simplify(G, strict=True):
     msg = 'Simplified graph (from {:,} to {:,} nodes and from {:,} to {:,} edges) in {:,.2f} seconds'
     return G
 
-def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = None):
+def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = None, geometry_tag='Wkt'):
     """
     Adds in new nodes to edges greater than a given length
 
@@ -1959,7 +1960,7 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
                 return [LineString(coords[:i] + [(cp.x, cp.y)]),LineString([(cp.x, cp.y)] + coords[i:])]
 
     G2 = G.copy()
-    edges = edge_gdf_from_graph(G2, geometry_tag = 'Wkt')
+    edges = edge_gdf_from_graph(G2, geometry_tag = geometry_tag)
     edges_projected = edges.to_crs(target)
     nodes_projected = node_gdf_from_graph(G).to_crs(target).set_index('node_ID')
 
@@ -1997,7 +1998,7 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
         v = data['endnode']
 
         # load geometry
-        UTM_geom = data['Wkt']
+        UTM_geom = data[geometry_tag]
 
         # test geometry length
         if UTM_geom.length > thresh:
@@ -2017,7 +2018,7 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
     for u, v, data in unique_long_edges:
 
         # load geometry of long edge
-        UTM_geom = data['Wkt']
+        UTM_geom = data[geometry_tag]
 
         if UTM_geom.type == 'MultiLineString':
             UTM_geom = linemerge(UTM_geom)
@@ -2078,7 +2079,7 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
             t_geom = transform(project_UTM_WGS, result[0])
             #print(f"new way t_geom: {t_geom}")
 
-            edge_data = {'Wkt' : t_geom,
+            edge_data = {geometry_tag : t_geom,
                         'length' : (int(result[0].length) / factor),
                         }
 
