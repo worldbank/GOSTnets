@@ -199,7 +199,7 @@ class OSM_to_network(object):
 
             for feature in sql_lyr_ferries:
                 osm_id = feature.GetField('osm_id')
-                shapely_geo = ops.linemerge(loads(feature.geometry().ExportToWkt()).boundary)
+                shapely_geo = shapely.ops.linemerge(loads(feature.geometry().ExportToWkt()).boundary)
                 if shapely_geo is None:
                     continue
                 highway = 'pier'
