@@ -1577,7 +1577,8 @@ def simplify_junctions(G, measure_crs, in_crs = {'init': 'epsg:4326'}, thresh = 
         # passing index to be compatible with Pandas ver 2.0
         juncs_pd = pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)}, index=[0])
     else:
-        juncs_pd = pd.DataFrame({'geometry':unary_union(gdfnodes_proj_buffer)})
+        # Wrap the dictionary into a list to avoiod  "ValueError: If using all scalar values, you must pass an index"
+        juncs_pd = pd.DataFrame([{'geometry':unary_union(gdfnodes_proj_buffer)}])
 
     juncs_gdf = gpd.GeoDataFrame(juncs_pd, crs = measure_crs, geometry = 'geometry')
     juncs_gdf['area'] = juncs_gdf.area
