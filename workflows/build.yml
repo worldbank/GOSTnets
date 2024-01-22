@@ -1,0 +1,47 @@
+# Workflow to test installation of the GOSTnets package
+
+name: build-package
+
+# Controls when the action will run.
+  # Triggers the workflow on push or pull request events as well as on
+  # a monthly cron schedule. Also allows manual triggering.
+on:
+  pull_request:
+  schedule:
+    - cron: '0 0 1 * *'  # run on the first of every month at midnight
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+# Set up jobs to spin up a virtual machine and build the package on each of
+  # the operating systems we want to test on. We use a matrix to run the same
+  # job on multiple operating systems and Python versions. At this time our
+  # 'test' is very simple and consists of installing the package and trying
+  # to import it.
+jobs:
+  test-os:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      os: [ubuntu-latest, windows-latest, macos-latest]
+      python-version: ['3.10']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }} with minconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          auto-update-conda: true
+      - name: Install GOSTnets
+        run: |
+          conda install -c conda-forge rtree=0.9.3 geopandas rasterio geojson
+          python setup.py build
+          python setup.py install
+      - name: Test GOSTnets install
+        run: |
+          python -c "import GOSTnets"
