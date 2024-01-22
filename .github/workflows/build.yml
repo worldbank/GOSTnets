@@ -38,6 +38,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           auto-update-conda: true
+        run: |
+          python -V
       - name: Install GOSTnets
         run: |
           conda install -c conda-forge rtree=0.9.3 geopandas rasterio geojson
