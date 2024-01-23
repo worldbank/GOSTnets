@@ -38,6 +38,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           auto-update-conda: true
+      - name: Print Python Version
         run: |
           python -V
       - name: Install GOSTnets
