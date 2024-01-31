@@ -49,4 +49,4 @@ optimization = [
 "Source" = "https://github.com/worldbank/GOSTnets"
 
 [tool.setuptools_scm]
-write_to = "GOSTnets/_version.py"
+write_to = "src/GOSTnets/_version.py"
