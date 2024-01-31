@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "GOSTnets"
+dynamic = ["version"]
+description = "Convenience wrapper for networkx analysis using geospatial information, focusing on OSM"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+authors = [{name = "World Bank", email = "github@worldbank.org"}]
+maintainers = [
+	{name = "Benjamin P. Stewart", email = "bstewart@worldbankgroup.org"},
+	{name = "Benny Istanto", email = "benny@istan.to"},
+	{name = "Andres Chamorro", email = "afche18@gmail.com"},
+]
+classifiers = [
+	"Programming Language :: Python :: 3.8",
+]
+requires-python = ">=3.8"
+dependencies = [
+	"rtree==0.9.3",
+	"geopandas",
+	"rasterio",
+	"geojson",
+]
+
+[project.optional-dependencies]
+docs = [
+	"docutils==0.17.1",
+	"jupyter-book >=1,<2",
+]
+dev = [
+	"pytest",
+	"pytest-cov",
+]
+osm = [
+	"gdal",
+	"geopy",
+	"boltons"
+]
+optimization = [
+	"pulp"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/worldbank/GOSTnets"
+"Bug Reports" = "https://github.com/worldbank/GOSTnets/issues"
+"Source" = "https://github.com/worldbank/GOSTnets"
+
+[tool.setuptools_scm]
+write_to = "GOSTnets/_version.py"
