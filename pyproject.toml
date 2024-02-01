@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "GOSTnets"
 dynamic = ["version"]
-description = "Convenience wrapper for networkx analysis using geospatial information, focusing on OSM"
+description = "Networkx wrapper to simplify network analysis using geospatial data"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {file = "LICENSE"}
 authors = [{name = "World Bank", email = "github@worldbank.org"}]
@@ -18,13 +18,21 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-	"geojson",
+	"rtree>=0.9.3",
 	"geopandas",
-	"osmnx",
 	"rasterio",
-	"rtree==0.9.3",
+	"geojson",
+	"networkx",
+	"numpy",
+	"osmnx>=1.0.1",
+	"pandas>=0.23.5",
+	"pyproj>=2.4.2",
 	"scipy",
+	"shapely"
 ]
+
+[tool.setuptools]
+packages = ["GOSTnets"]
 
 [project.optional-dependencies]
 docs = [
@@ -34,6 +42,12 @@ docs = [
 dev = [
 	"pytest",
 	"pytest-cov",
+	"docutils==0.17.1",
+	"jupyter-book >=1,<2",
+	"gdal",
+	"geopy",
+	"boltons",
+	"pulp"
 ]
 osm = [
 	"gdal",

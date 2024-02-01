@@ -2,31 +2,37 @@
 
 **Python for network analysis**
 
-Build, process, and analyze networks. GOSTNets is built on top of geopandas, networkx, osmnx, and peartree.
+Build, process, and analyze networks.
+GOSTNets is built on top of geopandas, networkx, osmnx, and rtree.
 
 ## Installation
-Eventually we will have the tool available on pip and conda, but for now, please use the setup.py in this repository
+
 ### From PyPi
-```
+**In development**
+<!-- ```
 conda create --name test python=3.8
 conda activate test
 conda install -c conda-forge rtree=0.9.3 geopandas rasterio geojson
 pip install GOSTnets
-```
+``` -->
+
+### From `conda-forge`
+**In development**
 
 ### From Source
+
+Clone or download this repository to your local machine.
+Then, navigate to the root directory of the repository and run the following command:
+
 ```
-conda create --name test python=3.8
-conda activate test
-conda install -c conda-forge rtree=0.9.3 geopandas rasterio geojson git
-git clone https://github.com/worldbank/GOSTnets.git
-python setup.py build
-python setup.py install
+pip install .
 ```
 
-### From Docker
+We recommend using a virtual environment to install GOSTnets, as it has many dependencies that may conflict with other packages on your system.
 
-#### pull image from DockerHub 
+<!-- ### From Docker
+
+#### pull image from DockerHub
 
 Clone this repo in your local environment (for example in: C:\repos\GOSTnets). Then run the docker container:
 
@@ -64,25 +70,27 @@ conda install python=3 geopandas rasterio geojson git gdal geopy boltons pulp ju
 
 optional: you can also install graph-tool using Conda and these instructions: https://git.skewed.de/count0/graph-tool/-/wikis/installation-instructions
 
-Then you will commit your image.
+Then you will commit your image. -->
 
 
-### Optional Dependencies
+## Alternative Installations With Optional Dependencies
+Below are some optional dependencies that can be installed with GOSTnets.
+These are not required to use GOSTnets, but they may be useful for some users, as they enable additional functionality.
+All of these alternative installs use the same `pip install` command as above, the below examples show how to install these from PyPI, but the same commands can be used to install from source, the text `GOSTnets` should be replaced with a `.` similar to the example above.
 
-#### load_osm.py
+### OSM Support (Needed to run functions from `load_osm.py`)
 ```
-conda install -c conda-forge gdal
-pip install geopy
-pip install boltons
-```
-
-#### optimization.py
-```
-pip install pulp
+pip install GOSTnets[osm]
 ```
 
-#### Install Jupyter Notebook
-Jupyter Notebook is used in many GOSTnets examples. We recommend installing it within your environment
+### Optimization Functions (Needed to run functions from `optimization.py`)
+```
+pip install GOSTnets[optimization]
+```
+
+### *Optional*: Install Jupyter Lab
+Jupyter Notebooks are used in many GOSTnets examples.
+We recommend installing `jupyterlab` within your environment so that you can run these examples.
 ```
 conda install -c conda-forge jupyterlab
 ```
@@ -94,7 +102,7 @@ Documentation available at [readthedocs](https://gostnets.readthedocs.io/)
 Plenty of examples and tutorials using Jupyter Notebooks live inside of the Implementations folder within the [GOST_PublicGoods Github repo](https://github.com/worldbank/GOST_PublicGoods)
 
 ### how to autobuild docs:
-in the docs dir, run: 
+in the docs dir, run:
 ```
 sphinx-apidoc -f -o source/ ../GOSTnets
 ```
@@ -105,14 +113,14 @@ make html
 
 ## Usage
 
-Every function contains a docstring which can be brought up in use to check the inputs for various functions. For example: 
+Every function contains a docstring which can be brought up in use to check the inputs for various functions. For example:
 
 ```python
 import GOSTnets as gn
 gn.edge_gdf_from_graph?
 ```
 
-returns: 
+returns:
 
 ```
 Signature: gn.edge_gdf_from_graph(G, crs={'init': 'epsg:4326'}, attr_list=None, geometry_tag='geometry', xCol='x', yCol='y')
