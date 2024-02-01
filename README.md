@@ -1,13 +1,11 @@
-# GOSTNets
+# GOSTnets: Build, process, and analyze networks
 
-**Python for network analysis**
-
-Build, process, and analyze networks.
-GOSTNets is built on top of geopandas, networkx, osmnx, and rtree.
+[GOSTnets](https://github.com/worldbank/GOSTnets) is built on top of geopandas, networkx, osmnx, and rtree.
 
 ## Installation
 
-### From PyPi
+### From PyPI
+
 **In development**
 <!-- ```
 conda create --name test python=3.8
@@ -17,18 +15,32 @@ pip install GOSTnets
 ``` -->
 
 ### From `conda-forge`
+
 **In development**
 
 ### From Source
 
-Clone or download this repository to your local machine.
-Then, navigate to the root directory of the repository and run the following command:
+1. Clone or download this repository to your local machine. Then, navigate to the root directory of the repository:
 
-```
-pip install .
-```
+    ```shell
+    git clone https://github.com/worldbank/GOSTnets.git
+    cd GOSTnets
+    ```
 
-We recommend using a virtual environment to install GOSTnets, as it has many dependencies that may conflict with other packages on your system.
+2. Create a virtual environment (optional but recommended):
+
+    ```shell
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
+
+3. Install the package in editable mode with dependencies:
+
+    ```shell
+    pip install -e .
+    ```
+
+    The `-e` flag stands for "editable," meaning changes to the source code will immediately affect the installed package.
 
 <!-- ### From Docker
 
@@ -37,10 +49,10 @@ We recommend using a virtual environment to install GOSTnets, as it has many dep
 Clone this repo in your local environment (for example in: C:\repos\GOSTnets). Then run the docker container:
 
 ```
-docker run -i -t -p 8888:8888 -v ${PWD}:/home -v C:\repos\GOSTnets:/GOSTnets --name anaconda3_gostnets_c1 d3netxer/anaconda3_gostnets_v1
+docker run -i -t -p 8888:8888 -v ${PWD}:/home -v C:\repos\GOSTnets:/GOSTnets --name anaconda3_GOSTnets_c1 d3netxer/anaconda3_GOSTnets_v1
 ```
 
-note in the docker command how you are mapping the 8888 port in the docker container to your local machine. You are also creating a volume to the GOSTnets repository code. You are also creating another volume in your present working directory, this is where your project code should be. Then within your container first activate the 'geo_env' anaconda environment ```conda activate geo_env```. Then use the following command to launch jupyter notebook from the container:
+note in the docker command how you are mapping the 8888 port in the docker container to your local machine. You are also creating a volume to the [GOSTnets](https://github.com/worldbank/GOSTnets) repository code. You are also creating another volume in your present working directory, this is where your project code should be. Then within your container first activate the 'geo_env' anaconda environment ```conda activate geo_env```. Then use the following command to launch jupyter notebook from the container:
 
 ```
 jupyter notebook --ip='0.0.0.0' --port=8888 --no-browser --allow-root --notebook-dir=/home
@@ -72,41 +84,44 @@ optional: you can also install graph-tool using Conda and these instructions: ht
 
 Then you will commit your image. -->
 
-
 ## Alternative Installations With Optional Dependencies
-Below are some optional dependencies that can be installed with GOSTnets.
-These are not required to use GOSTnets, but they may be useful for some users, as they enable additional functionality.
-All of these alternative installs use the same `pip install` command as above, the below examples show how to install these from PyPI, but the same commands can be used to install from source, the text `GOSTnets` should be replaced with a `.` similar to the example above.
+
+The following are optional dependencies that can be installed with [GOSTnets](https://github.com/worldbank/GOSTnets) - which not required to use [GOSTnets](https://github.com/worldbank/GOSTnets), but they may be useful for some users, as they enable additional functionality. All of these alternative installs use the same `pip install` command as above. The examples show how to install these from PyPI, but the same commands can be used to install from source, replacing the package name `GOSTnets` with a `.` similar to the example above.
 
 ### OSM Support (Needed to run functions from `load_osm.py`)
-```
+
+```shell
 pip install GOSTnets[osm]
 ```
 
-### Optimization Functions (Needed to run functions from `optimization.py`)
-```
-pip install GOSTnets[optimization]
+### Optimization Support (Needed to run functions from `optimization.py`)
+
+```shell
+pip install GOSTnets[opt]
 ```
 
-### *Optional*: Install Jupyter Lab
-Jupyter Notebooks are used in many GOSTnets examples.
-We recommend installing `jupyterlab` within your environment so that you can run these examples.
-```
-conda install -c conda-forge jupyterlab
+### Development Support
+
+```shell
+pip install GOSTnets[dev]
 ```
 
 ## Documentation
 
-Documentation available at [readthedocs](https://gostnets.readthedocs.io/)
+Documentation available at [readthedocs](https://GOSTnets.readthedocs.io/)
 
 Plenty of examples and tutorials using Jupyter Notebooks live inside of the Implementations folder within the [GOST_PublicGoods Github repo](https://github.com/worldbank/GOST_PublicGoods)
 
-### how to autobuild docs:
+### how to autobuild docs
+
 in the docs dir, run:
+
 ```
 sphinx-apidoc -f -o source/ ../GOSTnets
 ```
+
 in the docs dir, run:
+
 ```
 make html
 ```
@@ -146,3 +161,7 @@ Signature: gn.edge_gdf_from_graph(G, crs={'init': 'epsg:4326'}, attr_list=None, 
 ```
 
 These docstrings have been written for every function, and should help new and old users alike with the options and syntax.
+
+## License
+
+This licensed under the [**MIT License**](https://opensource.org/license/mit). This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

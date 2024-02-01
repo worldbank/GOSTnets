@@ -1,62 +1,44 @@
 [build-system]
-requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=64.0", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "GOSTnets"
 dynamic = ["version"]
 description = "Networkx wrapper to simplify network analysis using geospatial data"
-readme = {file = "README.md", content-type = "text/markdown"}
-license = {file = "LICENSE"}
-authors = [{name = "World Bank", email = "github@worldbank.org"}]
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
+authors = [{ name = "World Bank", email = "github@worldbank.org" }]
 maintainers = [
-	{name = "Benjamin P. Stewart", email = "bstewart@worldbankgroup.org"},
-	{name = "Andres Chamorro", email = "achamorroelizond@worldbank.org"},
+	{ name = "Benjamin P. Stewart", email = "bstewart@worldbankgroup.org" },
+	{ name = "Andres Chamorro", email = "achamorroelizond@worldbank.org" },
 ]
 classifiers = [
-	"Programming Language :: Python :: 3.8",
+	"Programming Language :: Python :: 3 :: Only",
+	"Development Status :: 3 - Alpha",
+	"Intended Audience :: Developers",
+	"Operating System :: OS Independent",
 ]
 requires-python = ">=3.8"
 dependencies = [
-	"rtree>=0.9.3",
-	"geopandas",
-	"rasterio",
 	"geojson",
+	"geopandas",
 	"networkx",
 	"numpy",
 	"osmnx>=1.0.1",
 	"pandas>=0.23.5",
 	"pyproj>=2.4.2",
+	"rasterio",
+	"rtree>=0.9.3",
 	"scipy",
-	"shapely"
+	"shapely",
 ]
-
-[tool.setuptools]
-packages = ["GOSTnets"]
 
 [project.optional-dependencies]
-docs = [
-	"docutils==0.17.1",
-	"jupyter-book>=1,<2",
-]
-dev = [
-	"pytest",
-	"pytest-cov",
-	"docutils==0.17.1",
-	"jupyter-book >=1,<2",
-	"gdal",
-	"geopy",
-	"boltons",
-	"pulp"
-]
-osm = [
-	"gdal",
-	"geopy",
-	"boltons"
-]
-optimization = [
-	"pulp"
-]
+dev = ["pytest", "pytest-cov", "GOStnets[docs,osm,opt]"]
+docs = ["docutils==0.17.1", "jupyter-book>=1,<2"]
+osm = ["gdal", "geopy", "boltons"]
+opt = ["pulp"]
 
 [project.urls]
 "Homepage" = "https://github.com/worldbank/GOSTnets"
