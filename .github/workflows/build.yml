@@ -43,9 +43,7 @@ jobs:
           python -V
       - name: Install GOSTnets
         run: |
-          conda install -c conda-forge rtree=0.9.3 geopandas rasterio geojson
-          python setup.py build
-          python setup.py install
+          pip install .
       - name: Test GOSTnets install
         run: |
           python -c "import GOSTnets"
