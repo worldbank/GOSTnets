@@ -26,7 +26,7 @@ def optimize_facility_locations(OD, facilities, p, existing_facilities = None, v
     """
     Function for identifying spatially optimal locations of facilities (P-median problem)
 
-    :param OD: an Origin:Destination matrix, origins as rows, destinations as columns, in pandas DataFrame format. 
+    :param OD: an Origin:Destination matrix, origins as rows, destinations as columns, in pandas DataFrame format.
     :param facilities: The 'destinations' of the OD-Matrix. MUST be a list of objects included in OD.columns (or subset) if certain nodes are unsuitable for facility locations
     :param p: the number of facilities to solve for
     :param existing_facilities: facilities to always include in the solution. MUST be in 'facilities' list
@@ -34,12 +34,12 @@ def optimize_facility_locations(OD, facilities, p, existing_facilities = None, v
     :param execute: should the problem be executed
     :param write: outPath to write problem
     """
-    
+
     num_procs = mp.cpu_count()
     if verbose:
         print('cpu count: %s' % num_procs)
     t1=time.time()
-    
+
     if type(OD) != pandas.core.frame.DataFrame:
         raise ValueError('OD must be pandas Dataframe!')
 
@@ -51,10 +51,10 @@ def optimize_facility_locations(OD, facilities, p, existing_facilities = None, v
         raise ValueError('need to solve for more than one facility!')
     elif p > len(facilities):
         raise ValueError('need to solve for fewer locations than location options!')
-    
+
     if verbose:
         print('Setting up problem')
-    
+
     origins = OD.index
     origins = list(map(int, origins))
 
@@ -77,13 +77,13 @@ def optimize_facility_locations(OD, facilities, p, existing_facilities = None, v
     if existing_facilities is not None:
         for e in existing_facilities:
             prob += X[e] == 1
-    
+
     if verbose:
         print('Set up the problem')
-    
+
     if write != '':
         prob.writeLP(write)
-        
+
     if execute:
         prob.solve()
         #the code below needs coin-or to be installed in the OS
@@ -91,7 +91,7 @@ def optimize_facility_locations(OD, facilities, p, existing_facilities = None, v
         ans = []
         if verbose:
             print("Processing time took: ", time.time() - t1)
-        
+
         for v in prob.variables():
             subV = v.name.split('_')
 
@@ -167,10 +167,10 @@ def optimize_set_coverage(OD, max_coverage = 2000, existing_facilities = None):
 
     print('print totalCoveredFacilities')
     print(totalCoveredFacilities)
-            
+
     print('print percent coverage')
     print(totalCoveredFacilities/len(origins)*100)
-    
+
     print('print prob obj')
     print(prob.objective)
 
@@ -190,12 +190,12 @@ def optimize_partial_set_coverage(OD, pop_coverage = .8, max_coverage = 2000, or
 
     # OD keys must be integers
     OD.columns = OD.columns.astype(int)
-    
+
     origins = OD.index
     origins = list(map(int, origins))
 
     facilities = OD.keys()
-    facilities = list(map(int, facilities))  
+    facilities = list(map(int, facilities))
 
     X = LpVariable.dicts('X',(facilities),0,1,LpInteger)
 
@@ -277,12 +277,12 @@ def optimize_max_coverage(OD, p_facilities = 5, max_coverage = 2000, origins_pop
 
     # OD keys must be integers
     OD.columns = OD.columns.astype(int)
-    
+
     origins = OD.index
     origins = list(map(int, origins))
 
     facilities = OD.keys()
-    facilities = list(map(int, facilities))  
+    facilities = list(map(int, facilities))
 
     #If a facility is located at candidate site j
     X = LpVariable.dicts('X', (facilities),0,1,LpInteger)

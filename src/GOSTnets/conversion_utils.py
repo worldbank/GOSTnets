@@ -13,12 +13,12 @@ from rasterio import features
 
 def rasterize_od_results(inD, outFile, field, template = None):
     ''' Convert gridded point data frame to raster of commensurate size and resolution
-    
+
     INPUT
     inD [ geopandas data frame ] - OD matrix as point data frame
     outFile [ string ] - path to save output raster
     field [ string ] - field to rasterize
-    
+
     RETURNS
     None
     '''
@@ -45,7 +45,7 @@ def rasterize_od_results(inD, outFile, field, template = None):
         new_dataset.write_band(1, burned)
 
         new_dataset.close()
-        
+
     else:
         #create grid from input shapefile
         # get xs, ys, and values from origin points
@@ -64,7 +64,7 @@ def rasterize_od_results(inD, outFile, field, template = None):
         xRes = (xx.max() - xx.min()) / len(unique_xs)
         yRes = (yy.max() - yy.min()) / len(unique_ys)
         # get the right transformation for raster file
-        trans = rasterio.transform.from_bounds(xx.min() - (xRes/2), yy.min() - (yRes/2), 
+        trans = rasterio.transform.from_bounds(xx.min() - (xRes/2), yy.min() - (yRes/2),
                                                xx.max() - (xRes/2), yy.max() - (yRes/2),
                                                x_pixels - 1, y_pixels - 1)
         new_dataset = rasterio.open(
@@ -74,10 +74,10 @@ def rasterize_od_results(inD, outFile, field, template = None):
             crs=inD.crs,
             transform=trans
         )
-        
+
         shapes = ((row.geometry,row[field]) for idx, row in inD.iterrows())
         burned = features.rasterize(shapes=shapes, fill=0, out_shape=grid_array.shape, transform=new_dataset.transform)
-        burned = burned.astype(grid_array.dtype)    
+        burned = burned.astype(grid_array.dtype)
         new_dataset.write_band(1, burned)
-        
+
         new_dataset.close()

@@ -36,7 +36,7 @@ def haversine(lon1, lat1, lon2, lat2, unit_m = True):
 
 
 def download_osm(left, bottom, right, top, proxy = False, proxyHost = "10.0.4.2", proxyPort = "3128", cache = False, cacheTempDir = "/tmp/tmpOSM/", verbose = True):
-    """ 
+    """
     Return a filehandle to the downloaded data from osm api.
     """
 
@@ -134,7 +134,7 @@ def read_osm(filename_or_stream, only_roads=True):
             G.add_path(w.nds, id=w.id, highway=w.tags['highway'])
             G.add_path(w.nds[::-1], id=w.id, highway=w.tags['highway'])
 
-    ## Complete the used nodes' information    
+    ## Complete the used nodes' information
     for n_id in G.nodes.keys():
         n = osm.nodes[n_id]
         G.node[n_id]['lat'] = n.lat
@@ -197,7 +197,7 @@ class Way:
 
 class OSM:
     def __init__(self, filename_or_stream):
-        """ 
+        """
         File can be either a filename or stream/file object.
         """
 
@@ -262,7 +262,7 @@ class OSM:
             for split_way in split_ways:
                 new_ways[split_way.id] = split_way
         self.ways = new_ways
-        
+
 def fetch_roads_OSM(osm_path, acceptedRoads=["motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","secondary_link","tertiary","tertiary_link"]):
     """
     Returns a GeoDataFrame of OSM roads from an OSM file
@@ -274,14 +274,14 @@ def fetch_roads_OSM(osm_path, acceptedRoads=["motorway","motorway_link","trunk",
 
     driver=ogr.GetDriverByName('OSM')
     data = driver.Open(osm_path)
-        
+
     sql_lyr = data.ExecuteSQL("SELECT osm_id,highway FROM lines WHERE highway IS NOT NULL")
 
-    roads=[]                          
+    roads=[]
     for feature in sql_lyr:
         if feature.GetField('highway') is not None:
             osm_id = feature.GetField('osm_id')
-            shapely_geo = loads(feature.geometry().ExportToWkt()) 
+            shapely_geo = loads(feature.geometry().ExportToWkt())
             if shapely_geo is None:
                 continue
             highway=feature.GetField('highway')
@@ -295,7 +295,7 @@ def fetch_roads_OSM(osm_path, acceptedRoads=["motorway","motorway_link","trunk",
         return road_gdf
     else:
         print('No roads in {}'.format(country))
-        
+
 def line_length(line, ellipsoid='WGS-84'):
     """
     Returns length of a line in meters, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
@@ -304,7 +304,7 @@ def line_length(line, ellipsoid='WGS-84'):
     :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
     :returns: Length of line in meters
     """
-      
+
     if line.geometryType() == 'MultiLineString':
         return sum(line_length(segment) for segment in line)
 

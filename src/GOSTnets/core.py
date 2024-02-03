@@ -109,19 +109,19 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
     """
     Function for generating a G object from a saved .csv of edges
 
-    :param fpath_nodes: 
+    :param fpath_nodes:
       path to a .csv containing nodes
-    :param fpath_edges: 
+    :param fpath_edges:
       path to a .csv containing edges
-    :param u_tag: 
+    :param u_tag:
       optional. specify column containing the node ID. This is used to only include entries that have a value.
-    :param u_tag: 
+    :param u_tag:
       optional. specify column containing u node ID if not labelled 'stnode'
-    :param v_tag: 
+    :param v_tag:
       specify column containing v node ID if not labelled 'endnode'
-    :param geometry_tag: 
+    :param geometry_tag:
       specify column containing geometry if not labelled 'Wkt'
-    :param largest_G: 
+    :param largest_G:
       If largest_G is true, then only the largest graph will be returned
     :param discard_node_col:
       default is empty, all columns in the nodes_df will be copied to the nodes in the graph. If a list is filled, all the columns specified will be dropped.
@@ -131,7 +131,7 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
       if contains a tag, then the oneway column is used to see whether reverse edges need to be added. This is much faster than using the add_missing_reflected_edges after a graph is already created.
     :oneway_tag:
       if oneway_tag exists, then missing reflected edges won't be added where an edge's oneway_tag equals True
-    :returns: 
+    :returns:
       a multidigraph object
     """
 
@@ -150,9 +150,9 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
                 return 0
 
         nodes_df['node_in_edge_df'] = nodes_df[node_tag].apply(lambda x: check(x, chck_set))
-        
+
         unique, counts = np.unique(nodes_df['node_in_edge_df'].values, return_counts=True)
-       
+
         print("validation check")
         print(f"counts of nodes in edges_df or not: {dict(zip(unique, counts))}")
 
@@ -197,7 +197,7 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
         data = {geometry_tag:loads(str(x[geometry_tag]))}
         for i in attr_list:
             data[i] = x[i]
-        
+
         if add_missing_reflected_edges:
             if oneway_tag:
                 if x[oneway_tag] == False:
@@ -222,7 +222,7 @@ def edges_and_nodes_gdf_to_graph(nodes_df, edges_df, node_tag = 'node_ID', u_tag
     # discard columns if specified
     if len(discard_node_col) > 0:
         nodes_df = nodes_df.drop(columns=discard_node_col)
-    
+
     # consider dropping na values
     # nodes_df.dropna(axis='columns', inplace=True)
 
@@ -277,17 +277,17 @@ def edges_and_nodes_csv_to_graph(fpath_nodes, fpath_edges, u_tag = 'stnode', v_t
     """
     Function for generating a G object from a saved .csv of edges
 
-    :param fpath_nodes: 
+    :param fpath_nodes:
       path to a .csv containing nodes
-    :param fpath_edges: 
+    :param fpath_edges:
       path to a .csv containing edges
-    :param u_tag: 
+    :param u_tag:
       optional. specify column containing u node ID if not labelled 'stnode'
-    :param v_tag: 
+    :param v_tag:
       specify column containing v node ID if not labelled 'endnode'
-    :param geometry_tag: 
+    :param geometry_tag:
       specify column containing geometry if not labelled 'Wkt'
-    :returns: 
+    :returns:
       a multidigraph object
     """
 
@@ -428,7 +428,7 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
                 new_column_info[i] = data[i]
             except:
                 pass
-        
+
         return new_column_info
 
     if single_edge == False:
@@ -438,7 +438,7 @@ def edge_gdf_from_graph(G, crs = 'EPSG:4326', attr_list = None, geometry_tag = '
             new_column_info = add_edge_attributes(data, stnode=u, endnode=v)
 
             edges.append(new_column_info)
-    
+
     else:
 
         unique_edges = []
@@ -744,24 +744,24 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
                             edge_gdf = edge_gdf.loc[edge_gdf[edge_filter[0]] != edge_filter[1]]
                     edge_gdf = edge_gdf[['geometry']]
                     edge_gdf['coords'] = edge_gdf.geometry.apply(lambda geometry: str(geometry.coords[0])+','+str(geometry.coords[1]))
-    
+
                 else:
-                    
+
                     new_nodes_gdf = gpd.GeoDataFrame({'id': subgraph.nodes()}, geometry=node_points, crs = default_crs)
                     new_nodes_gdf = new_nodes_gdf.set_index('id')
                     new_nodes_gdf['coords'] = new_nodes_gdf['geometry'].map(lambda x: x.coords[0])
-                    
+
                     new_edge_gdf = edge_gdf_from_graph(subgraph)
                     if edge_filters:
                         for edge_filter in edge_filters.items():
                             new_edge_gdf = new_edge_gdf.loc[new_edge_gdf[edge_filter[0]] != edge_filter[1]]
                     new_edge_gdf = new_edge_gdf[['geometry']]
                     new_edge_gdf['coords'] = new_edge_gdf.geometry.apply(lambda geometry: str(geometry.coords[0])+','+str(geometry.coords[1]))
-                    
+
                     # discard pp that have the same coordinate of an existing node
                     nodes_gdf = pd.concat([nodes_gdf,new_nodes_gdf], ignore_index = True)
                     edge_gdf = pd.concat([edge_gdf,new_edge_gdf], ignore_index = True)
-                    
+
             else:
                 pass
 
@@ -769,7 +769,7 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
 
         #drop duplicates
         nodes_gdf.drop_duplicates(inplace=True, subset="coords")
-        edge_gdf.drop_duplicates(inplace=True, subset="coords") 
+        edge_gdf.drop_duplicates(inplace=True, subset="coords")
 
         if measure_crs != None and nodes_gdf.crs != measure_crs:
             nodes_gdf = nodes_gdf.to_crs(measure_crs)
@@ -793,8 +793,8 @@ def make_iso_polys(G, origins, trip_times, edge_buff=10, node_buff=25, infill=Fa
         isochrone_polys.append(new_iso)
         nodez.append(str(_node_))
         tt.append(trip_time)
-            
-        
+
+
     gdf = gpd.GeoDataFrame({'geometry':isochrone_polys,'thresh':tt,'nodez':_node_}, crs = measure_crs, geometry = 'geometry')
     gdf = gdf.to_crs(default_crs)
 
@@ -902,7 +902,7 @@ def find_hwy_distances_by_class(G, distance_tag='length'):
         else:
             if data['highway'] not in class_list:
                 class_list.append(data['highway'])
-    
+
     class_dict = { i : 0 for i in class_list }
 
     for i in class_list:
@@ -920,7 +920,7 @@ def find_graph_avg_speed(G, distance_tag, time_tag):
     """
     Function for finding the average speed per km for the graph. It will sum up the total meters in the graph and the total time (in sec). \
     Then it will convert m/sec to km/hr. This function needs the 'convert_network_to_time' function to have run previously.
-    
+
     :param G:
       a graph containing one or more nodes
     :param distance_tag:
@@ -1314,7 +1314,7 @@ def randomly_disrupt_network(G, edge_frac, fail_value):
 
     :param G: a graph containing one or more nodes and one or more edges
     :param edge_frac: the percentage of edges to destroy. Integer rather than decimal, e.g. 5 = 5% of edges
-    :param fail_value: the data['time'] property is set to this value to simulate the removal of the edge      
+    :param fail_value: the data['time'] property is set to this value to simulate the removal of the edge
     :returns: a modified graph with the edited 'time' attribute the list of edge IDs randomly chosen for destruction
     """
 
@@ -1974,7 +1974,7 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
     #             pyproj.Proj(init=source),
     #             pyproj.Proj(init=target))
 
-    
+
     # project_UTM_WGS = partial(
     #             pyproj.transform,
     #             pyproj.Proj(init=target),
@@ -2117,13 +2117,13 @@ def salt_long_lines(G, source, target, thresh = 5000, factor = 1, attr_list = No
 
     return G2
 
-def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
+def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326',
                     add_dist_to_node_col = True, time_it = False):
     """
     snaps points to a graph at very high speed
     :param G: a graph object, or the node geodataframe of a graph
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
-    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
+    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638'
     :param target_crs: The measure crs how distances between points are calculated. The returned point GeoDataFrame's CRS does not get modified. The crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
     :return: returns a GeoDataFrame that is the same as the input point_gdf but adds a column containing the id of the nearest node in the graph, and the distance if add_dist_to_node_col == True
@@ -2207,13 +2207,13 @@ def pandana_snap(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326
 
     return in_df
 
-def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
+def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326',
                     add_dist_to_node_col = True, time_it = False):
     """
     snaps points to a graph at a faster speed than pandana_snap.
     :param G: a graph object, or the node geodataframe of a graph
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
-    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
+    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638'
     :param target_crs: The measure crs how distances between points are calculated. The returned point GeoDataFrame's CRS does not get modified. The crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
     :param time_it: return time to complete function
@@ -2300,14 +2300,14 @@ def pandana_snap_c(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:43
         print(func_end - func_start)
 
     return in_df
-    
-def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326', 
+
+def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'epsg:4326',
                     add_dist_to_node_col = True, time_it = False, k_nearest=5, origin_id = 'index'):
     """
-    snaps points their k nearest neighbors in the graph. 
+    snaps points their k nearest neighbors in the graph.
     :param G: a graph object
     :param point_gdf: a geodataframe of points, in the same source crs as the geometry of the graph object
-    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638' 
+    :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638'
     :param target_crs: The desired crs returned point GeoDataFrame. The crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
     :param time_it: return time to complete function
@@ -2349,7 +2349,7 @@ def pandana_snap_to_many(G, point_gdf, source_crs = 'epsg:4326', target_crs = 'e
             for origin, distance_list, index_list in zip(list(in_df[origin_id]), distances, indices):
                 index_list_NN = list(node_gdf['node_ID'].iloc[index_list])
                 nn_map[origin] = {'NN':list(index_list_NN), 'NN_dist':list(distance_list)}
-            
+
         else:
 
             try:
@@ -2432,11 +2432,11 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
     target_gdf['ID'] = target_gdf.index
 
     if add_dist_to_node_col is True:
-        
+
         if source_crs != target_crs:
             target_gdf = target_gdf.to_crs(f'{target_crs}')
             source_gdf = source_gdf.to_crs(f'{target_crs}')
-        
+
         target_gdf['x'] = target_gdf.geometry.x
         target_gdf['y'] = target_gdf.geometry.y
 
@@ -2457,7 +2457,7 @@ def pandana_snap_points(source_gdf, target_gdf, source_crs = 'epsg:4326', target
 
         target_gdf['x'] = target_gdf.geometry.x
         target_gdf['y'] = target_gdf.geometry.y
-        
+
         source_gdf['x'] = source_gdf.geometry.x
         source_gdf['y'] = source_gdf.geometry.y
 
@@ -2867,10 +2867,10 @@ def euclidean_distance(lat1, lon1, lat2, lon2):
     return km
 
 def utm_of_graph(G):
-     
+
     # STEP 1: PROJECT THE NODES
     gdf_nodes = node_gdf_from_graph(G)
-    
+
     # calculate longitude of centroid of union of all geometries in gdf
     avg_lng = gdf_nodes["geometry"].unary_union.centroid.x
 
@@ -2887,7 +2887,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     link each POI to the nearest edge (road segment) based on its projection
     point (PP) and generate a new integrated road network including the POIs,
     the projected points, and the connection edge.
-    
+
     Credit for original code: Yuwen Chang, 2020-08-16
 
     1. Make sure all three input GeoDataFrames have defined crs attribute. Try something like `gdf.crs` or `gdf.crs = 'epsg:4326'`. They will then be converted into epsg:3857 or specified measure_crs for processing.
@@ -2910,7 +2910,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     import rtree
     import itertools
     from shapely.ops import snap, split
-    
+
     pd.options.mode.chained_assignment = None
 
     # check if POIs are not MultiPolygon
@@ -2922,7 +2922,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         print("POI keys are not ints, are you sure this is okay?")
 
     ## STAGE 0: initialization
-    
+
     nodes = node_gdf_from_graph(G)
     nodes = nodes.rename(columns={'node_ID': node_key_col})
 
@@ -2933,7 +2933,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #     print('error, node_key_col needs to be an int or convertible to an int')
 
     edges = edge_gdf_from_graph(G, oneway_tag = oneway_tag, single_edge=True)
-    
+
     graph_crs = edges.crs
 
     start = time.time()
@@ -2951,14 +2951,14 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     edges_meter = edges.to_crs(measure_crs)
 
     # 0-1: helper functions
-    
+
     # find nearest edge
     def find_kne(point, lines, near_idx):
         # getting the distances between the point and the lines
         dists = np.array(list(map(lambda l: l.distance(point), lines)))
         kne_pos = dists.argsort()[0]
         #kne = lines.iloc[[kne_pos]]
-        
+
 
         #debugging
         #return lines, kne_pos
@@ -2968,7 +2968,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
         kne_idx = near_idx[kne_pos]
 
-        
+
 
         #kne_idx = kne.index[0]
         #return kne_idx, kne.values[0]
@@ -2979,7 +2979,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     def get_pp(point, line):
         """Get the projected point (pp) of 'point' on 'line'."""
-        
+
         # project new Point to be interpolated
         pp = line.interpolate(line.project(point))  # PP as a Point
 
@@ -2998,7 +2998,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         # IMPORTANT FIX for ensuring intersection between splitters and the line
         # but no need for updating edges_meter manually because the old lines will be
         # replaced anyway
-        # we want the tolerance to be really small, I changed it to a bigger tolerance of .5 meters and it caused 
+        # we want the tolerance to be really small, I changed it to a bigger tolerance of .5 meters and it caused
         # the end of the line to snap to the PP therefore creating a gap
         line = snap(line, pps, 1e-4)  # slow?
 
@@ -3013,7 +3013,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     def update_nodes(nodes, new_points, ptype, measure_crs='epsg:3857'):
         """Update nodes with a list (pp) or a GeoDataFrame (poi) of new_points.
-        
+
         Args:
             ptype: type of Point list to append, 'pp' or 'poi'
         """
@@ -3050,11 +3050,11 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         Args:
             replace: treat new_lines (flat list) as newly added edges if False,
                      else replace existing edges with new_lines (often a nested list)
-        
+
         Note:
             kne_idx refers to 'fid in Rtree'/'label'/'loc', not positional iloc
         """
-        
+
         # for interpolation (split by pp): replicate old line
         if replace:
             # create a flattened gdf with all line segs and corresponding kne_idx
@@ -3079,12 +3079,12 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
             # round nodes
             new_edges['geometry'] = new_edges.apply(lambda x: loads(dumps(x['geometry'], rounding_precision=3)), axis=1)
-            
+
             print('after')
             print(new_edges['geometry'])
 
             new_lines = new_edges['geometry']  # now a flatten list
-            
+
         # for connection (to external poi): append new lines
         else:
             new_edges = gpd.GeoDataFrame(pois[[poi_key_col]], geometry=new_lines, columns=[poi_key_col, 'geometry'], crs=measure_crs)
@@ -3110,7 +3110,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             lambda x: nodes_id_dict.get(list(x.coords)[-1], None))
 
         print("debugging")
-        # debugging 
+        # debugging
         for x in new_edges['geometry']:
             node_id_match = nodes_id_dict.get(list(x.coords)[0], None)
             if node_id_match is None:
@@ -3173,7 +3173,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
             # all edges, newly added edges only
             return edges, new_edges
 
-    
+
 
     print("print edges_meter")
     #print(edges_meter)
@@ -3193,10 +3193,10 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # print("print nodes_meter 2385764797 before")
     # print(nodes_meter.loc[nodes_meter.node_ID == 2385764797])
-    
+
     print("updating external nodes (pois)")
     nodes_meter, _ = update_nodes(nodes_meter, pois_meter, ptype='poi', measure_crs=measure_crs)
-    
+
     if verbose == True:
         print("finished updating external nodes (pois)")
         print('seconds elapsed: ' + str(time.time() - start))
@@ -3210,8 +3210,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     #pois_meter['near_idx'] = [list(Rtree.nearest(point.bounds, knn))
                               #for point in pois_meter['geometry']]  # slow
 
-    
-                              
+
+
     #pois_meter['near_lines'] = [edges_meter['geometry'][near_idx]
                                 #for near_idx in pois_meter['near_idx']]  # very slow
 
@@ -3219,8 +3219,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     def nearest_edge(row):
         near_idx = list(Rtree.nearest(row['geometry'].bounds, knn))
         near_lines = edges_meter['geometry'][near_idx]
-        return near_idx, near_lines     
-        
+        return near_idx, near_lines
+
     #debug
     #return pois_meter, edges_meter
 
@@ -3234,8 +3234,8 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
         print("finished pois_meter['near_idx'] and pois_meter['near_lines']")
         print('seconds elapsed: ' + str(time.time() - start))
 
-    
-                                
+
+
     pois_meter['kne_idx'], knes = zip(
         *[find_kne(point, near_lines, near_idx) for point, near_lines, near_idx in
           zip(pois_meter['geometry'], pois_meter['near_lines'], pois_meter['near_idx'])])  # slow
@@ -3273,7 +3273,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # reduce precision for the existing nodes in the graph and store them in the 'coords' column
     nodes_meter['coords'] = nodes_meter.apply(lambda x: dumps(x['geometry'], rounding_precision=3), axis=1)
-    
+
     pp_column = pp_column.merge(nodes_meter['coords'], on='coords', how='left', indicator=True)
     pp_column = pp_column.query('_merge == "left_only"')
 
@@ -3300,13 +3300,13 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     #return nodes_meter, _new_nodes
 
-    
-   
+
+
     nodes_coord = nodes_meter['geometry'].map(lambda x: x.coords[0])
-    
+
     #print("print nodes_coord")
     #print(nodes_coord)
-    
+
     #nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col].astype('int64')))
     nodes_id_dict = dict(zip(nodes_coord, nodes_meter[node_key_col]))
 
@@ -3350,10 +3350,10 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     #return nodes_id_dict, new_lines, line_pps_dict, edges_meter, nodes_meter
 
-    # print("edges_meter before") 
+    # print("edges_meter before")
     # print(edges_meter.loc[edges_meter.endnode == 3874047473])
 
-    
+
     # replacing existing lines with split lines
     print("Updating update_edges")
     edges_meter, _ = update_edges(edges_meter, new_lines, replace=True)
@@ -3368,7 +3368,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     # print("edges_meter after")
     # print(edges_meter.loc[edges_meter.endnode == 3874047473])
-    
+
     ## STAGE 2: connection
     # 2-1: update external edges (projected footways connected to pois)
     # establish new_edges
@@ -3378,7 +3378,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pois_meter['pp'])]
     edges_meter, new_footway_edges, nodes_meter, pois_meter = update_edges(edges_meter, new_lines, replace=False, nodes_meter=nodes_meter, pois_meter=pois_meter)
 
-    
+
 
     if verbose == True:
         print("finished Updating external links")
@@ -3398,7 +3398,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # print(nodes)
     # print("print edges")
     # print(edges)
-      
+
     # preprocess for pandana
     nodes.index = nodes[node_key_col]  # IMPORTANT
     nodes.index.name = None
@@ -3417,21 +3417,21 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
     # - examine missing nodes
     print("Missing 'from' nodes:", edges[u_tag].isnull().sum())
     print("Missing 'to' nodes:", edges[v_tag].isnull().sum())
-   
+
     # convert back to input graph CRS
     nodes = nodes.to_crs(graph_crs)
     edges = edges.to_crs(graph_crs)
     pois_meter = pois_meter.to_crs(graph_crs)
 
     new_footway_edges = new_footway_edges.to_crs(graph_crs)
-       
+
     #print("print edges")
     #print(edges)
-    
+
     #print("print nodes")
     #print(nodes)
 
-    # Makes bi-directional graph from edges 
+    # Makes bi-directional graph from edges
     print("making a new graph from edges and nodes")
 
     # not sure why, but there may be an edge case where en edge has the same to and from node and a length of 0
@@ -3439,7 +3439,7 @@ def advanced_snap(G, pois, u_tag = 'stnode', v_tag = 'endnode', node_key_col='os
 
     #return nodes, edges
 
-    # now the edges_and_nodes_gdf_to_graph function has the ability to add reverse edges from a single-way GDF using the add_missing_reflected_edges flag. 
+    # now the edges_and_nodes_gdf_to_graph function has the ability to add reverse edges from a single-way GDF using the add_missing_reflected_edges flag.
     # This is much faster than using the add_missing_reflected_edges after a graph is already created
     G = edges_and_nodes_gdf_to_graph(nodes, edges, node_tag = node_key_col, u_tag = u_tag, v_tag = v_tag, geometry_tag = 'geometry', discard_node_col=['coords'], add_missing_reflected_edges=True, oneway_tag=oneway_tag)
     #G = add_missing_reflected_edges(G, one_way_tag=oneway_tag)
@@ -3496,7 +3496,7 @@ def add_intersection_delay(G, intersection_delay=7, time_col = 'time', highway_c
             node_intersection_list.append(node)
 
     for intersection in node_intersection_list:
-            
+
         pred_node_dict = {}
         for pred_node in G.predecessors(intersection):
             for edge in G[pred_node][intersection]:
@@ -3506,12 +3506,12 @@ def add_intersection_delay(G, intersection_delay=7, time_col = 'time', highway_c
                 if isinstance(new_key, list):
                     new_key = new_key[0]
                 pred_node_dict[pred_node] = highway_rank.get(new_key)
-                
+
         # update all 'None' values to 5
         pred_node_dict = {k:(5 if v==None else v) for k, v in pred_node_dict.items() }
         pred_node_dict = dict(sorted(pred_node_dict.items(), key=lambda item: item[1], reverse=False))
         #print(pred_node_dict)
-        
+
         first_element_value = pred_node_dict[next(iter(pred_node_dict))]
         res = Counter(pred_node_dict.values())
         if res[first_element_value] <= 2:
@@ -3520,7 +3520,7 @@ def add_intersection_delay(G, intersection_delay=7, time_col = 'time', highway_c
             pred_node_dict = {key:val for key, val in pred_node_dict.items() if val != first_element_value}
         else:
             pred_node_dict = pred_node_dict
-        
+
         #print(f"print pred_node_dict again: {pred_node_dict}")
         for pred_node,value in pred_node_dict.items():
         #for pred_node in G.predecessors(intersection):

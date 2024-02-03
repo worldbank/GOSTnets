@@ -12,7 +12,7 @@ from .core import calculate_OD as calc_od
 
 def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calculate_snap=False, wgs84 = {'init':'epsg:4326'}):
     ''' Calculate Origin destination matrix from GeoDataframes
-    
+
     Args:
         G (networkx graph): describes the road network. Often extracted using OSMNX
         origins (geopandas dataframe): source locations for calculating access
@@ -44,8 +44,8 @@ def calculateOD_gdf(G, origins, destinations, fail_value=-1, weight="time", calc
         for idx, row in originsUTM.iterrows():
             outputMatrix[idx,:] = outputMatrix[idx,:] + row['tTime_sec']
         outputMatrix = outputMatrix
-    return(outputMatrix)    
-    
+    return(outputMatrix)
+
 def calculateOD_csv(G, originCSV, destinationCSV='', oLat="Lat", oLon="Lon", dLat="Lat", dLon="Lon", crs={'init':'epsg:4326'}, fail_value=-1, weight='time', calculate_snap=False):
     """
     Calculate OD matrix from csv files of points
@@ -88,27 +88,27 @@ def calculate_gravity(od, oWeight=[], dWeight=[], decayVals=[0.01,
                                                         0.0000962704,   # Market access halves every 120 mins
                                                         0.0000385082,   # Market access halves every 300 mins
                                                         0.00001]):
-    
+
 
     if len(oWeight) != od.shape[0]:
         oWeight = [1] * od.shape[0]
     if len(dWeight) != od.shape[1]:
         dWeight = [1] * od.shape[1]
     allRes = []
-    
+
     od_df = pd.DataFrame(od)
-    
-    
+
+
     for dist_decay in decayVals:
         decayFunction = lambda x: np.exp(-1 * dist_decay * x)
-        
+
         summedVals = np.sum(decayFunction(od_df) * dWeight, axis=1) * oWeight
-        
+
         allRes.append(summedVals)
-        
+
     res = pd.DataFrame(allRes).transpose()
     res.columns = columns=['d_%s' % d for d in decayVals]
-    
+
     return(res)
 
 
@@ -122,10 +122,10 @@ def calculate_gravity(od, oWeight=[], dWeight=[], decayVals=[0.01,
 #                                                         0.0000385082,   # Market access halves every 300 mins
 #                                                         0.00001]):
 #     ''' Calculate the gravity weight between origins and destinations.
-    
+
 #     Args:
-#         od (ndarray): matrix of travel time    
-#         oWeight/dWeight (array, optional) - array of weights for calculating weight; reverts to 1 for if not defined   
+#         od (ndarray): matrix of travel time
+#         oWeight/dWeight (array, optional) - array of weights for calculating weight; reverts to 1 for if not defined
 #         decayVals (array, optional): decayVals to calculate for gravity. Each value will be returned as a column of results
 #     Returns:
 #         geopandas: columns of decayvals
@@ -148,5 +148,5 @@ def calculate_gravity(od, oWeight=[], dWeight=[], decayVals=[0.01,
 #     res = pd.DataFrame(allRes).transpose()
 #     res.columns = columns=['d_%s' % d for d in decayVals]
 #     return(res)
-    
-    
+
+

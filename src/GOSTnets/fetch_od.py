@@ -12,8 +12,8 @@ except:
     import urllib2 as url  # python 2
 
 ###### OD Matrix ######
-def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = 'ID', 
-                    Pop = None, call_type = 'OSRM', rescue = 0, rescue_num = 0, MB_Token = '', 
+def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = 'ID',
+                    Pop = None, call_type = 'OSRM', rescue = 0, rescue_num = 0, MB_Token = '',
                     sleepTime = 5, osrmHeader = ''):
     """
     make sure lat_name and Lon_names are the same column names in both your infile (origins) and infile_2 (destinations)
@@ -25,8 +25,8 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
     :param Pop: Population / weighting column name
     :param call_type: Server call type - "OSRM" for OSRM, "MB" for Mapbox, "MBT" for Mapbox traffic, or "Euclid" for Euclidean distances (as the crow flies)
     :param MB_Token: Mapbox private key if using the "MB" or "MBT" call types
-    """     
-        
+    """
+
     # Function for performing Euclidian distances.
     def EuclidCall(source_list,dest_list,source_points,dest_points):
             distmatrix = np.zeros((len(source_points),len(dest_points)))
@@ -40,7 +40,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
             df = df.stack(level =-1)
             df.columns = ['O','D','DIST']
             return df
-    
+
     # Function for calling OSRM server.
     def Call(O_list, D_list, i, O_IDs, D_IDs, header):
         # Convert origins to HTTP request string
@@ -66,7 +66,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
         else:
             # Build request string
             request = header+data+'?sources='+sources+'&destinations='+destinations
-            
+
         # Pass request to interweb
         try:
             r = url.urlopen(request)
@@ -74,7 +74,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
             print(request)
             time.sleep(5)
             r = url.urlopen(request)
-            
+
         # Error handle
         try:
             # Convert Bytes response to readable Json
@@ -154,7 +154,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
     input_df2['dest_list'] = input_df2[lon_name].map(str).str.cat(input_df2[lat_name].map(str), sep = ',')
     input_df2['dest_list'] = input_df2['dest_list']+';'
     dest_list = input_df2['dest_list'].values.tolist()
-    dest_UIDs = input_df2[UID].values.tolist()           
+    dest_UIDs = input_df2[UID].values.tolist()
 
     if call_type == 'MBT' :
         sources_list = split_and_bundle(source_list, 5)
@@ -168,7 +168,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
         dests_UIDs = split_and_bundle(dest_UIDs, 13)
     else:
         pass
-            
+
     # Run function call across the O-D matrix; output is 'df'
     returns = []
     numcalls = (len(sources_list) * len(dests_list))
@@ -176,7 +176,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
     #s, d = sources_list, dests_list
     i, j = 1 + (rescue * len(sources_list)), 1 + rescue
 
-    ### Making Calls 
+    ### Making Calls
     if call_type == 'Euclid':
         df = EuclidCall(source_list,dest_list,source_points,dest_points)
     else:
@@ -194,8 +194,8 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
             time.sleep(sleepTime)
         for O_list in sources_list:
             O_IDs = sources_UIDs[sources_list.index(O_list)]
-            for D_list in dests_list:  
-                print("1 iteration")                  
+            for D_list in dests_list:
+                print("1 iteration")
                 if sleepTime > 0:
                     time.sleep(sleepTime)
                 D_IDs = dests_UIDs[dests_list.index(D_list)]
@@ -210,7 +210,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
                         header = osrmHeader
                 try:
                     # prevent server annoyance
-                    print('Call to OSRM server number: %d of %s' % (i, numcalls_rem))                
+                    print('Call to OSRM server number: %d of %s' % (i, numcalls_rem))
                     returns.append(Call(O_list,D_list,i,O_IDs,D_IDs, header))
                     print('done with call')
                     i += 1
@@ -262,7 +262,7 @@ def CreateODMatrix(infile, infile_2, lat_name = 'Lat', lon_name = 'Lon', UID = '
     else:
         return df
 
-def MarketAccess(new, lambder_list = 
+def MarketAccess(new, lambder_list =
                    [0.01,
                     0.005,
                     0.001,
@@ -287,7 +287,7 @@ def MarketAccess(new, lambder_list =
 
     return output
 
-      
+
 def ReadMe(ffpath):
     readmetext = ("""
         GOST: Market Access: Product Assumptions
@@ -359,49 +359,49 @@ def ReadMe(ffpath):
     text_file.write(readmetext)
     text_file.close()
 
-    
+
 if __name__ == "__main__":
     exampleText = '''
     ##### Run OD Matrix only #####
     python OD.py -od -s C:/Temp/sources.csv -d C:/Temp/destinations.csv -outputOD C:/Temp/OD.csv
-    
+
     # Run MA only
     python OD.py -ma -matrix C:/Temp/MatrixRes.csv -outputMA C:/Temp/MA_Res.csv
-    
+
     # Run Both Analyses
     python OD.py -all -s C:/Temp/sources.csv -d C:/Temp/destinations.csv -outputMA C:/Temp/MA_Res.csv -outputOD C:/Temp/OD.csv
     '''
     parser = argparse.ArgumentParser(description="Calculate Origin Detination",
         epilog=exampleText, formatter_class=argparse.RawDescriptionHelpFormatter)
-    
+
     parser.add_argument('-all', dest="ALL", action='store_true', help="Set if you want to run both OD Matrix Calculation and Market Access")
     parser.add_argument('-od', dest="OD", action='store_true', help="Run OD Matrix calculation only")
     parser.add_argument('-ma', dest="MA", action='store_true', help="Run Market Access Calculation")
-    
+
     parser.add_argument('-s', dest="SOURCES_FILE", action='store', help="Sources Points as CSV")
     parser.add_argument('-d', dest="DESTINATION_FILE", action='store', help="Destination Points as CSV")
     parser.add_argument('-matrix', dest='MATRIX_FILE', action='store', help="if running only market access, define Matrix csv here")
-    
+
     parser.add_argument('-outputOD', dest='OD_FILE', action='store', help="Output csv for OD Matrix")
     parser.add_argument('-outputMA', dest='MA_FILE', action='store', help="Output csv for market access results")
-    
+
     parser.add_argument('--lat', dest='LAT_NAME', action='store', default='Lat', help="Name of Latitude coordinates in both sources and dests")
     parser.add_argument('--lon', dest='LON_NAME', action='store', default='Lon', help="Name of Longitude coordinates in both sources and dests")
     parser.add_argument('--id', dest='UID', action='store', default='ID', help="unique identifier used in both sources and dests")
     parser.add_argument('--Pop', dest='POPFIELD', action='store', default='Pop', help="Field in input files defining population for sources and destinations")
     parser.add_argument('--osrm', dest='OSRMHEADER', action='store', default='', help="optional parameter to set OSRM source")
     parser.add_argument('--sleep', dest='SLEEPTIME', action='store', default=3, help="When making calls to OSRM, a sleep time is required to avoid DDoS")
-    
+
     args = parser.parse_args()
-    
+
     if args.ALL or args.OD:
-        #Create OD Matrix        
-        odRes = CreateODMatrix(args.SOURCES_FILE, args.DESTINATION_FILE, 
+        #Create OD Matrix
+        odRes = CreateODMatrix(args.SOURCES_FILE, args.DESTINATION_FILE,
                        lat_name=args.LAT_NAME, lon_name=args.LON_NAME, Pop=args.POPFIELD,
                        UID=args.UID, osrmHeader=args.OSRMHEADER, sleepTime=float(args.SLEEPTIME))
         if args.OD_FILE:
             odRes.to_csv(args.OD_FILE)
-        
+
     if args.ALL or args.MA:
         #Create Market Access
         if args.MATRIX_FILE:

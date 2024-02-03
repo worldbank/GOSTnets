@@ -15,7 +15,7 @@ from shapely.ops import unary_union
 ### Definitions
 
 class OsmObject():
-    """	
+    """
     education = {'amenity':['school', 'kindergarten','university', 'college']}
     health = {'amenity':['clinic', 'pharmacy', 'hospital', 'health']}
 
@@ -29,7 +29,7 @@ class OsmObject():
         current.RemoveDupes(buf_width, crs)
         current.Save(a)
     """
-    
+
     def __init__(self, a, poly, tags, path=""):
         """
         VARIABLES
@@ -42,9 +42,9 @@ class OsmObject():
         self.name = a
         self.bbox = poly
         self.path = path
-    
+
     def RelationtoPoint(self, string):
-        
+
         lats, lons = [], []
 
         #It is possible that a relation might be a Polygon instead of a MultiPolygon
@@ -58,9 +58,9 @@ class OsmObject():
             lats.append(i.bounds[3])
 
         point = box(min(lons), min(lats), max(lons), max(lats)).centroid
-                
+
         return point
-    
+
     def GenerateOSMPOIs(self):
 
         # old way in OSMNX
@@ -74,10 +74,10 @@ class OsmObject():
         print(f"is df empty: {df.empty}")
         if df.empty == True:
             return df
-        
+
         points = df.copy()
         points = points.loc[points['element_type'] == 'node']
-        
+
         polygons = df.copy()
         polygons = polygons.loc[polygons['element_type'] == 'way']
         polygons['geometry'] = polygons.centroid
@@ -87,33 +87,33 @@ class OsmObject():
         multipolys['geometry'] = multipolys['geometry'].apply(lambda x: self.RelationtoPoint(x))
 
         df = pd.concat([pd.DataFrame(points),pd.DataFrame(polygons),pd.DataFrame(multipolys)], ignore_index=True)
-        
+
         self.df = df
         return df
-    
-    def RemoveDupes(self, buf_width, crs = 'epsg:4326'):        
-        df = self.df        
-        gdf = gpd.GeoDataFrame(df, geometry = 'geometry', crs = crs)        
+
+    def RemoveDupes(self, buf_width, crs = 'epsg:4326'):
+        df = self.df
+        gdf = gpd.GeoDataFrame(df, geometry = 'geometry', crs = crs)
         if gdf.crs != crs:
-            gdf = gdf.to_crs(crs)        
-        gdf['buffer'] = gdf['geometry'].buffer(buf_width)        
-        l = pd.DataFrame()        
-        for i in gdf.index:            
-            row = gdf.loc[i]            
+            gdf = gdf.to_crs(crs)
+        gdf['buffer'] = gdf['geometry'].buffer(buf_width)
+        l = pd.DataFrame()
+        for i in gdf.index:
+            row = gdf.loc[i]
             if len(l) == 0:
                 #l = l.append(row, ignore_index = True)
-                l = pd.concat([l, row.to_frame().T], ignore_index = True)              
+                l = pd.concat([l, row.to_frame().T], ignore_index = True)
             else:
-                current_points = unary_union(l['buffer']) 
+                current_points = unary_union(l['buffer'])
                 if row['buffer'].intersects(current_points):
-                    pass                
+                    pass
                 else:
                     #l = l.append(row, ignore_index = True)
-                    l = pd.concat([l, row.to_frame().T], ignore_index = True)      
-        gdf = gdf.to_crs(crs)        
+                    l = pd.concat([l, row.to_frame().T], ignore_index = True)
+        gdf = gdf.to_crs(crs)
         self.df = l
         return l
-                
+
     def prepForMA(self):
         """
         prepare results data frame for use in the OSRM functions in OD
@@ -126,9 +126,9 @@ class OsmObject():
                 return ([x.x, x.y])
             except:
                 return([0,0])
-            
+
         curDF = self.df
-        allShapes = [tryLoad(x) for x in curDF.geometry]   
+        allShapes = [tryLoad(x) for x in curDF.geometry]
         Lon = [x[0] for x in allShapes]
         Lat = [x[1] for x in allShapes]
         curDF['Lat'] = Lat
@@ -136,7 +136,7 @@ class OsmObject():
         curDF['mID'] = range(0,curDF.shape[0])
         curDF = curDF.drop(['geometry', 'buffer'], axis=1)
         return curDF
-    
+
     def Save(self, outFolder):
         out = os.path.join(self.path, outFolder)
         if not os.path.exists(out):
