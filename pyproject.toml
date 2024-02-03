@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "GOStnets[docs,osm,opt]"]
+dev = ["pre-commit", "pytest", "pytest-cov", "GOStnets[docs,osm,opt]"]
 docs = ["docutils==0.17.1", "jupyter-book>=1,<2"]
 osm = ["gdal", "geopy", "boltons"]
 opt = ["pulp"]
