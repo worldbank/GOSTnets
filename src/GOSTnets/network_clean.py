@@ -1,17 +1,18 @@
-#the cleaning network part
-import os, sys, time
+# the cleaning network part
 
-import importlib
-import osmnx as ox
-
-from shapely.ops import unary_union
-from shapely.wkt import loads
-from shapely.geometry import LineString, MultiLineString, Point
 
 from .core import *
 
 
-def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:3857'}, WGS = {'init': 'epsg:4326'}, junctdist = 50, verbose = False):
+def clean_network(
+    G,
+    wpath="",
+    output_file_name="",
+    UTM={"init": "epsg:3857"},
+    WGS={"init": "epsg:4326"},
+    junctdist=50,
+    verbose=False,
+):
     """
     Topologically simplifies an input graph object by collapsing junctions and removing interstital nodes
     :param G: a graph object containing nodes and edges. Edges should have a property called 'Wkt' containing geometry objects describing the roads.
@@ -31,19 +32,19 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:385
 
     # save progress
     if verbose is True:
-        save(a, 'a', wpath)
+        save(a, "a", wpath)
 
     # Finds and deletes interstital nodes based on node degree
     b = custom_simplify(a)
 
     # rectify geometry
-    for u, v, data in b.edges(data = True):
-        if type(data['Wkt']) == list:
-                data['Wkt'] = unbundle_geometry(data['Wkt'])
+    for u, v, data in b.edges(data=True):
+        if type(data["Wkt"]) == list:
+            data["Wkt"] = unbundle_geometry(data["Wkt"])
 
     # save progress
     if verbose is True:
-        save(b, 'b', wpath)
+        save(b, "b", wpath)
 
     # For some reason CustomSimplify doesn't return a MultiDiGraph. Fix that here
     c = convert_to_MultiDiGraph(b)
@@ -56,18 +57,23 @@ def clean_network(G, wpath = '', output_file_name = '', UTM = {'init': 'epsg:385
     c = custom_simplify(c)
 
     # rectify geometry again
-    for u, v, data in c.edges(data = True):
-        if type(data['Wkt']) == list:
-            data['Wkt'] = unbundle_geometry(data['Wkt'])
+    for u, v, data in c.edges(data=True):
+        if type(data["Wkt"]) == list:
+            data["Wkt"] = unbundle_geometry(data["Wkt"])
 
     # Ensure all remaining edges are duplicated (two-way streets)
     c = add_missing_reflected_edges(c)
 
     # save final
     if verbose:
-       save(c, '%s_processed' % output_file_name, wpath)
+        save(c, "%s_processed" % output_file_name, wpath)
 
-    print('Edge reduction: %s to %s (%d percent)' % (G.number_of_edges(),
-                                               c.number_of_edges(),
-                                               ((G.number_of_edges() - c.number_of_edges())/G.number_of_edges()*100)))
+    print(
+        "Edge reduction: %s to %s (%d percent)"
+        % (
+            G.number_of_edges(),
+            c.number_of_edges(),
+            ((G.number_of_edges() - c.number_of_edges()) / G.number_of_edges() * 100),
+        )
+    )
     return c
