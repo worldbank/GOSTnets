@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "GOStnets[docs,osm,opt]"]
+dev = ["pre-commit", "pytest", "pytest-cov", "GOStnets[docs,osm,opt]"]
 docs = ["docutils==0.17.1", "jupyter-book>=1,<2"]
 osm = ["gdal", "geopy", "boltons"]
 opt = ["pulp"]
@@ -47,3 +47,11 @@ opt = ["pulp"]
 
 [tool.setuptools_scm]
 write_to = "src/GOSTnets/_version.py"
+
+[tool.codespell]
+skip = 'docs/_build,docs/references.bib,__pycache__,*.png,*.gz,*.whl'
+ignore-regex = '^\s*"image\/png":\s.*'
+ignore-words-list = "gost,"
+
+[tool.ruff.pydocstyle]
+convention = "numpy"
