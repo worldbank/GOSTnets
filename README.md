@@ -6,7 +6,8 @@
 
 ### From PyPI
 
-**In development**
+#### *pypi support in development*
+
 <!-- ```
 conda create --name test python=3.8
 conda activate test
@@ -16,7 +17,7 @@ pip install GOSTnets
 
 ### From `conda-forge`
 
-**In development**
+#### *conda support in development*
 
 ### From Source
 
@@ -116,13 +117,13 @@ Plenty of examples and tutorials using Jupyter Notebooks live inside of the Impl
 
 in the docs dir, run:
 
-```
+```shell
 sphinx-apidoc -f -o source/ ../GOSTnets
 ```
 
 in the docs dir, run:
 
-```
+```shell
 make html
 ```
 
@@ -137,7 +138,7 @@ gn.edge_gdf_from_graph?
 
 returns:
 
-```
+```python
 Signature: gn.edge_gdf_from_graph(G, crs={'init': 'epsg:4326'}, attr_list=None, geometry_tag='geometry', xCol='x', yCol='y')
 #### Function for generating a GeoDataFrame from a networkx Graph object ###
  REQUIRED: a graph object G
