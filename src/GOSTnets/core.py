@@ -142,7 +142,7 @@ def edges_and_nodes_gdf_to_graph(
     :param discard_node_col:
       default is empty, all columns in the nodes_df will be copied to the nodes in the graph. If a list is filled, all the columns specified will be dropped.
     :checks:
-      if True, will perfrom a validation checks and return the nodes_df with a 'node_in_edge_df' column
+      if True, will perform a validation checks and return the nodes_df with a 'node_in_edge_df' column
     :add_missing_reflected_edges:
       if contains a tag, then the oneway column is used to see whether reverse edges need to be added. This is much faster than using the add_missing_reflected_edges after a graph is already created.
     :oneway_tag:
@@ -693,7 +693,7 @@ def generate_isochrones(G, origins, thresh, weight=None, stacking=False):
     Function for generating isochrones from one or more graph nodes. Ensure any GeoDataFrames / graphs are in the same projection before using function, or pass a crs
 
     :param G: a graph containing one or more nodes
-    :param orgins: a list of node IDs that the isochrones are to be generated from
+    :param origins: a list of node IDs that the isochrones are to be generated from
     :param thresh: The time threshold for the calculation of the isochrone
     :param weight: Name of edge weighting for calculating 'distances'. For isochrones, should be time expressed in seconds. Defaults to time expressed in seconds.
     :param stacking: If True, returns number of origins that can be reached from that node. If false, max = 1
@@ -1243,7 +1243,7 @@ def assign_traffic_times(
     :param verbose: Set to true to monitor progress of queries and notify if any queries failed, defaults to False
     :param road_col: key for the road type in the edge data dictionary, defaults to 'infra_type'
     :param id_col: key for the id in the edge data dictionary, defaults to 'id'
-    :returns: The original graph with two new data properties for the edges: 'mapbox_api' (a boolean set to True if the edge succesfuly received a trafic time value) and 'time_traffic' (travel time in seconds)
+    :returns: The original graph with two new data properties for the edges: 'mapbox_api' (a boolean set to True if the edge successfully received a traffic time value) and 'time_traffic' (travel time in seconds)
     """
 
     import json
@@ -1264,7 +1264,7 @@ def assign_traffic_times(
     # print(edges_all[road_col][390:400])
 
     print("print unique roads")
-    # may not of orginally worked because some fields can contain multiple road tags in a list. Ex. [motorway, trunk]. need to do pre-processing
+    # may not of originally worked because some fields can contain multiple road tags in a list. Ex. [motorway, trunk]. need to do pre-processing
     print(edges_all[road_col].unique())
 
     print("print accepted_road_types")
@@ -1512,7 +1512,7 @@ def gravity_demand(
     G, origins, destinations, weight, maxtrips=100, dist_decay=1, fail_value=99999999999
 ):
     """
-    Function for generating a gravity-model based demand matrix. Note: 1 trip will always be returned between an origin and a destination, even if weighting would otherewise be 0.
+    Function for generating a gravity-model based demand matrix. Note: 1 trip will always be returned between an origin and a destination, even if weighting would otherwise be 0.
     :param origins: a list of node IDs. Must be in G.
     :param destinations: a list of node IDs Must be in G.
     :param weight: the gravity weighting of the nodes in the model, e.g. population
@@ -3024,7 +3024,7 @@ def new_edge_generator(
         nodes_to_add.append((v, node_data))
         iterator += 1
 
-    # update the data dicionary for the new geometry
+    # update the data dictionary for the new geometry
     UTM_geom = transform(project_WGS_UTM, passed_geom)
     edge_data = {}
     edge_data[geom_col] = passed_geom
@@ -3248,7 +3248,7 @@ def advanced_snap(
     :param knn (int): k nearest neighbors to query for the nearest edge. Consider increasing this number up to 10 if the connection output is slightly unreasonable. But higher knn number will slow down the process.
     :param measure_crs (int):  preferred EPSG in meter units. Suggested to use the correct UTM projection.
     :param factor: allows you to scale up / down unit of returned new_footway_edges if other than meters. Set to 1000 if length in km.
-    :return: G (graph): the original gdf with POIs and PPs appended and with connection edges appended and existing edges updated (if PPs are present)pois_meter (GeoDataFrame): gdf of the POIs along with extra columns, such as the associated nearest lines and PPs new_footway_edges (GeoDataFrame): gdf of the new footway edges that connect the POIs to the orginal graph
+    :return: G (graph): the original gdf with POIs and PPs appended and with connection edges appended and existing edges updated (if PPs are present)pois_meter (GeoDataFrame): gdf of the POIs along with extra columns, such as the associated nearest lines and PPs new_footway_edges (GeoDataFrame): gdf of the new footway edges that connect the POIs to the original graph
     """
 
     import rtree
@@ -3506,7 +3506,7 @@ def advanced_snap(
             # do not add new edges if they are longer than the threshold or if the length equals 0, if the length equals 0 that means the poi was overlaying an edge itself, therefore no extra edge needs to be created
             # unvalid_pos = np.where((new_edges['length'] > threshold) | (new_edges['length'] == 0))[0]
             unvalid_new_edges = new_edges.iloc[unvalid_pos]
-            # print("print unvalid lines over threshold")
+            # print("print invalid lines over threshold")
             # print(unvalid_new_edges)
 
             print(f"node count before: {nodes_meter.count()[0]}")

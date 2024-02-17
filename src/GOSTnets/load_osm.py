@@ -378,7 +378,7 @@ class OSM_to_network(object):
                     ]
                 )
 
-        # Create one big list and treat all the cutted lines as unique lines
+        # Create one big list and treat all the cut lines as unique lines
         flat_list = []
         all_data = {}
 
