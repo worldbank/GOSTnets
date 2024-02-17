@@ -12,7 +12,7 @@ import numpy as np
 
 try:
     import urllib.request as url  # python 3
-except:
+except ImportError:
     import urllib2 as url  # python 2
 
 
@@ -95,7 +95,7 @@ def CreateODMatrix(
         # Pass request to interweb
         try:
             r = url.urlopen(request)
-        except:
+        except Exception:
             print(request)
             time.sleep(5)
             r = url.urlopen(request)
@@ -105,7 +105,7 @@ def CreateODMatrix(
             # Convert Bytes response to readable Json
             MB_TelTest_json = json.loads(r.read().decode("utf-8"))
             data_block = MB_TelTest_json["durations"]
-        except:
+        except Exception:
             data_block = "null"
 
         # Build df from JSON
@@ -135,7 +135,7 @@ def CreateODMatrix(
         return new_list
 
     # Save settings
-    save_rate = 5
+    # save_rate = 5
 
     def save(returns, j, i, numcalls, rescue_num):
         elapsed_mins = (time.time() - start) / 60
@@ -155,7 +155,7 @@ def CreateODMatrix(
         print("\n______________________________________\n")
         try:
             df = pd.concat(returns)
-        except:
+        except Exception:
             df = returns
         curOutput = os.path.join(ffpath, "temp_file_%d.csv" % rescue_num)
         df.to_csv(curOutput)
@@ -216,10 +216,12 @@ def CreateODMatrix(
 
     ### Making Calls
     if call_type == "Euclid":
-        df = EuclidCall(source_list, dest_list, source_points, dest_points)
+        pass
+        # source_points and dest_points are not defined
+        # df = EuclidCall(source_list, dest_list, source_points, dest_points)
     else:
         if rescue > 0:
-            s = s[rescue:]  # possibly rescue -1
+            # s = s[rescue:]  # possibly rescue -1 - s commented out L. 214
             sources_UIDs = sources_UIDs[rescue:]
         print("source list: %s" % len(source_list))
         print("sources list: %s" % len(sources_list))
@@ -255,12 +257,12 @@ def CreateODMatrix(
                     print("done with call")
                     i += 1
                     j += 1
-                except:
+                except Exception:
                     logging.warning("Error Processing OSRM for i:%s and j:%s" % (i, j))
                     save(returns, j, i, numcalls, rescue_num)
         try:
             df = pd.concat(returns)
-        except:
+        except Exception:
             df = returns
 
     # re-attach the population of origins and destinations, prep dataframe
@@ -298,7 +300,7 @@ def CreateODMatrix(
             new = new.drop_duplicates("combo")
             new = new.drop(["combo"], axis=1)
             return new
-        except:
+        except Exception:
             print(
                 "Something went wrong with processing population information, returning results without population results"
             )
