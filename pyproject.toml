@@ -31,13 +31,13 @@ dependencies = [
 	"rasterio",
 	"rtree>=0.9.3",
 	"scipy",
-	"shapely",
+	"shapely"
 ]
 
 [project.optional-dependencies]
 dev = ["pre-commit", "pytest", "pytest-cov", "tomli", "GOStnets[docs,osm,opt]"]
 docs = ["docutils==0.17.1", "jupyter-book>=1,<2"]
-osm = ["gdal", "geopy", "boltons", "osgeo"]
+osm = ["gdal", "geopy", "boltons"]
 opt = ["pulp"]
 
 [project.urls]
