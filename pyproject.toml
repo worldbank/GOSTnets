@@ -31,7 +31,8 @@ dependencies = [
 	"rasterio",
 	"rtree>=0.9.3",
 	"scipy",
-	"shapely"
+	"shapely",
+	"boltons"
 ]
 
 [project.optional-dependencies]
