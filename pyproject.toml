@@ -32,7 +32,8 @@ dependencies = [
 	"rtree>=0.9.3",
 	"scipy",
 	"shapely",
-	"boltons"
+	"boltons",
+	"geopy"
 ]
 
 [project.optional-dependencies]
