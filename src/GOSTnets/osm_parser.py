@@ -13,7 +13,7 @@ import networkx
 # Specific modules
 import xml.sax  # parse osm file
 from pathlib import Path  # manage cached tiles
-import ogr
+from osgeo import ogr
 from shapely.wkt import loads
 import geopandas as gpd
 from boltons.iterutils import pairwise
