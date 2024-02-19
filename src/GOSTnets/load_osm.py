@@ -156,7 +156,7 @@ class OSM_to_network(object):
                                 one_way = True
                             else:
                                 one_way = False
-                        except:
+                        except Exception:
                             print(
                                 f"skipping over reading other tags of osm_id: {osm_id}"
                             )
@@ -268,7 +268,7 @@ class OSM_to_network(object):
         """
 
         if line.geometryType() == "MultiLineString":
-            return sum(line_length(segment) for segment in line)
+            return sum(self.line_length(segment) for segment in line)
 
         return sum(
             distance.geodesic(
@@ -305,7 +305,7 @@ class OSM_to_network(object):
         start = time.time()
         inters_done = {}
         new_lines = []
-        allCounts = []
+        # allCounts = []
 
         for idx, row in shape_input.iterrows():
             # print(row)
@@ -313,7 +313,7 @@ class OSM_to_network(object):
             line = row.geometry
             infra_type = row.infra_type
             one_way = row.get("one_way")
-            if count % 1000 == 0 and verboseness == True:
+            if (count % 1000 == 0) and (verboseness is True):
                 print("Processing %s of %s" % (count, tLength))
                 print("seconds elapsed: " + str(time.time() - start))
             count += 1
@@ -364,7 +364,7 @@ class OSM_to_network(object):
                             for x in out.geoms
                         ]
                     )
-                except:
+                except Exception:
                     pass
             else:
                 new_lines.append(
@@ -414,7 +414,7 @@ class OSM_to_network(object):
         else:
             try:
                 edges_1 = self.roadsGPD
-            except:
+            except Exception:
                 self.generateRoadsGDF()
                 edges_1 = self.roadsGPD
 
@@ -442,9 +442,9 @@ class OSM_to_network(object):
         G.add_edges_from(edge_bunch)
 
         for u, data in G.nodes(data=True):
-            if type(u) == str:
+            if isinstance(u, str):
                 q = tuple(float(x) for x in u[1:-1].split(","))
-            if type(u) == tuple:
+            if isinstance(u, tuple):
                 q = u
             data["x"] = q[0]
             data["y"] = q[1]
