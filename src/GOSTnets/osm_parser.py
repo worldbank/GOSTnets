@@ -13,6 +13,11 @@ import networkx
 # Specific modules
 import xml.sax  # parse osm file
 from pathlib import Path  # manage cached tiles
+import ogr
+from shapely.wkt import loads
+import geopandas as gpd
+from boltons.iterutils import pairwise
+import geopy.distance as distance
 
 
 def haversine(lon1, lat1, lon2, lat2, unit_m=True):
@@ -352,22 +357,24 @@ def fetch_roads_OSM(
         )
         return road_gdf
     else:
-        print("No roads in {}".format(country))
+        print("No roads in {}".format(roads))
 
 
 def line_length(line, ellipsoid="WGS-84"):
     """
-    Returns length of a line in meters, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
+    Returns length of a line in kilometers, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
 
     :param line: a shapely LineString object with WGS-84 coordinates
     :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-    :returns: Length of line in meters
+    :returns: Length of line in kilometers
     """
 
     if line.geometryType() == "MultiLineString":
         return sum(line_length(segment) for segment in line)
 
     return sum(
-        vincenty(tuple(reversed(a)), tuple(reversed(b)), ellipsoid=ellipsoid).kilometers
+        distance.geodesic(
+            tuple(reversed(a)), tuple(reversed(b)), ellipsoid=ellipsoid
+        ).km
         for a, b in pairwise(line.coords)
     )
