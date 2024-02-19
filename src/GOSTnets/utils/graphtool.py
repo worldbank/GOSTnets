@@ -1,5 +1,4 @@
 import graph_tool as gt
-from graph_tool.topology import *
 
 
 def get_prop_type(value, key=None):
@@ -115,7 +114,7 @@ def nx2gt(nxG):
 
         # Add the edge properties
         for key, value in data.items():
-            if type(value) == list:
+            if isinstance(value, list):
                 value = value[0]
 
             gtG.ep[key][e] = value  # ep is short for edge_properties
