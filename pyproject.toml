@@ -55,3 +55,6 @@ ignore-words-list = "gost,nd,ans,chck,lenth"
 
 [tool.ruff.pydocstyle]
 convention = "numpy"
+
+[tool.ruff]
+exclude = ["__init__.py"]
