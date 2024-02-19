@@ -68,7 +68,7 @@ class OsmObject:
         df = ox.geometries_from_polygon(self.bbox, self.tags).reset_index()
 
         print(f"is df empty: {df.empty}")
-        if df.empty == True:
+        if df.empty is True:
             return df
 
         points = df.copy()
@@ -98,22 +98,22 @@ class OsmObject:
         if gdf.crs != crs:
             gdf = gdf.to_crs(crs)
         gdf["buffer"] = gdf["geometry"].buffer(buf_width)
-        l = pd.DataFrame()
+        df_l = pd.DataFrame()
         for i in gdf.index:
             row = gdf.loc[i]
-            if len(l) == 0:
-                # l = l.append(row, ignore_index = True)
-                l = pd.concat([l, row.to_frame().T], ignore_index=True)
+            if len(df_l) == 0:
+                # df_l = df_l.append(row, ignore_index = True)
+                df_l = pd.concat([df_l, row.to_frame().T], ignore_index=True)
             else:
-                current_points = unary_union(l["buffer"])
+                current_points = unary_union(df_l["buffer"])
                 if row["buffer"].intersects(current_points):
                     pass
                 else:
-                    # l = l.append(row, ignore_index = True)
-                    l = pd.concat([l, row.to_frame().T], ignore_index=True)
+                    # df_l = df_l.append(row, ignore_index = True)
+                    df_l = pd.concat([df_l, row.to_frame().T], ignore_index=True)
         gdf = gdf.to_crs(crs)
-        self.df = l
-        return l
+        self.df = df_l
+        return df_l
 
     def prepForMA(self):
         """
@@ -126,7 +126,7 @@ class OsmObject:
         def tryLoad(x):
             try:
                 return [x.x, x.y]
-            except:
+            except Exception:
                 return [0, 0]
 
         curDF = self.df
