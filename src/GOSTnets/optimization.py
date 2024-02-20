@@ -1,6 +1,6 @@
 import time
 import multiprocessing as mp
-from pulp import LpInteger, LpVariable, LpProblem, LpMaximize
+from pulp import LpInteger, LpVariable, LpProblem, LpMaximize, LpMinimize, lpSum
 import pandas
 
 speed_dict = {
@@ -60,15 +60,15 @@ def optimize_facility_locations(
     origins = OD.index
     origins = list(map(int, origins))
 
-    X = pulp.LpVariable.dicts("X", (facilities), 0, 1, pulp.LpInteger)
+    X = LpVariable.dicts("X", (facilities), 0, 1, LpInteger)
 
-    Y = pulp.LpVariable.dicts("Y", (origins, facilities), 0, 1, pulp.LpInteger)
+    Y = LpVariable.dicts("Y", (origins, facilities), 0, 1, LpInteger)
 
-    prob = pulp.LpProblem("P Median", pulp.LpMinimize)
+    prob = LpProblem("P Median", LpMinimize)
 
     prob += sum(sum(OD.loc[i, j] * Y[i][j] for j in facilities) for i in origins)
 
-    prob += pulp.lpSum([X[j] for j in facilities]) == p
+    prob += lpSum([X[j] for j in facilities]) == p
 
     for i in origins:
         prob += sum(Y[i][j] for j in facilities) == 1

@@ -12,7 +12,14 @@ import numpy as np
 
 from scipy import spatial
 from shapely.wkt import loads, dumps
-from shapely.geometry import Point, LineString, MultiLineString, MultiPoint, box
+from shapely.geometry import (
+    Point,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    box,
+    Polygon,
+)
 from shapely.ops import linemerge, unary_union, transform
 from collections import Counter
 
@@ -95,15 +102,15 @@ def combo_csv_to_graph(
 
     # G = nx.convert_node_labels_to_integers(G)
 
-    if largest_G == True:
+    if largest_G is True:
         list_of_subgraphs = list(nx.strongly_connected_component_subgraphs(G))
-        l = 0
+        line = 0
         cur_max = 0
         for i in list_of_subgraphs:
             if i.number_of_edges() > cur_max:
                 cur_max = i.number_of_edges()
-                max_ID = l
-            l += 1
+                max_ID = line
+            line += 1
         G = list_of_subgraphs[max_ID]
 
     return G
@@ -151,7 +158,7 @@ def edges_and_nodes_gdf_to_graph(
       a multidigraph object
     """
 
-    if checks == True:
+    if checks is True:
         # chck_set = list(set(list(edges_df[u_tag]) + list(edges_df[v_tag])))
         # same thing, but easier to understand?
         chck_set = list(edges_df[u_tag])
@@ -219,7 +226,7 @@ def edges_and_nodes_gdf_to_graph(
 
         if add_missing_reflected_edges:
             if oneway_tag:
-                if x[oneway_tag] == False:
+                if x[oneway_tag] is False:
                     edge_bunch_reverse_edges.append((v, u, data))
             else:
                 edge_bunch_reverse_edges.append((v, u, data))
@@ -276,15 +283,15 @@ def edges_and_nodes_gdf_to_graph(
     # we want to keep the original node labels
     # G = nx.convert_node_labels_to_integers(G)
 
-    if largest_G == True:
+    if largest_G is True:
         list_of_subgraphs = list(nx.strongly_connected_component_subgraphs(G))
-        l = 0
+        line = 0
         cur_max = 0
         for i in list_of_subgraphs:
             if i.number_of_edges() > cur_max:
                 cur_max = i.number_of_edges()
-                max_ID = l
-            l += 1
+                max_ID = line
+            line += 1
         G = list_of_subgraphs[max_ID]
 
     return G
@@ -348,11 +355,13 @@ def node_gdf_from_graph(
     nodes = []
     keys = []
 
+    def flatten(line):
+        return [item for sublist in line for item in sublist]
+
     # finds all of the attributes
     if attr_list is None:
         for u, data in G.nodes(data=True):
             keys.append(list(data.keys()))
-        flatten = lambda l: [item for sublist in l for item in sublist]
         attr_list = list(set(flatten(keys)))
 
     if geometry_tag in attr_list:
@@ -376,7 +385,7 @@ def node_gdf_from_graph(
                     "x": data[xCol],
                     "y": data[yCol],
                 }
-            except:
+            except Exception:
                 print("Skipped due to missing geometry data:", (u, data))
         else:
             try:
@@ -386,13 +395,13 @@ def node_gdf_from_graph(
                     "x": data[geometry_tag].x,
                     "y": data[geometry_tag].y,
                 }
-            except:
+            except Exception:
                 print((u, data))
 
         for i in non_geom_attr_list:
             try:
                 new_column_info[i] = data[i]
-            except:
+            except Exception:
                 pass
 
         nodes.append(new_column_info)
@@ -432,17 +441,19 @@ def edge_gdf_from_graph(
     edges = []
     keys = []
 
+    def flatten(line):
+        return [item for sublist in line for item in sublist]
+
     if attr_list is None:
         for u, v, data in G.edges(data=True):
             keys.append(list(data.keys()))
-        flatten = lambda l: [item for sublist in l for item in sublist]
         keys = list(set(flatten(keys)))
         if geometry_tag in keys:
             keys.remove(geometry_tag)
         if "geometry" in keys:
             keys.remove("geometry")
         attr_list = keys
-        if single_edge == True:
+        if single_edge is True:
             if oneway_tag not in keys:
                 attr_list.append(oneway_tag)
 
@@ -468,12 +479,12 @@ def edge_gdf_from_graph(
         for i in attr_list:
             try:
                 new_column_info[i] = data[i]
-            except:
+            except Exception:
                 pass
 
         return new_column_info
 
-    if single_edge == False:
+    if single_edge is False:
         for u, v, data in G.edges(data=True):
             new_column_info = add_edge_attributes(data, stnode=u, endnode=v)
 
@@ -507,7 +518,7 @@ def edge_gdf_from_graph(
             attr_list.remove(attr)
 
     edges_df = edges_df[["stnode", "endnode", *attr_list, geometry_tag]]
-    if type(edges_df.iloc[0][geometry_tag]) == str:
+    if isinstance(edges_df.iloc[0][geometry_tag], str):
         edges_df[geometry_tag] = edges_df[geometry_tag].apply(str)
         edges_df[geometry_tag] = edges_df[geometry_tag].apply(loads)
     edges_gdf = gpd.GeoDataFrame(edges_df, geometry=geometry_tag, crs=crs)
@@ -536,10 +547,10 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
     if type(polygons) != gpd.geodataframe.GeoDataFrame:
         raise ValueError("Expecting a geodataframe for polygon(s)!")
 
-    if crs != None and graph_gdf.crs != crs:
+    if (crs is not None) and (graph_gdf.crs != crs):
         graph_gdf = graph_gdf.to_crs(crs)
 
-    if crs != None and polygons.crs != crs:
+    if (crs is not None) and (polygons.crs != crs):
         polygons = polygons.to_crs(crs)
 
     if polygons.crs != graph_gdf.crs:
@@ -585,10 +596,10 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
     if type(polygons) != gpd.geodataframe.GeoDataFrame:
         raise ValueError("Expecting a geodataframe for polygon(s)!")
 
-    if crs != None and node_graph_gdf.crs != crs:
+    if (crs is not None) and (node_graph_gdf.crs != crs):
         node_graph_gdf = node_graph_gdf.to_crs(crs)
 
-    if crs != None and polygons.crs != crs:
+    if (crs is not None) and (polygons.crs != crs):
         polygons = polygons.to_crs(crs)
 
     if polygons.crs != node_graph_gdf.crs:
@@ -596,7 +607,7 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
 
     intersecting_nodes = graph_nodes_intersecting_polygon(node_graph_gdf, polygons, crs)
 
-    if fast == True:
+    if fast is True:
         if mode == "contains":
             edge_graph_gdf = edge_graph_gdf.loc[
                 (edge_graph_gdf.stnode.isin(intersecting_nodes))
@@ -607,7 +618,7 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
                 (edge_graph_gdf.stnode.isin(intersecting_nodes))
                 | (edge_graph_gdf.endnode.isin(intersecting_nodes))
             ]
-    elif fast == False:
+    elif fast is False:
         poly = unary_union(polygons.geometry)
 
         if mode == "contains":
@@ -647,7 +658,7 @@ def sample_raster(G, tif_path, property_name="RasterValue"):
         list_of_nodes = {}
         for u, data in G.nodes(data=True):
             list_of_nodes.update({u: (data["x"], data["y"])})
-    except:
+    except Exception:
         raise ValueError(
             "loading point geometry went wrong. Ensure node data dict includes x, y values!"
         )
@@ -655,7 +666,7 @@ def sample_raster(G, tif_path, property_name="RasterValue"):
     # load raster
     try:
         dataset = rasterio.open(os.path.join(tif_path))
-    except:
+    except Exception:
         raise ValueError("Expecting a path to a .tif file!")
 
     # create list of values, throw out nodes that don't intersect the bounds of the raster
@@ -678,7 +689,7 @@ def sample_raster(G, tif_path, property_name="RasterValue"):
     for u, data in G.nodes(data=True):
         try:
             data[property_name] = ref[u]
-        except:
+        except Exception:
             missedCnt += 1
             logging.info("Could not add raster value to node %s" % u)
     logging.info("Number of original nodes: %s" % len(G.nodes))
@@ -700,7 +711,7 @@ def generate_isochrones(G, origins, thresh, weight=None, stacking=False):
     :returns: The original graph with a new data property for the nodes and edges included in the isochrone
     """
 
-    if type(origins) == list and len(origins) >= 1:
+    if isinstance(origins, list) and len(origins) >= 1:
         pass
     else:
         raise ValueError(
@@ -709,7 +720,7 @@ def generate_isochrones(G, origins, thresh, weight=None, stacking=False):
 
     ddict = list(G.nodes(data=True))[:1][0][1]
 
-    if weight == None:
+    if weight is None:
         if "time" not in ddict.keys():
             raise ValueError('need "time" key in edge value dictionary!')
         else:
@@ -725,7 +736,7 @@ def generate_isochrones(G, origins, thresh, weight=None, stacking=False):
 
     reachable_nodes = [j for i in reachable_nodes for j in i]
 
-    if stacking == False:
+    if stacking is False:
         reachable_nodes = set(reachable_nodes)
 
         for u, data in G.nodes(data=True):
@@ -734,7 +745,7 @@ def generate_isochrones(G, origins, thresh, weight=None, stacking=False):
             else:
                 data[thresh] = 0
 
-    elif stacking == True:
+    elif stacking is True:
         reachable_nodes = Counter(reachable_nodes)
 
         for u, data in G.nodes(data=True):
@@ -775,7 +786,7 @@ def make_iso_polys(
 
     default_crs = "epsg:4326"
 
-    if type(origins) == list and len(origins) >= 1:
+    if isinstance(origins, list) and len(origins) >= 1:
         pass
     else:
         raise ValueError(
@@ -855,7 +866,7 @@ def make_iso_polys(
         nodes_gdf.drop_duplicates(inplace=True, subset="coords")
         edge_gdf.drop_duplicates(inplace=True, subset="coords")
 
-        if measure_crs != None and nodes_gdf.crs != measure_crs:
+        if (measure_crs is not None) and (nodes_gdf.crs != measure_crs):
             nodes_gdf = nodes_gdf.to_crs(measure_crs)
             edge_gdf = edge_gdf.to_crs(measure_crs)
 
@@ -914,7 +925,7 @@ def make_iso_polys_original(
 
     default_crs = "epsg:4326"
 
-    if type(origins) == list and len(origins) >= 1:
+    if isinstance(origins, list) and len(origins) >= 1:
         pass
     else:
         raise ValueError(
@@ -950,7 +961,7 @@ def make_iso_polys_original(
                     {"geoms": edge_lines}, geometry="geoms", crs=default_crs
                 )
 
-                if measure_crs != None and nodes_gdf.crs != measure_crs:
+                if (measure_crs is not None) and (nodes_gdf.crs != measure_crs):
                     nodes_gdf = nodes_gdf.to_crs(measure_crs)
                     edge_gdf = edge_gdf.to_crs(measure_crs)
 
@@ -1007,7 +1018,7 @@ def find_hwy_distances_by_class(G, distance_tag="length"):
 
     for u, v, data in G_adj.edges(data=True):
         # print(data['highway'])
-        if type(data["highway"]) == list:
+        if isinstance(data["highway"], list):
             if data["highway"][0] not in class_list:
                 class_list.append(data["highway"][0])
         else:
@@ -1018,7 +1029,7 @@ def find_hwy_distances_by_class(G, distance_tag="length"):
 
     for i in class_list:
         for u, v, data in G_adj.edges(data=True):
-            if type(data["highway"]) == list:
+            if isinstance(data["highway"], list):
                 if data["highway"][0] == i:
                     class_dict[i] += data[distance_tag]
             else:
@@ -1152,7 +1163,7 @@ def convert_network_to_time(
             warnings.warn(
                 "Aree you sure you want to convert length to time? This graph already has a time attribute"
             )
-    except:
+    except Exception:
         pass
 
     G_adj = G.copy()
@@ -1171,7 +1182,7 @@ def convert_network_to_time(
             speed = walk_speed
 
         elif graph_type == "drive":
-            if speed_dict == None:
+            if speed_dict is None:
                 speed_dict = {
                     "residential": 20,  # kmph
                     "primary": 40,  # kmph
@@ -1190,13 +1201,13 @@ def convert_network_to_time(
 
             highwayclass = data[road_col]
 
-            if type(highwayclass) == list:
+            if isinstance(highwayclass, list):
                 highwayclass = highwayclass[0]
 
             if highwayclass in speed_dict.keys():
                 speed = speed_dict[highwayclass]
             else:
-                if default == None:
+                if default is None:
                     continue
                 else:
                     speed = default
@@ -1298,7 +1309,7 @@ def assign_traffic_times(
 
         try:
             data = json.loads(r.read().decode("utf-8"))["routes"][0]["duration"]
-        except:
+        except Exception:
             data = np.nan
 
         # print(data)
@@ -1311,7 +1322,7 @@ def assign_traffic_times(
             elapsed_seconds = (time.time() - start) % 60
             # print('print elapsed_seconds without %: ' + str((time.time() - start)))
             # print('print elapsed_seconds: ' + str(elapsed_seconds))
-            if verbose == True:
+            if verbose is True:
                 print(
                     f"Did {numcalls+1} calls in {elapsed_seconds:.2f} seconds, now wait {60-elapsed_seconds:.2f}, {(300*loop_count)/len(edges):.2%} complete"
                 )
@@ -1333,7 +1344,7 @@ def assign_traffic_times(
     edges_duration = edges_duration.set_index("newID")
     n_null = edges_duration.isnull().sum()["duration"]
 
-    if verbose == True and n_null > 0:
+    if verbose is True and n_null > 0:
         print(f"query failed {n_null} times")
 
     edges_duration = edges_duration.dropna()
@@ -1388,7 +1399,7 @@ def calculate_OD(
     count = 0
     start = time.time()
 
-    if weighted_origins == True:
+    if weighted_origins is True:
         print("weighted_origins equals true")
         OD = np.zeros((len(origins), len(destinations)))
         # dictionary key length
@@ -1409,7 +1420,7 @@ def calculate_OD(
 
     else:
         flip = 0
-        if one_way_roads_exist == False:
+        if one_way_roads_exist is False:
             if len(origins) > len(destinations):
                 flip = 1
                 o_2 = destinations
@@ -1422,7 +1433,7 @@ def calculate_OD(
         for o in range(0, len(origins)):
             origin = origins[o]
 
-            if count % 1000 == 0 and verbose == True:
+            if count % 1000 == 0 and verbose is True:
                 print("Processing %s of %s" % (count, len(origins)))
                 print("seconds elapsed: " + str(time.time() - start))
             count += 1
@@ -1431,7 +1442,7 @@ def calculate_OD(
                 results_dict = nx.single_source_dijkstra_path_length(
                     G, origin, cutoff=None, weight=weight
                 )
-            except:
+            except Exception:
                 results_dict = {}
                 # print(f"error: printing origin: {origin}")
                 # print(e)
@@ -1527,7 +1538,7 @@ def gravity_demand(
 
     demand = np.zeros((len(origins), len(destinations)))
 
-    shortest_time = Calculate_OD(G, origins, destinations, fail_value)
+    shortest_time = calculate_OD(G, origins, destinations, fail_value)
 
     for o in range(0, len(origins)):
         for d in range(0, len(destinations)):
@@ -1552,10 +1563,10 @@ def unbundle_geometry(c):
     :returns: an unbundled geometry value that can be plotted.
     """
 
-    if type(c) == list:
+    if isinstance(c, list):
         objs = []
         for i in c:
-            if type(i) == str:
+            if isinstance(i, str):
                 J = loads(i)
                 if type(J) == LineString:
                     objs.append(J)
@@ -1572,7 +1583,7 @@ def unbundle_geometry(c):
             mls = MultiLineString(objs)
             ls = linemerge(mls)
         return ls
-    elif type(c) == str:
+    elif isinstance(c, str):
         return loads(c)
     else:
         return c
@@ -1590,13 +1601,13 @@ def save(G, savename, wpath, pickle=True, edges=True, nodes=True):
     :param nodes: if set to false, will not save a node gdf
     """
 
-    if nodes == True:
+    if nodes is True:
         new_node_gdf = node_gdf_from_graph(G)
         new_node_gdf.to_csv(os.path.join(wpath, "%s_nodes.csv" % savename))
-    if edges == True:
+    if edges is True:
         new_edge_gdf = edge_gdf_from_graph(G)
         new_edge_gdf.to_csv(os.path.join(wpath, "%s_edges.csv" % savename))
-    if pickle == True:
+    if pickle is True:
         nx.write_gpickle(G, os.path.join(wpath, "%s.pickle" % savename))
 
 
@@ -1617,7 +1628,7 @@ def add_missing_reflected_edges(G, one_way_tag=None, verbose=False):
     count = 0
     start = time.time()
     for u, v, data in G.edges(data=True):
-        if count % 10000 == 0 and verbose == True:
+        if count % 10000 == 0 and verbose is True:
             print("Processing %s of %s" % (count, edgeLength))
             print("seconds elapsed: " + str(time.time() - start))
         count += 1
@@ -1628,7 +1639,7 @@ def add_missing_reflected_edges(G, one_way_tag=None, verbose=False):
             # print(data)
             # print("data[one_way_tag]")
             # print(data[one_way_tag])
-            if data[one_way_tag] == False:
+            if data[one_way_tag] is False:
                 # print("2-way road")
                 # if (v, u) not in unique_edges:
                 # print("appending to missing_edges")
@@ -1666,7 +1677,7 @@ def add_missing_reflected_edges_old(G, one_way_tag=None):
             # print(data)
             # print("data[one_way_tag]")
             # print(data[one_way_tag])
-            if data[one_way_tag] == False:
+            if data[one_way_tag] is False:
                 # print("2-way road")
                 if (v, u) not in unique_edges:
                     # print("appending to missing_edges")
@@ -1812,17 +1823,17 @@ def simplify_junctions(
     edgeLength = G2.number_of_edges()
 
     for u, v, data in G2.edges(data=True):
-        if count % 10000 == 0 and verbose == True:
+        if count % 10000 == 0 and verbose is True:
             print("Processing %s of %s" % (count, edgeLength))
             print("seconds elapsed: " + str(time.time() - start))
         count += 1
 
         if type(data["Wkt"]) == LineString:
-            l = data["Wkt"]
+            line = data["Wkt"]
         else:
-            l = loads(data["Wkt"])
+            line = loads(data["Wkt"])
 
-        line_to_be_edited = l.coords
+        line_to_be_edited = line.coords
 
         if u in nodes_to_be_destroyed and v in nodes_to_be_destroyed:
             if node_dict[u] == node_dict[v]:
@@ -1919,12 +1930,12 @@ def custom_simplify(G, strict=True):
         """
 
         # first identify all the nodes that are endpoints
-        start_time = time.time()
+        # start_time = time.time()
         endpoints = set(
             [node for node in G.nodes() if is_endpoint(G, node, strict=strict)]
         )
 
-        start_time = time.time()
+        # start_time = time.time()
         paths_to_simplify = []
 
         # for each endpoint node, look at each of its successor nodes
@@ -2062,16 +2073,16 @@ def custom_simplify(G, strict=True):
     G = G.copy()
 
     if type(G) != nx.classes.multidigraph.MultiDiGraph:
-        G = ConvertToMultiDiGraph(G)
-    initial_node_count = len(list(G.nodes()))
-    initial_edge_count = len(list(G.edges()))
+        G = nx.MultiDiGraph(G)
+    # initial_node_count = len(list(G.nodes()))
+    # initial_edge_count = len(list(G.edges()))
     all_nodes_to_remove = []
     all_edges_to_add = []
 
     # construct a list of all the paths that need to be simplified
     paths = get_paths_to_simplify(G, strict=strict)
 
-    start_time = time.time()
+    # start_time = time.time()
     for path in paths:
         # add the interstitial edges we're removing to a list so we can retain
         # their spatial geometry
@@ -2128,7 +2139,7 @@ def custom_simplify(G, strict=True):
     # finally remove all the interstitial nodes between the new edges
     G.remove_nodes_from(set(all_nodes_to_remove))
 
-    msg = "Simplified graph (from {:,} to {:,} nodes and from {:,} to {:,} edges) in {:,.2f} seconds"
+    # msg = "Simplified graph (from {:,} to {:,} nodes and from {:,} to {:,} edges) in {:,.2f} seconds"
     return G
 
 
@@ -2187,7 +2198,7 @@ def salt_long_lines(
     # repeated transformations using the same inProj and outProj, using the Transformer object in pyproj 2+ is much faster
     wgs84 = pyproj.CRS(source)
     utm = pyproj.CRS(target)
-    project_WGS_UTM = pyproj.Transformer.from_crs(wgs84, utm, always_xy=True).transform
+    # project_WGS_UTM = pyproj.Transformer.from_crs(wgs84, utm, always_xy=True).transform
     project_UTM_WGS = pyproj.Transformer.from_crs(utm, wgs84, always_xy=True).transform
 
     long_edges, long_edge_IDs, unique_long_edges, new_nodes, new_edges = (
@@ -2283,6 +2294,7 @@ def salt_long_lines(
                 new_nodes.append((new_node_ID, node_data))
 
             ## GENERATE NEW EDGES ##
+            result = None  # placeholder to define result tuple - will need to be debugged/fixed later
             # define geometry to be cutting (iterative)
             if i == 0:
                 geom_to_split = UTM_geom
@@ -2303,7 +2315,7 @@ def salt_long_lines(
                 "length": (int(result[0].length) / factor),
             }
 
-            if attr_list != None:
+            if attr_list is not None:
                 for attr in attr_list:
                     if attr in data:
                         edge_data[attr] = data[attr]
@@ -2359,11 +2371,11 @@ def pandana_snap(
     :param source_crs: The crs for the input G and input point_gdf in format 'epsg:32638'
     :param target_crs: The measure crs how distances between points are calculated. The returned point GeoDataFrame's CRS does not get modified. The crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
-    :return: returns a GeoDataFrame that is the same as the input point_gdf but adds a column containing the id of the nearest node in the graph, and the distance if add_dist_to_node_col == True
+    :return: returns a GeoDataFrame that is the same as the input point_gdf but adds a column containing the id of the nearest node in the graph, and the distance if add_dist_to_node_col is True
     """
     import time
 
-    if time_it == True:
+    if time_it is True:
         func_start = time.time()
 
     in_df = point_gdf.copy()
@@ -2372,7 +2384,7 @@ def pandana_snap(
     if not set(["geometry"]).issubset(in_df.columns):
         raise Exception("input point_gdf should have a geometry column")
 
-    if isinstance(G, nx.classes.multidigraph.MultiDiGraph) == True:
+    if isinstance(G, nx.classes.multidigraph.MultiDiGraph) is True:
         node_gdf = node_gdf_from_graph(G)
     else:
         node_gdf = G
@@ -2409,7 +2421,7 @@ def pandana_snap(
             try:
                 in_df["x"] = in_df.geometry.x
                 in_df["y"] = in_df.geometry.y
-            except:
+            except Exception:
                 in_df["x"] = in_df.geometry.apply(lambda geometry: geometry.x)
                 in_df["y"] = in_df.geometry.apply(lambda geometry: geometry.y)
 
@@ -2423,7 +2435,7 @@ def pandana_snap(
         try:
             in_df["x"] = in_df.geometry.x
             in_df["y"] = in_df.geometry.y
-        except:
+        except Exception:
             in_df["x"] = in_df.geometry.apply(lambda geometry: geometry.x)
             in_df["y"] = in_df.geometry.apply(lambda geometry: geometry.y)
 
@@ -2432,7 +2444,7 @@ def pandana_snap(
 
         in_df["NN"] = list(node_gdf["node_ID"].iloc[indices])
 
-    if time_it == True:
+    if time_it is True:
         func_end = time.time()
         print("time elapsed for function")
         print(func_end - func_start)
@@ -2456,11 +2468,11 @@ def pandana_snap_c(
     :param target_crs: The measure crs how distances between points are calculated. The returned point GeoDataFrame's CRS does not get modified. The crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance to nearest node in the units of the target_crs
     :param time_it: return time to complete function
-    :return: returns a GeoDataFrame that is the same as the input point_gdf but adds a column containing the id of the nearest node in the graph, and the distance if add_dist_to_node_col == True
+    :return: returns a GeoDataFrame that is the same as the input point_gdf but adds a column containing the id of the nearest node in the graph, and the distance if add_dist_to_node_col is True
     """
     import time
 
-    if time_it == True:
+    if time_it is True:
         func_start = time.time()
 
     in_df = point_gdf.copy()
@@ -2469,7 +2481,7 @@ def pandana_snap_c(
     if not set(["geometry"]).issubset(in_df.columns):
         raise Exception("input point_gdf should have a geometry column")
 
-    if isinstance(G, nx.classes.multidigraph.MultiDiGraph) == True:
+    if isinstance(G, nx.classes.multidigraph.MultiDiGraph) is True:
         node_gdf = node_gdf_from_graph(G)
     else:
         node_gdf = G
@@ -2504,7 +2516,7 @@ def pandana_snap_c(
             try:
                 in_df["x"] = in_df.geometry.x
                 in_df["y"] = in_df.geometry.y
-            except:
+            except Exception:
                 in_df["x"] = in_df.geometry.apply(lambda geometry: geometry.x)
                 in_df["y"] = in_df.geometry.apply(lambda geometry: geometry.y)
 
@@ -2518,7 +2530,7 @@ def pandana_snap_c(
         try:
             in_df["x"] = in_df.geometry.x
             in_df["y"] = in_df.geometry.y
-        except:
+        except Exception:
             in_df["x"] = in_df.geometry.apply(lambda geometry: geometry.x)
             in_df["y"] = in_df.geometry.apply(lambda geometry: geometry.y)
 
@@ -2531,7 +2543,7 @@ def pandana_snap_c(
 
         in_df["NN"] = list(node_gdf["node_ID"].iloc[indices])
 
-    if time_it == True:
+    if time_it is True:
         func_end = time.time()
         print("time elapsed for function")
         print(func_end - func_start)
@@ -2560,7 +2572,7 @@ def pandana_snap_to_many(
     """
     import time
 
-    if time_it == True:
+    if time_it is True:
         func_start = time.time()
 
     in_df = point_gdf.copy()
@@ -2605,7 +2617,7 @@ def pandana_snap_to_many(
             try:
                 in_df["x"] = in_df.geometry.x
                 in_df["y"] = in_df.geometry.y
-            except:
+            except Exception:
                 in_df["x"] = in_df.geometry.apply(lambda geometry: geometry.x)
                 in_df["y"] = in_df.geometry.apply(lambda geometry: geometry.y)
 
@@ -2625,7 +2637,7 @@ def pandana_snap_to_many(
         try:
             in_df["x"] = in_df.geometry.x
             in_df["y"] = in_df.geometry.y
-        except:
+        except Exception:
             in_df["x"] = in_df.geometry.apply(lambda geometry: geometry.x)
             in_df["y"] = in_df.geometry.apply(lambda geometry: geometry.y)
 
@@ -2642,7 +2654,7 @@ def pandana_snap_to_many(
             index_list_NN = list(node_gdf["node_ID"].iloc[index_list])
             nn_map[origin] = {"NN": list(index_list_NN)}
 
-    if time_it == True:
+    if time_it is True:
         func_end = time.time()
         print("time elapsed for function")
         print(func_end - func_start)
@@ -2690,7 +2702,7 @@ def pandana_snap_points(
     :param target_gdf: a geodataframe of points, in the same source crs as the geometry of the source_gdfsg:32638'
     :param target_crs: crs object in format 'epsg:32638'
     :param add_dist_to_node_col: return distance in metres to nearest node
-    :return: returns a GeoDataFrame that is the same as the input source_gdf but adds a column containing the id of the nearest node in the target_gdf, and the distance if add_dist_to_node_col == True
+    :return: returns a GeoDataFrame that is the same as the input source_gdf but adds a column containing the id of the nearest node in the target_gdf, and the distance if add_dist_to_node_col is True
     """
 
     source_gdf = source_gdf.copy()
@@ -2861,20 +2873,20 @@ def clip(
             # define basics from data dictionary
             try:
                 infra_type = data["infra_type"]
-            except:
+            except Exception:
                 infra_type = data["highway"]
             # extract the geometry of the geom_col, if there is no explicit geometry, load the wkt
             try:
                 geom = data[geom_col]
-            except:
+            except Exception:
                 geom = loads(data["Wkt"])
 
             # road fully within country - do nothing
-            if bound.contains(geom) == True:
+            if bound.contains(geom) is True:
                 pass
 
             # road fully outside country - remove entirely
-            elif bound.intersects(geom) == False:
+            elif bound.intersects(geom) is False:
                 edges_to_remove.append((u, v))
                 edges_to_remove.append((v, u))
                 nodes_to_remove.append(u)
@@ -2949,7 +2961,7 @@ def clip(
     )
 
     # Select only largest remaining graph
-    if largest_G == True:
+    if largest_G is True:
         # compatible with NetworkX 2.4
         list_of_subgraphs = list(
             G_copy.subgraph(c).copy() for c in nx.strongly_connected_components(G_copy)
@@ -3066,7 +3078,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
 
     # if to_latlong is True, project the gdf to latlong
     if to_latlong:
-        gdf_proj = gdf.to_crs(settings.default_crs)
+        gdf_proj = gdf.to_crs(ox.settings.default_crs)
         # utils.log(f"Projected GeoDataFrame to {settings.default_crs}")
 
     # else if to_crs was passed-in, project gdf to this CRS
@@ -3076,7 +3088,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
 
     # otherwise, automatically project the gdf to UTM
     else:
-        if CRS.from_user_input(gdf.crs).is_projected:
+        if ox.CRS.from_user_input(gdf.crs).is_projected:
             raise ValueError("Geometry must be unprojected to calculate UTM zone")
 
         # calculate longitude of centroid of union of all geometries in gdf
@@ -3299,7 +3311,7 @@ def advanced_snap(
     # find nearest edge
     def find_kne(point, lines, near_idx):
         # getting the distances between the point and the lines
-        dists = np.array(list(map(lambda l: l.distance(point), lines)))
+        dists = np.array(list(map(lambda line: line.distance(point), lines)))
         kne_pos = dists.argsort()[0]
         # kne = lines.iloc[[kne_pos]]
 
@@ -3454,9 +3466,9 @@ def advanced_snap(
         # https://stackoverflow.com/questions/61955960/shapely-linestring-length-units
         # update features (a bit slow)
         # length is only calculated and added to new lines
-        new_edges["length"] = [l.length for l in new_lines]
+        new_edges["length"] = [line.length for line in new_lines]
         if factor > 1:
-            new_edges["length"] = [l.length / factor for l in new_lines]
+            new_edges["length"] = [line.length / factor for line in new_lines]
         # try to apply below to just new lines?
         if replace:
             new_edges[u_tag] = new_edges["geometry"].map(
@@ -3555,7 +3567,7 @@ def advanced_snap(
     # items() now replaces iteritems() for a GeoSeries in GeoPandas
     [Rtree.insert(fid, geom.bounds) for fid, geom in edges_meter["geometry"].items()]
 
-    if verbose == True:
+    if verbose is True:
         print("finished Building rtree")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3570,7 +3582,7 @@ def advanced_snap(
         nodes_meter, pois_meter, ptype="poi", measure_crs=measure_crs
     )
 
-    if verbose == True:
+    if verbose is True:
         print("finished updating external nodes (pois)")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3601,7 +3613,7 @@ def advanced_snap(
         map(list, zip(*pois_meter.apply(nearest_edge, axis=1)))
     )
 
-    if verbose == True:
+    if verbose is True:
         print("finished pois_meter['near_idx'] and pois_meter['near_lines']")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3614,7 +3626,7 @@ def advanced_snap(
         ]
     )  # slow
 
-    if verbose == True:
+    if verbose is True:
         print("finished pois_meter['kne_idx']")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3624,7 +3636,7 @@ def advanced_snap(
         get_pp(point, kne) for point, kne in zip(pois_meter["geometry"], knes)
     ]
 
-    if verbose == True:
+    if verbose is True:
         print("finished assigning a projected point to each POI")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3666,7 +3678,7 @@ def advanced_snap(
         nodes_meter, list(pp_column), ptype="pp", measure_crs=measure_crs
     )
 
-    if verbose == True:
+    if verbose is True:
         print("finished Updating internal nodes")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3713,7 +3725,7 @@ def advanced_snap(
 
     # return nodes_id_dict, line_pps_dict, nodes_meter
 
-    if verbose == True:
+    if verbose is True:
         print("finished creating line_pps_dict")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3725,7 +3737,7 @@ def advanced_snap(
         for idx, pps in line_pps_dict.items()
     ]  # bit slow
 
-    if verbose == True:
+    if verbose is True:
         print("finished creating new_lines")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3742,7 +3754,7 @@ def advanced_snap(
 
     # return edges_meter, _
 
-    if verbose == True:
+    if verbose is True:
         print("finished Updating update_edges")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3766,7 +3778,7 @@ def advanced_snap(
         pois_meter=pois_meter,
     )
 
-    if verbose == True:
+    if verbose is True:
         print("finished Updating external links")
         print("seconds elapsed: " + str(time.time() - start))
 
@@ -3909,7 +3921,7 @@ def add_intersection_delay(
                 pred_node_dict[pred_node] = highway_rank.get(new_key)
 
         # update all 'None' values to 5
-        pred_node_dict = {k: (5 if v == None else v) for k, v in pred_node_dict.items()}
+        pred_node_dict = {k: (5 if v is None else v) for k, v in pred_node_dict.items()}
         pred_node_dict = dict(
             sorted(pred_node_dict.items(), key=lambda item: item[1], reverse=False)
         )

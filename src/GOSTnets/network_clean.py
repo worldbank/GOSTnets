@@ -1,7 +1,12 @@
 # the cleaning network part
 
-
-from .core import *
+from .core import simplify_junctions
+from .core import add_missing_reflected_edges
+from .core import custom_simplify
+from .core import remove_duplicate_edges
+from .core import convert_to_MultiDiGraph
+from .core import unbundle_geometry
+from .core import save
 
 
 def clean_network(
@@ -39,7 +44,7 @@ def clean_network(
 
     # rectify geometry
     for u, v, data in b.edges(data=True):
-        if type(data["Wkt"]) == list:
+        if isinstance(data["Wkt"], list):
             data["Wkt"] = unbundle_geometry(data["Wkt"])
 
     # save progress
@@ -58,7 +63,7 @@ def clean_network(
 
     # rectify geometry again
     for u, v, data in c.edges(data=True):
-        if type(data["Wkt"]) == list:
+        if isinstance(data["Wkt"], list):
             data["Wkt"] = unbundle_geometry(data["Wkt"])
 
     # Ensure all remaining edges are duplicated (two-way streets)

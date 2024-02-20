@@ -32,6 +32,8 @@ dependencies = [
 	"rtree>=0.9.3",
 	"scipy",
 	"shapely",
+	"boltons",
+	"geopy"
 ]
 
 [project.optional-dependencies]
@@ -55,3 +57,6 @@ ignore-words-list = "gost,nd,ans,chck,lenth"
 
 [tool.ruff.pydocstyle]
 convention = "numpy"
+
+[tool.ruff]
+exclude = ["__init__.py"]

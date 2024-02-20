@@ -129,15 +129,18 @@ def calculate_gravity(
 
     od_df = pd.DataFrame(od)
 
-    for dist_decay in decayVals:
-        decayFunction = lambda x: np.exp(-1 * dist_decay * x)
+    def decayFunction(x, decay):
+        return np.exp(-1 * decay * x)
 
-        summedVals = np.sum(decayFunction(od_df) * dWeight, axis=1) * oWeight
+    for dist_decay in decayVals:
+        summedVals = (
+            np.sum(decayFunction(od_df, dist_decay) * dWeight, axis=1) * oWeight
+        )
 
         allRes.append(summedVals)
 
     res = pd.DataFrame(allRes).transpose()
-    res.columns = columns = ["d_%s" % d for d in decayVals]
+    res.columns = ["d_%s" % d for d in decayVals]
 
     return res
 
