@@ -22,8 +22,8 @@ def calculateOD_gdf(
         G (networkx graph): describes the road network. Often extracted using OSMNX
         origins (geopandas dataframe): source locations for calculating access
         destinations (geopandas dataframe): destination locations for calculating access
-        calculate_snap (boolean, optioinal): variable to add snapping distance to travel time, default is false
-        wgs84 (CRS dictionary, optional): CRS fo road network to which the GDFs are projected
+        calculate_snap (boolean, optional): variable to add snapping distance to travel time, default is false
+        wgs84 (CRS dictionary, optional): CRS of road network to which the GDFs are projected
     Returns:
         numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
     """

@@ -43,7 +43,7 @@ def CreateODMatrix(
     :param MB_Token: Mapbox private key if using the "MB" or "MBT" call types
     """
 
-    # Function for performing Euclidian distances.
+    # Function for performing Euclidean distances.
     def EuclidCall(source_list, dest_list, source_points, dest_points):
         distmatrix = np.zeros((len(source_points), len(dest_points)))
         for s in range(0, len(source_points)):
@@ -403,7 +403,7 @@ def ReadMe(ffpath):
         *** Optional - if sources =/= destinations. Note - Unique identifier and Pop column names must remain the same ***
         -W   Filename of destinations csv
         *** Optional - if encountering server errors / internet connectivity instability ***
-        -R   Save - input latest save number to pick up matrix construciton process from there.
+        -R   Save - input latest save number to pick up matrix construction process from there.
         -Z   Rescue number parameter - If you have already re-started the download process, denote how many times. First run = 0, restarted once = 1...
         Do NOT put column names or indeed any input inside quotation marks.
         The only exceptions is if the file paths have spaces in them.
@@ -426,7 +426,7 @@ if __name__ == "__main__":
     python OD.py -all -s C:/Temp/sources.csv -d C:/Temp/destinations.csv -outputMA C:/Temp/MA_Res.csv -outputOD C:/Temp/OD.csv
     """
     parser = argparse.ArgumentParser(
-        description="Calculate Origin Detination",
+        description="Calculate Origin Destination",
         epilog=exampleText,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
