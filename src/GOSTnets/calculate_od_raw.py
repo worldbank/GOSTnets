@@ -18,14 +18,24 @@ def calculateOD_gdf(
 ):
     """Calculate Origin destination matrix from GeoDataframes
 
-    Args:
-        G (networkx graph): describes the road network. Often extracted using OSMNX
-        origins (geopandas dataframe): source locations for calculating access
-        destinations (geopandas dataframe): destination locations for calculating access
-        calculate_snap (boolean, optional): variable to add snapping distance to travel time, default is false
-        wgs84 (CRS dictionary, optional): CRS of road network to which the GDFs are projected
-    Returns:
-        numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
+    Parameters
+    ----------
+    G : networkx graph
+        describes the road network. Often extracted using OSMNX
+    origins : geopandas dataframe
+        source locations for calculating access
+    destinations : geopandas dataframe
+        destination locations for calculating access
+    calculate_snap : boolean, optional
+        variable to add snapping distance to travel time, default is false
+    wgs84 : CRS dictionary, optional
+        CRS of road network to which the GDFs are projected
+
+    Returns
+    -------
+    numpy array
+        2d OD matrix with columns as index of origins and rows as index of
+        destinations
     """
     # Get a list of originNodes and destinationNodes
     if origins.crs != wgs84:
@@ -74,18 +84,36 @@ def calculateOD_csv(
     """
     Calculate OD matrix from csv files of points
 
-    :param G: describes the road network. Often extracted using OSMNX
-    :param string origins: path to csv file with locations for calculating access
-    :param string destinations: path to csv with destination locations for calculating access
-    :param string oLat:
-    :param string oLon:
-    :param string dLat:
-    :param string dLon:
-    :param dict crs: crs of input origins and destinations, defaults to {'init':'epsg:4326'}
-    :param int fail-value: value to put in OD matrix if no route found, defaults to -1
-    :param string weight: variable in G used to define edge impedance, defaults to 'time'
-    :param bool calculate_snap: variable to add snapping distance to travel time, default is false
-    :returns: numpy array: 2d OD matrix with columns as index of origins and rows as index of destinations
+    Parameters
+    ----------
+    G :
+        describes the road network. Often extracted using OSMNX
+    origins : str
+        path to csv file with locations for calculating access
+    destinations : str
+        path to csv with destination locations for calculating access
+    oLat : str
+        Origin latitude field
+    oLon : str
+        Origin longitude field
+    dLat : str
+        Destination latitude field
+    dLon : str
+        Destination longitude field
+    crs : dict
+        crs of input origins and destinations, defaults to {'init':'epsg:4326'}
+    fail-value : int
+        value to put in OD matrix if no route found, defaults to -1
+    weight : str
+        variable in G used to define edge impedance, defaults to 'time'
+    calculate_snap : bool
+        variable to add snapping distance to travel time, default is false
+
+    Returns
+    -------
+    numpy array
+        2d OD matrix with columns as index of origins and rows as index of
+        destinations
     """
 
     originPts = pd.read_csv(originCSV)
@@ -121,6 +149,26 @@ def calculate_gravity(
         0.00001,
     ],
 ):
+    """
+    Calculate gravity model values for origin-destination (OD) matrix.
+
+    Parameters
+    ----------
+    od : numpy.ndarray
+        Origin-destination matrix.
+    oWeight : list, optional
+        List of weights for each origin. Defaults to an empty list.
+    dWeight : list, optional
+        List of weights for each destination. Defaults to an empty list.
+    decayVals : list, optional
+        List of decay values for market access. Defaults to a predefined list.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame containing gravity model values for each origin-destination
+        pair.
+    """
     if len(oWeight) != od.shape[0]:
         oWeight = [1] * od.shape[0]
     if len(dWeight) != od.shape[1]:
