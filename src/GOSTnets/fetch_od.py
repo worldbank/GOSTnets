@@ -32,19 +32,66 @@ def CreateODMatrix(
     osrmHeader="",
 ):
     """
+    Create an Origin-Destination matrix from a list of origins and destinations.
+
     make sure lat_name and Lon_names are the same column names in both your infile (origins) and infile_2 (destinations)
-    :param infile: string for folder path containing input data of the origins. This can also be a geodataframe of the data instead.
-    :param infile_2: string for folder path containing input data of the destinations. This can also be a geodataframe of the data instead.
-    :param lat_name: Latitude column name.
-    :param lon_name: Longitude column name
-    :param UID:   Origin Unique Identifier column name (e.g. District, Name, Object ID...). This is mainly helpful for joining the output back to the input data / a shapefile, and is non-essential in terms of the calculation. It can be text or a number.
-    :param Pop: Population / weighting column name
-    :param call_type: Server call type - "OSRM" for OSRM, "MB" for Mapbox, "MBT" for Mapbox traffic, or "Euclid" for Euclidean distances (as the crow flies)
-    :param MB_Token: Mapbox private key if using the "MB" or "MBT" call types
+
+    Parameters
+    ----------
+    infile : string or geodataframe
+        string for folder path containing input data of the origins. This can also be a geodataframe of the data instead.
+    infile_2 : string or geodataframe
+        string for folder path containing input data of the destinations. This can also be a geodataframe of the data instead.
+    lat_name : string
+        Latitude column name.
+    lon_name : string
+        Longitude column name
+    UID : string
+        Origin Unique Identifier column name (e.g. District, Name, Object ID...). This is mainly helpful for joining the output back to the input data / a shapefile, and is non-essential in terms of the calculation. It can be text or a number.
+    Pop : string
+        Population / weighting column name
+    call_type : string
+        Server call type - "OSRM" for OSRM, "MB" for Mapbox, "MBT" for Mapbox traffic, or "Euclid" for Euclidean distances (as the crow flies)
+    rescue : int
+        Save - input latest save number to pick up matrix construction process from there.
+    rescue_num : int
+        Rescue number parameter - If you have already re-started the download process, denote how many times. First run = 0, restarted once = 1...
+    MB_Token : string
+        Mapbox private key if using the "MB" or "MBT" call types
+    sleepTime : int
+        When making calls to OSRM, a sleep time is required to avoid DDoS
+    osrmHeader : string
+        optional parameter to set OSRM source
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame containing the OD matrix.
+
     """
 
     # Function for performing Euclidean distances.
     def EuclidCall(source_list, dest_list, source_points, dest_points):
+        """
+        Calculates the Euclidean distance matrix between source and destination points.
+
+        Parameters
+        ----------
+        source_list : list
+            List of source point names.
+        dest_list : list
+            List of destination point names.
+        source_points : list
+            List of source points as Shapely Point objects.
+        dest_points : list
+            List of destination points as Shapely Point objects.
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame containing the distance matrix with source points as rows and destination points as columns.
+
+        """
         distmatrix = np.zeros((len(source_points), len(dest_points)))
         for s in range(0, len(source_points)):
             for d in range(0, len(dest_points)):
@@ -57,6 +104,34 @@ def CreateODMatrix(
 
     # Function for calling OSRM server.
     def Call(O_list, D_list, i, O_IDs, D_IDs, header):
+        """
+        Fetches origin-destination (OD) data from a web service.
+
+        Parameters
+        ----------
+        O_list : list
+            List of origin coordinates.
+        D_list : list
+            List of destination coordinates.
+        i : int
+            Index of the current iteration.
+        O_IDs : list
+            List of origin IDs.
+        D_IDs : list
+            List of destination IDs.
+        header : str
+            Header for the HTTP request.
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame containing the OD data.
+
+        Raises
+        ------
+        Exception: If there is an error in fetching the data.
+
+        """
         # Convert origins to HTTP request string
         Os = ";".join(str(coord).replace("'", "").replace(";", "") for coord in O_list)
         # Destinations to HTTP request string
@@ -121,6 +196,22 @@ def CreateODMatrix(
 
     # Generate appropriately split source and destination lists
     def split_and_bundle(in_list, break_size):
+        """
+        Splits a list into smaller sublists of a specified size.
+
+        Parameters
+        ----------
+        in_list : list
+            The input list to be split.
+        break_size : int
+            The size of each sublist.
+
+        Returns
+        -------
+        list
+            A list of sublists, where each sublist has a maximum size of `break_size`.
+
+        """
         new_list = []
         for i in range(0, (int(max(len(in_list) / break_size, 1)))):
             upper = (i + 1) * break_size
@@ -138,6 +229,27 @@ def CreateODMatrix(
     # save_rate = 5
 
     def save(returns, j, i, numcalls, rescue_num):
+        """
+        Save the returns to a CSV file and print progress information.
+
+        Parameters
+        ----------
+        returns : list or pd.DataFrame
+            A list of dataframes or a single dataframe to be saved.
+        j : int
+            The save point number.
+        i : int
+            The number of calls completed.
+        numcalls : int
+            The total number of calls.
+        rescue_num : int
+            The rescue number for the temporary file.
+
+        Returns
+        -------
+        None
+
+        """
         elapsed_mins = (time.time() - start) / 60
         elapsed_secs = (time.time() - start) % 60
         total = (numcalls / float(i)) * (time.time() - start) / 60.0
@@ -324,10 +436,21 @@ def MarketAccess(
     ],
 ):
     """
-    Calculate Market Access for a given range of lambdas
-    """
+    Calculate Market Access for a given range of lambdas.
 
-    # Run market access for all lambda across 'new' dataframe
+    Parameters
+    ---------
+    new : pd.DataFrame
+        DataFrame containing the data for market access calculation.
+    lambder_list : list
+        List of lambda values to be used for market access calculation.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the market access values for each lambda.
+
+    """
     output = pd.DataFrame()
     new = new.loc[new["DIST"] > -1]
 
@@ -409,8 +532,8 @@ def ReadMe(ffpath):
         -Z   Rescue number parameter - If you have already re-started the download process, denote how many times. First run = 0, restarted once = 1...
         Do NOT put column names or indeed any input inside quotation marks.
         The only exceptions is if the file paths have spaces in them.
-        """
 
+        """
     text_file = open(os.path.join(ffpath, "GOST_ReadMe_MarketAccess.txt"), "w")
     text_file.write(readmetext)
     text_file.close()
@@ -426,6 +549,7 @@ if __name__ == "__main__":
 
     # Run Both Analyses
     python OD.py -all -s C:/Temp/sources.csv -d C:/Temp/destinations.csv -outputMA C:/Temp/MA_Res.csv -outputOD C:/Temp/OD.csv
+
     """
     parser = argparse.ArgumentParser(
         description="Calculate Origin Destination",
