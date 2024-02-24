@@ -12,13 +12,19 @@ from rasterio import features
 def rasterize_od_results(inD, outFile, field, template=None):
     """Convert gridded point data frame to raster of commensurate size and resolution
 
-    INPUT
-    inD [ geopandas data frame ] - OD matrix as point data frame
-    outFile [ string ] - path to save output raster
-    field [ string ] - field to rasterize
+    Parameters
+    ----------
+    inD : geopandas data frame
+        OD matrix as point data frame
+    outFile: string
+        path to save output raster
+    field : string
+        field to rasterize
 
-    RETURNS
+    Returns
+    -------
     None
+
     """
     if template:
         raster_template = rasterio.open(template)
