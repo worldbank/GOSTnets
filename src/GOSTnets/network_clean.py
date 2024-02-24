@@ -20,15 +20,30 @@ def clean_network(
 ):
     """
     Topologically simplifies an input graph object by collapsing junctions and removing interstital nodes
-    :param G: a graph object containing nodes and edges. Edges should have a property called 'Wkt' containing geometry objects describing the roads.
-    :param wpath: the write path - a drive directory for inputs and output
-    :param output_file_name: This will be the output file name with '_processed' appended
-    :param UTM: The epsg code of the projection, in metres, to apply the junctdist
-    :param WGS: the current crs of the graph's geometry properties. By default, assumes WGS 84 (epsg 4326)
-    :param junctdist: distance within which to collapse neighboring nodes. simplifies junctions. Set to 0.1 if not simplification desired. 50m good for national (primary / secondary) networks
-    :param verbose: if True, saves down intermediate stages for dissection
-    """
 
+    Parameters
+    ----------
+    G : networkx.graph object
+        a graph object containing nodes and edges. Edges should have a property called 'Wkt' containing geometry objects describing the roads.
+    wpath : str
+        the write path - a drive directory for inputs and output
+    output_file_name : str
+        This will be the output file name with '_processed' appended
+    UTM : dict
+        The epsg code of the projection, in metres, to apply the junctdist
+    WGS : dict
+        the current crs of the graph's geometry properties. By default, assumes WGS 84 (epsg 4326)
+    junctdist : int, float
+        distance within which to collapse neighboring nodes. simplifies junctions. Set to 0.1 if not simplification desired. 50m good for national (primary / secondary) networks
+    verbose : boolean
+        if True, saves down intermediate stages for dissection
+
+    Returns
+    -------
+    nx.MultiDiGraph
+        A simplified graph object
+
+    """
     # Squeezes clusters of nodes down to a single node if they are within the snapping tolerance
     a = simplify_junctions(G, UTM, WGS, junctdist)
 
