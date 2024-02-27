@@ -28,20 +28,33 @@ class OSM_to_network(object):
     """
     Object to load OSM PBF to networkX objects.
 
-    Object to load OSM PBF to networkX objects. \
-    EXAMPLE: \
-    G_loader = losm.OSM_to_network(bufferedOSM_pbf) \
-    G_loader.generateRoadsGDF() \
-    G = G.initialReadIn() \
+    Example
+    -------
+    >>> G_loader = losm.OSM_to_network(bufferedOSM_pbf) \
+    >>> G_loader.generateRoadsGDF() \
+    >>> G = G.initialReadIn() \
+    >>> # snap origins and destinations \
+    >>> o_snapped = gn.pandana_snap(G, origins) \
+    >>> d_snapped = gn.pandana_snap(G, destinations) \
 
-    snap origins and destinations \
-    o_snapped = gn.pandana_snap(G, origins) \
-    d_snapped = gn.pandana_snap(G, destinations) \
     """
 
     def __init__(self, osmFile, includeFerries=False):
         """
         Generate a networkX object from a osm file
+
+        Parameters
+        ----------
+        osmFile : string
+            The path to the OSM file
+
+        includeFerries : boolean
+            Include ferries in the network
+
+        Returns
+        -------
+        None
+
         """
         self.osmFile = osmFile
         self.roads_raw = (
@@ -54,9 +67,18 @@ class OSM_to_network(object):
         """
         post-process roads GeoDataFrame adding additional attributes
 
-        :param in_df: Optional input GeoDataFrame
-        :param outFile: optional parameter to output a csv with the processed roads
-        :returns: Length of line in kilometers
+        Parameters
+        ----------
+        in_df : GeoDataFrame
+            Optional input GeoDataFrame
+        outFile : string
+            optional parameter to output a csv with the processed roads
+
+        Returns
+        -------
+        float
+            Length of line in kilometers
+
         """
         if type(in_df) != gpd.geodataframe.GeoDataFrame:
             in_df = self.roads_raw
@@ -106,10 +128,17 @@ class OSM_to_network(object):
         """
         Extract certain times of roads from the OSM before the netowrkX conversion
 
-        :param acceptedRoads: [ optional ] acceptedRoads [ list of strings ]
-        :returns: None - the raw roads are filtered based on the list of accepted roads
-        """
+        Parameters
+        ----------
+        acceptedRoads : list of strings, optional
+            list of accepted road types
 
+        Returns
+        -------
+        None
+            the raw roads are filtered based on the list of accepted roads
+
+        """
         self.roads_raw = self.roads_raw.loc[
             self.roads_raw.infra_type.isin(acceptedRoads)
         ]
@@ -118,8 +147,16 @@ class OSM_to_network(object):
         """
         Extracts roads from an OSM PBF
 
-        :param data_path: The directory of the shapefiles consisting of edges and nodes
-        :returns: a road GeoDataFrame
+        Parameters
+        ----------
+        data_path : string
+            The directory of the shapefiles consisting of edges and nodes
+
+        Returns
+        -------
+        GeoDataFrame
+            a road GeoDataFrame
+
         """
         if data_path.split(".")[-1] == "pbf":
             driver = ogr.GetDriverByName("OSM")
@@ -185,10 +222,17 @@ class OSM_to_network(object):
         """
         Extracts roads and ferries from an OSM PBF
 
-        :param data_path: The directory of the shapefiles consisting of edges and nodes
-        :returns: a road GeoDataFrame
-        """
+        Parameters
+        ----------
+        data_path : string
+            The directory of the shapefiles consisting of edges and nodes
 
+        Returns
+        -------
+        GeoDataFrame
+            a road GeoDataFrame
+
+        """
         if data_path.split(".")[-1] == "pbf":
             driver = ogr.GetDriverByName("OSM")
             data = driver.Open(data_path)
@@ -262,11 +306,19 @@ class OSM_to_network(object):
         """
         Returns length of a line in kilometers, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
 
-        :param line: a shapely LineString object with WGS-84 coordinates
-        :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-        :returns: Length of line in kilometers
-        """
+        Parameters
+        ----------
+        line : LineString
+            a shapely LineString object with WGS-84 coordinates
+        ellipsoid : str
+            string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
 
+        Returns
+        -------
+        float
+            Length of line in kilometers
+
+        """
         if line.geometryType() == "MultiLineString":
             return sum(self.line_length(segment) for segment in line)
 
@@ -283,12 +335,21 @@ class OSM_to_network(object):
         """
         Processes GeoDataFrame and splits edges as intersections
 
-        :param shape_input: Input GeoDataFrame
-        :param idx_osm: The geometry index name
-        :param unique_id: The unique id field name
-        :returns: returns processed GeoDataFrame
-        """
+        Parameters
+        ----------
+        shape_input : GeoDataFrame
+            Input GeoDataFrame
+        idx_osm : spatial index
+            The geometry index name
+        unique_id : string
+            The unique id field name
 
+        Returns
+        -------
+        GeoDataFrame
+            returns processed GeoDataFrame
+
+        """
         # Initialize Rtree
         idx_inters = index.Index()
         # Load data
@@ -402,9 +463,18 @@ class OSM_to_network(object):
         """
         Convert the OSM object to a networkX object
 
-        :param fpath: path to CSV file with roads to read in
-        :param wktField: wktField name
-        :returns: Networkx Multi-digraph
+        Parameters
+        ----------
+        fpath : string
+            path to CSV file with roads to read in
+        wktField : string
+            wktField name
+
+        Returns
+        -------
+        nx.MultiDiGraph
+            a networkX MultiDiGraph object
+
         """
         if isinstance(fpath, str):
             edges_1 = pd.read_csv(fpath)

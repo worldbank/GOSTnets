@@ -32,7 +32,27 @@ def haversine(lon1, lat1, lon2, lat2, unit_m=True):
     """
     Calculate the great circle distance between two points
     on the earth (specified in decimal degrees)
-    default unit : km
+    default unit : m
+
+    Parameters
+    ----------
+    lon1 : float
+        longitude of the first point
+    lat1 : float
+        latitude of the first point
+    lon2 : float
+        longitude of the second point
+    lat2 : float
+        latitude of the second point
+    unit_m : bool
+        if True, return the distance in meters (default) if False,
+        return the distance in kilometers
+
+    Returns
+    -------
+    float
+        distance between the two points
+
     """
     # convert decimal degrees to radians
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
@@ -61,9 +81,37 @@ def download_osm(
     verbose=True,
 ):
     """
-    Return a filehandle to the downloaded data from osm api.
-    """
+    Downloads OpenStreetMap data for a given bounding box.
 
+    Parameters
+    ----------
+    left : float
+        The left longitude of the bounding box.
+    bottom : float
+        The bottom latitude of the bounding box.
+    right : float
+        The right longitude of the bounding box.
+    top : float
+        The top latitude of the bounding box.
+    proxy : bool, optional
+        Whether to use a proxy for the request. Defaults to False.
+    proxyHost : str, optional
+        The proxy host address. Defaults to "10.0.4.2".
+    proxyPort : str, optional
+        The proxy port number. Defaults to "3128".
+    cache : bool, optional
+        Whether to cache the downloaded tile. Defaults to False.
+    cacheTempDir : str, optional
+        The directory to store the cached tile. Defaults to "/tmp/tmpOSM/".
+    verbose : bool, optional
+        Whether to print progress messages. Defaults to True.
+
+    Returns
+    -------
+    file-like object
+        The downloaded OpenStreetMap tile.
+
+    """
     import urllib.request  # To request the web
 
     if cache:
@@ -141,17 +189,27 @@ def read_osm(filename_or_stream, only_roads=True):
     """
     Read graph in OSM format from file specified by name or by stream object.
 
-    Examples:
+    Parameters
+    ----------
+    filename_or_stream : string or file
+        The filename or stream to read. File can be either a filename
+        or stream/file object.
+    only_roads : bool, optional
+        Whether to only read roads. Defaults to True.
+
+    Returns
+    -------
+    networkx multidigraph
+        The graph from the OSM file.
+
+    Examples
+    --------
     >>> G=nx.read_osm(nx.download_osm(-122.33,47.60,-122.31,47.61))
     >>> import matplotlib.pyplot as plt
     >>> plt.plot([G.node[n]['lat']for n in G], [G.node[n]['lon'] for n in G], 'o', color='k')
     >>> plt.show()
 
-    :param filename_or_stream: filename or stream object
-    :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-    :returns G: networkx multidigraph
     """
-
     osm = OSM(filename_or_stream)
     G = networkx.DiGraph()
 
@@ -196,6 +254,23 @@ def read_osm(filename_or_stream, only_roads=True):
 
 
 class Node:
+    """
+    Represents a node in the OpenStreetMap data.
+
+    Attributes
+    ----------
+    id : int
+        The unique identifier of the node.
+    lon : float
+        The longitude coordinate of the node.
+    lat : float
+        The latitude coordinate of the node.
+    tags : dict
+        A dictionary containing additional tags associated with the
+        node.
+
+    """
+
     def __init__(self, id, lon, lat):
         self.id = id
         self.lon = lon
@@ -207,6 +282,22 @@ class Node:
 
 
 class Way:
+    """
+    Represents a way in the OpenStreetMap data.
+
+    Attributes
+    ----------
+    id : str
+        The unique identifier of the way.
+    osm : object
+        The OpenStreetMap object that the way belongs to.
+    nds : list
+        The list of node references that make up the way.
+    tags : dict
+        The dictionary of tags associated with the way.
+
+    """
+
     def __init__(self, id, osm):
         self.osm = osm
         self.id = id
@@ -214,6 +305,23 @@ class Way:
         self.tags = {}
 
     def split(self, dividers):
+        """
+        Splits the way into multiple smaller ways based on the given dividers.
+
+        Parameters
+        ----------
+        dividers : dict
+            A dictionary containing the number of occurrences of each
+            node reference.
+
+        Returns
+        -------
+        list
+            A list of new Way objects, each representing a slice of the
+            original way.
+
+        """
+
         # slice the node-array using this nifty recursive function
         def slice_array(ar, dividers):
             for i in range(1, len(ar) - 1):
@@ -242,11 +350,34 @@ class Way:
 
 
 class OSM:
+    """
+    Represents an OpenStreetMap (OSM) data structure.
+
+    Parameters
+    ----------
+    filename_or_stream : str or file object
+        The OSM data file name or stream.
+
+    Attributes
+    ----------
+    nodes : dict
+        A dictionary of OSM nodes, where the key is the node ID and the
+        value is the Node object.
+    ways : dict
+        A dictionary of OSM ways, where the key is the way ID and the
+        value is the Way object.
+    """
+
     def __init__(self, filename_or_stream):
         """
-        File can be either a filename or stream/file object.
-        """
+        Initializes an instance of the OSM class.
 
+        Parameters
+        ----------
+        filename_or_stream : str or file object
+            The OSM data file name or stream.
+
+        """
         nodes = {}
         ways = {}
 
@@ -332,11 +463,19 @@ def fetch_roads_OSM(
     """
     Returns a GeoDataFrame of OSM roads from an OSM file
 
-    :param osm_path: path to OSM file
-    :param list acceptedRoads: list of OSM road types
-    :returns: A GeoDataFrame of OSM roads
-    """
+    Parameters
+    ----------
+    osm_path : str
+        path to OSM file
+    acceptedRoads : list
+        list of OSM road types
 
+    Returns
+    -------
+    gpd.GeoDataFrame
+        A GeoDataFrame of OSM roads
+
+    """
     driver = ogr.GetDriverByName("OSM")
     data = driver.Open(osm_path)
 
@@ -370,13 +509,24 @@ def fetch_roads_OSM(
 
 def line_length(line, ellipsoid="WGS-84"):
     """
-    Returns length of a line in kilometers, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
+    Returns length of a line in kilometers, given in geographic
+    coordinates. Adapted from
+    https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
 
-    :param line: a shapely LineString object with WGS-84 coordinates
-    :param string ellipsoid: string name of an ellipsoid that `geopy` understands (see http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-    :returns: Length of line in kilometers
+    Parameters
+    ----------
+    line : shapely.geometry.LineString
+        A shapely LineString object with WGS-84 coordinates
+    ellipsoid : str
+        string name of an ellipsoid that `geopy` understands (see
+        http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
+
+    Returns
+    -------
+    float
+        Length of line in kilometers
+
     """
-
     if line.geometryType() == "MultiLineString":
         return sum(line_length(segment) for segment in line)
 

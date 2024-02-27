@@ -6,6 +6,19 @@ def get_prop_type(value, key=None):
     Performs typing and value conversion for the graph_tool PropertyMap class.
     If a key is provided, it also ensures the key is in a format that can be
     used with the PropertyMap. Returns a tuple, (type name, value, key)
+
+    Parameters
+    ----------
+    value : any
+        The value to be typed and converted
+    key : any, optional
+        The key to be typed and converted, if provided, defaults to None
+
+    Returns
+    -------
+    tuple
+        A tuple of the type name, value, and key
+
     """
     # Ensure that key is returned as a str type
     if isinstance(key, bytes):
@@ -39,6 +52,17 @@ def get_prop_type(value, key=None):
 def nx2gt(nxG):
     """
     Converts a networkx graph to a graph-tool graph.
+
+    Parameters
+    ----------
+    nxG : networkx.Graph
+        The networkx graph to be converted.
+
+    Returns
+    -------
+    gtG : graph_tool.Graph
+        The graph-tool graph converted from the networkx graph.
+
     """
     # Phase 0: Create a directed or undirected graph-tool Graph
     gtG = gt.Graph(directed=nxG.is_directed())
