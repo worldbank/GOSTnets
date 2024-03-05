@@ -1,0 +1,53 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: README
+parts:
+  - caption: Documentation
+    chapters:
+      - file: api/GOSTurban.rst
+  - caption: Novel Urbanization
+    chapters:
+      - file: novel_context
+      - file: urbanization_comparison
+  - caption: Tutorials
+    chapters:
+      - file: notebooks/Tutorials/UrbanAreas_tutorials.ipynb
+      - file: notebooks/Tutorials/LEI_Example.ipynb
+  # - caption: Implementations
+  #   chapters:
+  #     - file: notebooks/Implementations/JUP_SURGP_GLO_B_D__LEI_Evaluation.ipynb
+  #     - file: notebooks/Implementations/URB_DECAT_B_ExploringGHSSMODcode.ipynb
+  #     - file: notebooks/Implementations/URB_SEAU1_B_A_Ka_ExtractDataUrban.ipynb
+  #     - file: notebooks/Implementations/WSF_DECAT_B_ExploringIDCerrors.ipynb
+  # - caption: KAZ_SCADR_UrbanizationReview
+  #   chapters:
+  #     - file: notebooks/Implementations/KAZ_SCADR_UrbanizationReview/ECA_Urban_Extents.ipynb
+  #     - file: notebooks/Implementations/KAZ_SCADR_UrbanizationReview/Urban_metrics_Combine_All.ipynb
+  #     - file: notebooks/Implementations/KAZ_SCADR_UrbanizationReview/Urban_metrics_Shape.ipynb
+  #     - file: notebooks/Implementations/KAZ_SCADR_UrbanizationReview/Urban_metrics_Structure.ipynb
+  #     - file: notebooks/Implementations/KAZ_SCADR_UrbanizationReview/KAZ_Urbanization_Review.ipynb
+  #     - file: notebooks/Implementations/KAZ_SCADR_UrbanizationReview/Urban_metrics_Fullness.ipynb
+  #     - file: notebooks/Implementations/KAZ_SCADR_UrbanizationReview/Urban_metrics_Sprawl.ipynb
+  # - caption: POV_EEAPV_COG_urban_assessment
+  #   chapters:
+  #     - file: notebooks/Implementations/POV_EEAPV_COG_urban_assessment/Summarize_Urban.ipynb
+  # - caption: Slum_Mapping
+  #   chapters:
+  #     - file: notebooks/Implementations/Slum_Mapping/Imagery_Search.ipynb
+  # - caption: URB_SCAUR_UKR_B_I_urbanizationReview
+  #   chapters:
+  #     - file: notebooks/Implementations/URB_SCAUR_UKR_B_I_urbanizationReview/URB_SCAUR_UKR_B_I_urbanizationReview.ipynb
+  # - caption: URB_SEAU1_NovelUrbanization
+  #   chapters:
+  #     - file: notebooks/Implementations/URB_SEAU1_NovelUrbanization/Create_Mosaick_Datasets.ipynb
+  #     - file: notebooks/Implementations/URB_SEAU1_NovelUrbanization/GHSL_Standardize_To_Country.ipynb
+  #     - file: notebooks/Implementations/URB_SEAU1_NovelUrbanization/MAP_Urbanization.ipynb
+  #     - file: notebooks/Implementations/URB_SEAU1_NovelUrbanization/NGA_specific_results.ipynb
+  #     - file: notebooks/Implementations/URB_SEAU1_NovelUrbanization/URB_SEAU1_B_A_Ka_NovelUrbanizaton.ipynb
+  #     - file: notebooks/Implementations/URB_SEAU1_NovelUrbanization/WBGAPI_Extract_urbanization_GDP.ipynb
+  # - caption: URB_SURDR_ZAF_Energy_Transition
+  #   chapters:
+  #     - file: notebooks/Implementations/URB_SURDR_ZAF_Energy_Transition/Data Preparation.ipynb
+  #     - file: notebooks/Implementations/URB_SURDR_ZAF_Energy_Transition/Zonal_statistics.ipynb
