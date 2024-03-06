@@ -38,7 +38,13 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pre-commit", "pytest", "pytest-cov", "tomli", "GOStnets[docs,osm,opt]"]
-docs = ["docutils==0.17.1", "jupyter-book>=1,<2"]
+docs = [
+	"docutils==0.17.1",
+	"jupyter-book>=1,<2",
+	"sphinxcontrib-apidoc>=0.4.0,<1",
+	"jupyter-cache>=0.6.0",
+	"nbconvert",
+]
 osm = ["gdal", "geopy", "boltons"]
 opt = ["pulp"]
 

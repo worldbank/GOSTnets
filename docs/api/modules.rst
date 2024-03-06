@@ -1,5 +1,5 @@
-GOSTnets
-========
+src
+===
 
 .. toctree::
    :maxdepth: 4
