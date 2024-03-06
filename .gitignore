@@ -114,3 +114,8 @@ Tutorial/tutorial_data/rek_grid_pop_gravity.shx
 
 # ignore the version file
 *_version.py*
+
+# ignore the generated sphinx conf.py file
+# we generate it during the doc build using jupyter-book from _conf.py
+docs/conf.py
+_build/
