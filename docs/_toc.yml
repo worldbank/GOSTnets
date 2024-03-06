@@ -6,13 +6,13 @@ root: README
 parts:
   - caption: Tutorials
     chapters:
-      - file: Tutorials/'Step 1 - Extract From OSM.ipynb'
-      - file: Tutorials/'Step 2 - Clean Network.ipynb'
-      - file: Tutorials/'Step 3 - Using your Graph.ipynb'
-      - file: Tutorials/'EXAMPLE Finding_links_between_pairs.ipynb'
-      - file: Tutorials/'EXAMPLE Fixing your road network.ipynb'
-      - file: Tutorials/'EXAMPLE Gravity Calculations.ipynb'
+      - file: Tutorials/README
+      - file: Tutorials/Step_1-Extract_From_OSM.ipynb
+      - file: Tutorials/Step_2-Clean_Network.ipynb
+      - file: Tutorials/Step_3-Using_your_Graph.ipynb
+      - file: Tutorials/EXAMPLE_Finding_links_between_pairs.ipynb
+      - file: Tutorials/EXAMPLE_Fixing_your_road_network.ipynb
+      - file: Tutorials/EXAMPLE_Gravity_Calculations.ipynb
   - caption: API Documentation
     chapters:
       - file: api/index.rst
-      - file: api/modules.rst
