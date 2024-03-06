@@ -10,6 +10,9 @@ repos:
           - id: check-added-large-files
           - id: check-ast
           - id: check-json
+          - id: check-symlinks
+          - id: destroyed-symlinks
+          - id: check-toml
           - id: detect-aws-credentials
             args: [--allow-missing-credentials]
           - id: detect-private-key

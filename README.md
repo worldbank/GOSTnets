@@ -107,26 +107,6 @@ pip install GOSTnets[opt]
 pip install GOSTnets[dev]
 ```
 
-## Documentation
-
-Documentation available at [readthedocs](https://GOSTnets.readthedocs.io/)
-
-Plenty of examples and tutorials using Jupyter Notebooks live inside of the Implementations folder within the [GOST_PublicGoods Github repo](https://github.com/worldbank/GOST_PublicGoods)
-
-### how to autobuild docs
-
-in the docs dir, run:
-
-```shell
-sphinx-apidoc -f -o source/ ../GOSTnets
-```
-
-in the docs dir, run:
-
-```shell
-make html
-```
-
 ## Usage
 
 Every function contains a docstring which can be brought up in use to check the inputs for various functions. For example:
