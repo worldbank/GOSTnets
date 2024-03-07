@@ -2,6 +2,7 @@ import os
 import logging
 import warnings
 import time
+import pickle as pkl
 
 import pyproj
 import networkx as nx
@@ -1891,7 +1892,7 @@ def save(G, savename, wpath, pickle=True, edges=True, nodes=True):
         new_edge_gdf = edge_gdf_from_graph(G)
         new_edge_gdf.to_csv(os.path.join(wpath, "%s_edges.csv" % savename))
     if pickle is True:
-        nx.write_gpickle(G, os.path.join(wpath, "%s.pickle" % savename))
+        pkl.dump(G, open(os.path.join(wpath, "%s.pickle" % savename), "wb"))
 
 
 def add_missing_reflected_edges(G, one_way_tag=None, verbose=False):
