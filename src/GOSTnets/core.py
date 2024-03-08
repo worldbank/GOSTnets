@@ -380,7 +380,7 @@ def node_gdf_from_graph(
     G : nx.Graph
         a graph object G
     crs : str
-        projection of format {'init' :'epsg:4326'}. Defaults to WGS84. note: here we are defining the crs of the input geometry - we do NOT reproject to this crs. To reproject, consider using geopandas' to_crs method on the returned gdf.
+        projection of format 'epsg:4326'. Defaults to WGS84. note: here we are defining the crs of the input geometry - we do NOT reproject to this crs. To reproject, consider using geopandas' to_crs method on the returned gdf.
     attr_list : list
         list of the keys which you want to be moved over to the GeoDataFrame, if not all. Defaults to None, which will move all.
     geometry_tag : str
@@ -491,7 +491,7 @@ def edge_gdf_from_graph(
     G : nx.Graph
         (required) a graph object G
     crs : str
-        (optional) projection of format {'init' :'epsg:4326'}. Defaults to WGS84. Note: here we are defining the crs of the input geometry -we do NOT reproject to this crs. To reproject, consider using geopandas' to_crs method on the returned gdf.
+        (optional) projection of format 'epsg:4326'. Defaults to WGS84. Note: here we are defining the crs of the input geometry -we do NOT reproject to this crs. To reproject, consider using geopandas' to_crs method on the returned gdf.
     attr_list : list
         (optional) list of the keys which you want to be moved over to the GeoDataFrame.
     geometry_tag : str
@@ -636,8 +636,8 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
     ----------
     G : nx.Graph or gpd.GeoDataFrame
         a Graph object OR node geodataframe
-    crs : dict
-        a crs object of form {'init':'epsg:XXXX'}. If passed, matches both inputs to this crs.
+    crs : str
+        a crs object of form 'epsg:XXXX'. If passed, matches both inputs to this crs.
 
     Returns
     -------
@@ -931,7 +931,7 @@ def make_iso_polys(
     weight : str
         The edge weight to use when appraising travel times.
     measure_crs : str
-        measurement crs, object of form {'init':'epsg:XXXX'}
+        measurement crs, object of form 'epsg:XXXX'
     edge_filters : dict
         you can optionally add a dictionary with key values, where the key is the attribute and the value you want to ignore from creating isochrones. An example might be an underground subway line.
 
@@ -1087,7 +1087,7 @@ def make_iso_polys_original(
     weight : str
         The edge weight to use when appraising travel times.
     measure_crs : str
-        measurement crs, object of form {'init':'epsg:XXXX'}
+        measurement crs, object of form 'epsg:XXXX'
 
     Returns
     -------
