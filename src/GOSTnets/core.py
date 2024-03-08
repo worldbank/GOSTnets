@@ -2072,9 +2072,7 @@ def convert_to_MultiDiGraph(G):
 #### NETWORK SIMPLIFICATION ####
 
 
-def simplify_junctions(
-    G, measure_crs, in_crs={"init": "epsg:4326"}, thresh=25, verbose=False
-):
+def simplify_junctions(G, measure_crs, in_crs="epsg:4326", thresh=25, verbose=False):
     """
     simplifies topology of networks by simplifying node clusters into single nodes.
 
@@ -2129,7 +2127,7 @@ def simplify_junctions(
         juncs_gdf_unproj,
         gdfnodes,
         how="left",
-        op="intersects",
+        predicate="intersects",
         lsuffix="left",
         rsuffix="right",
     )

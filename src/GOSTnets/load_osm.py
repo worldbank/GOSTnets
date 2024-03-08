@@ -207,7 +207,7 @@ class OSM_to_network(object):
                 road_gdf = gpd.GeoDataFrame(
                     roads,
                     columns=["osm_id", "infra_type", "one_way", "geometry"],
-                    crs={"init": "epsg:4326"},
+                    crs="epsg:4326",
                 )
                 return road_gdf
 
@@ -291,7 +291,7 @@ class OSM_to_network(object):
                 road_gdf = gpd.GeoDataFrame(
                     roads,
                     columns=["osm_id", "infra_type", "geometry"],
-                    crs={"init": "epsg:4326"},
+                    crs="epsg:4326",
                 )
                 return road_gdf
 
@@ -455,7 +455,7 @@ class OSM_to_network(object):
 
         # Transform into geodataframe and add coordinate system
         full_gpd = gpd.GeoDataFrame(flat_list, geometry="geometry")
-        full_gpd.crs = {"init": "epsg:4326"}
+        full_gpd.crs = "epsg:4326"
 
         return full_gpd
 
