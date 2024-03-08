@@ -111,6 +111,11 @@ Tutorials/tutorial_data/rek_grid_pop_gravity.dbf
 Tutorials/tutorial_data/rek_grid_pop_gravity.prj
 Tutorials/tutorial_data/rek_grid_pop_gravity.shp
 Tutorials/tutorial_data/rek_grid_pop_gravity.shx
+Tutorials/tutorial_data/rek_grid_pop_gravity2.cpg
+Tutorials/tutorial_data/rek_grid_pop_gravity2.dbf
+Tutorials/tutorial_data/rek_grid_pop_gravity2.prj
+Tutorials/tutorial_data/rek_grid_pop_gravity2.shp
+Tutorials/tutorial_data/rek_grid_pop_gravity2.shx
 
 # ignore the version file
 *_version.py*
