@@ -105,12 +105,17 @@ venv.bak/
 
 .DS_Store
 
-tutorial/tutorial_outputs/*
-Tutorial/tutorial_data/rek_grid_pop_gravity.cpg
-Tutorial/tutorial_data/rek_grid_pop_gravity.dbf
-Tutorial/tutorial_data/rek_grid_pop_gravity.prj
-Tutorial/tutorial_data/rek_grid_pop_gravity.shp
-Tutorial/tutorial_data/rek_grid_pop_gravity.shx
+Tutorials/tutorial_outputs/*
+Tutorials/tutorial_data/rek_grid_pop_gravity.cpg
+Tutorials/tutorial_data/rek_grid_pop_gravity.dbf
+Tutorials/tutorial_data/rek_grid_pop_gravity.prj
+Tutorials/tutorial_data/rek_grid_pop_gravity.shp
+Tutorials/tutorial_data/rek_grid_pop_gravity.shx
+Tutorials/tutorial_data/rek_grid_pop_gravity2.cpg
+Tutorials/tutorial_data/rek_grid_pop_gravity2.dbf
+Tutorials/tutorial_data/rek_grid_pop_gravity2.prj
+Tutorials/tutorial_data/rek_grid_pop_gravity2.shp
+Tutorials/tutorial_data/rek_grid_pop_gravity2.shx
 
 # ignore the version file
 *_version.py*
