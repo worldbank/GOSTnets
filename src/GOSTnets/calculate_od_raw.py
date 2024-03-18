@@ -14,7 +14,7 @@ def calculateOD_gdf(
     fail_value=-1,
     weight="time",
     calculate_snap=False,
-    wgs84={"init": "epsg:4326"},
+    wgs84="epsg:4326",
 ):
     """Calculate Origin destination matrix from GeoDataframes
 
@@ -76,7 +76,7 @@ def calculateOD_csv(
     oLon="Lon",
     dLat="Lat",
     dLon="Lon",
-    crs={"init": "epsg:4326"},
+    crs="epsg:4326",
     fail_value=-1,
     weight="time",
     calculate_snap=False,
@@ -100,8 +100,8 @@ def calculateOD_csv(
         Destination latitude field
     dLon : str
         Destination longitude field
-    crs : dict
-        crs of input origins and destinations, defaults to {'init':'epsg:4326'}
+    crs : str
+        crs of input origins and destinations, defaults to 'epsg:4326'
     fail-value : int
         value to put in OD matrix if no route found, defaults to -1
     weight : str

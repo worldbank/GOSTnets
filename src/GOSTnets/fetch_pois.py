@@ -37,7 +37,7 @@ class OsmObject:
     --------
     >>> education = {'amenity':['school', 'kindergarten','university', 'college']}
     >>> health = {'amenity':['clinic', 'pharmacy', 'hospital', 'health']}
-    >>> crs = {'init' :'epsg:4326'}
+    >>> crs = 'epsg:4326'
     >>> buf_width = 0.0005
     >>> for a in amenities:
     ...     curr_amenity = amenities[a]
