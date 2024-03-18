@@ -34,7 +34,7 @@ repos:
             description: Checks for common misspellings in text files
             additional_dependencies: [tomli]
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.3.2
+      rev: v0.3.3
       hooks:
           - id: ruff
             types_or: [python, pyi, jupyter]
