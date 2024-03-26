@@ -1,5 +1,11 @@
+import pytest  # noqa: F401
 from GOSTnets import calculate_od_raw
 from unittest.mock import MagicMock
+
+
+def test_calculateOD_gdf(tmp_path):
+    """Test the calculateOD_gdf function."""
+    pass
 
 
 def test_calculateOD_csv(tmp_path):
@@ -32,3 +38,8 @@ def test_calculateOD_csv(tmp_path):
     # Check the result
     assert result == 1
     assert calculate_od_raw.calculateOD_gdf.call_count == 1
+
+
+def test_calculate_gravity():
+    """Test the calculate_gravity function."""
+    pass
