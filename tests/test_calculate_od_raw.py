@@ -6,6 +6,7 @@ import networkx as nx
 import geopandas as gpd
 from shapely.geometry import Point
 import numpy as np
+import pandas as pd
 
 
 def mocked_pandana_snap(G, point_gdf):
@@ -86,4 +87,10 @@ def test_calculateOD_csv(tmp_path):
 
 def test_calculate_gravity():
     """Test the calculate_gravity function."""
-    pass
+    # make inputs
+    od = np.array([[0, 1], [1, 0]])
+    # Run the function
+    result = calculate_od_raw.calculate_gravity(od)
+    # Check the result
+    assert isinstance(result, pd.DataFrame)
+    assert result.shape == (2, 9)
