@@ -45,7 +45,7 @@ docs = [
 	"jupyter-cache>=0.6.0",
 	"nbconvert",
 ]
-osm = ["gdal", "geopy", "boltons"]
+osm = ["gdal"]
 opt = ["pulp"]
 
 [project.urls]
