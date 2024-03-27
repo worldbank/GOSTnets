@@ -51,7 +51,7 @@ def calculateOD_gdf(
     destinations["OD_D"] = destinations["NN"].apply(
         lambda x: np.where(dNodes == x)[0][0]
     )
-    outputMatrix = od[origins["OD_O"].values, :][:, destinations["OD_D"].values]
+    outputMatrix = od[origins["OD_O"].values][destinations["OD_D"].values]
     if calculate_snap:
         originsUTM = pandana_snap(G, origins, target_crs="epsg:3857")
         destinationsUTM = pandana_snap(G, destinations, target_crs="epsg:3857")

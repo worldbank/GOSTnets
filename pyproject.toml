@@ -66,3 +66,12 @@ convention = "numpy"
 
 [tool.ruff]
 exclude = ["__init__.py"]
+
+[tool.coverage.run]
+omit = [
+	"tests/*",
+	"docs/*",
+	"Tutorials/*",
+	"src/GOSTnets/_version.py",
+	"src/GOSTnets/__init__.py",
+]

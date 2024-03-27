@@ -1,11 +1,55 @@
 import pytest  # noqa: F401
 from GOSTnets import calculate_od_raw
+from unittest import mock
 from unittest.mock import MagicMock
+import networkx as nx
+import geopandas as gpd
+from shapely.geometry import Point
+import numpy as np
 
 
+def mocked_pandana_snap(G, point_gdf):
+    """Mock the pandana_snap function."""
+    gdf = gpd.GeoDataFrame(
+        {"geometry": [Point(0, 0), Point(0, 1)], "NN": [0, 1], "NN_dist": [0, 1]},
+        crs="epsg:4326",
+    )
+    return gdf
+
+
+def mocked_calc_od(G, oNodes, dNodes, fail_value):
+    """Mock the calc_od function."""
+    return np.array([[0, 1], [1, 0]])
+
+
+@mock.patch("GOSTnets.calculate_od_raw.pandana_snap", mocked_pandana_snap)
+@mock.patch("GOSTnets.calculate_od_raw.calc_od", mocked_calc_od)
 def test_calculateOD_gdf(tmp_path):
     """Test the calculateOD_gdf function."""
-    pass
+    # generate inputs for the function
+    G = nx.Graph(
+        x=0,
+        y=0,
+    )
+    origins = gpd.GeoDataFrame(
+        {"geometry": [Point(0, 0), Point(0, 1)]}, crs="epsg:4326"
+    )
+    destinations = gpd.GeoDataFrame(
+        {"geometry": [Point(0, 0), Point(0, 1)]}, crs="epsg:4326"
+    )
+    calculate_snap = False
+    wgs84 = "epsg:4326"
+    # Run the function
+    result = calculate_od_raw.calculateOD_gdf(
+        G,
+        origins,
+        destinations,
+        calculate_snap=calculate_snap,
+        wgs84=wgs84,
+    )
+    # Check the result
+    assert result.shape == (2, 2)
+    # add more assertions here...
 
 
 def test_calculateOD_csv(tmp_path):
