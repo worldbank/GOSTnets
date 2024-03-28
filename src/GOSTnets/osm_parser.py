@@ -15,10 +15,10 @@ import xml.sax  # parse osm file
 from pathlib import Path  # manage cached tiles
 
 try:
-    import ogr
+    from osgeo import ogr
 except ImportError:
     try:
-        from osgeo import ogr
+        import ogr
     except ImportError:
         print("GDAL is not installed - OGR functionality not available")
 
@@ -500,7 +500,7 @@ def fetch_roads_OSM(
         road_gdf = gpd.GeoDataFrame(
             roads,
             columns=["osm_id", "infra_type", "geometry"],
-            crs={"init": "epsg:4326"},
+            crs="epsg:4326",
         )
         return road_gdf
     else:
