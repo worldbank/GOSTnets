@@ -15,10 +15,10 @@ import xml.sax  # parse osm file
 from pathlib import Path  # manage cached tiles
 
 try:
-    import ogr
+    from osgeo import ogr
 except ImportError:
     try:
-        from osgeo import ogr
+        import ogr
     except ImportError:
         print("GDAL is not installed - OGR functionality not available")
 

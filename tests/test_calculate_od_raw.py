@@ -49,8 +49,8 @@ def test_calculateOD_gdf(tmp_path):
         wgs84=wgs84,
     )
     # Check the result
+    assert isinstance(result, np.ndarray)
     assert result.shape == (2, 2)
-    # add more assertions here...
 
 
 def test_calculateOD_csv(tmp_path):
