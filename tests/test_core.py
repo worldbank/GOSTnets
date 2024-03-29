@@ -1,4 +1,12 @@
 import pytest  # noqa: F401
+from GOSTnets import core
+import networkx as nx
+from unittest import mock
+import pandas as pd
+import os
+import geopandas as gpd
+from shapely.geometry import Point
+import shutil
 
 
 def test_combo_csv_to_graph():
@@ -66,14 +74,34 @@ def test_find_graph_avg_speed():
     pass
 
 
-def test_example_edge():
+def test_example_edge(capsys):
     """Test the ExampleEdge class."""
-    pass
+    # make a networkx graph
+    G = nx.Graph()
+    G.add_node(1, x=0, y=0)
+    G.add_node(2, x=1, y=1)
+    G.add_edge(1, 2, length=1)
+    # call example_edge function
+    core.example_edge(G, n=1)
+    # capture the output
+    captured = capsys.readouterr()
+    # check the output
+    assert captured.out == "(1, 2, {'length': 1})\n"
 
 
-def test_example_node():
+def test_example_node(capsys):
     """Test the ExampleNode class."""
-    pass
+    # make a networkx graph
+    G = nx.Graph()
+    G.add_node(1, x=0, y=0)
+    G.add_node(2, x=1, y=1)
+    G.add_edge(1, 2, length=1)
+    # call example_edge function
+    core.example_edge(G, n=1)
+    # capture the output
+    captured = capsys.readouterr()
+    # check the output
+    assert captured.out == "(1, 2, {'length': 1})\n"
 
 
 def test_convert_network_to_time():
@@ -93,7 +121,19 @@ def test_calculate_OD():
 
 def test_disrupt_network():
     """Test the disrupt_network function."""
-    pass
+    # make a graph object
+    G = nx.Graph()
+    # add some nodes and edges
+    G.add_node(1, x=0, y=0)
+    G.add_node(2, x=5, y=1)
+    G.add_node(3, x=5, y=0)
+    G.add_edge(1, 2, length=1)
+    G.add_edge(2, 3, length=1)
+    # call the function
+    disrupted_G = core.disrupt_network(G, "x", 1, 2)
+    # assert type of function
+    assert isinstance(disrupted_G, nx.classes.graph.Graph)
+    # need to check function and make sure graph actually gets modified
 
 
 def test_randomly_disrupt_network():
@@ -111,9 +151,51 @@ def test_unbundle_geometry():
     pass
 
 
-def test_save():
+@mock.patch("GOSTnets.core.node_gdf_from_graph", return_value=pd.DataFrame())
+def test_save_01(tmp_path):
     """Test the save function."""
-    pass
+    G = nx.Graph()
+    # make output directory
+    os.makedirs(tmp_path, exist_ok=True)
+    # call the function
+    core.save(G, "test", tmp_path, pickle=False, edges=False, nodes=True)
+    # check the output
+    assert (tmp_path / "test_nodes.csv").exists()
+    # remove the output directory
+    shutil.rmtree(tmp_path)
+    if os.path.isdir("MagicMock"):
+        shutil.rmtree("MagicMock")
+
+
+@mock.patch("GOSTnets.core.edge_gdf_from_graph", return_value=pd.DataFrame())
+def test_save_02(tmp_path):
+    """Test the save function."""
+    G = nx.Graph()
+    # make output directory
+    os.makedirs(tmp_path, exist_ok=True)
+    # call the function
+    core.save(G, "test", tmp_path, pickle=False, edges=True, nodes=False)
+    # check the output
+    assert (tmp_path / "test_edges.csv").exists()
+    # remove the output directory
+    shutil.rmtree(tmp_path)
+    if os.path.isdir("MagicMock"):
+        shutil.rmtree("MagicMock")
+
+
+def test_save_03(tmp_path):
+    """Test the save function."""
+    G = nx.Graph()
+    # make output directory
+    os.makedirs(tmp_path, exist_ok=True)
+    # call the function
+    core.save(G, "test", tmp_path, pickle=True, edges=False, nodes=False)
+    # check the output
+    assert (tmp_path / "test.pickle").exists()
+    # remove the output directory
+    shutil.rmtree(tmp_path)
+    if os.path.isdir("MagicMock"):
+        shutil.rmtree("MagicMock")
 
 
 def test_add_missing_reflected_edges():
@@ -128,12 +210,37 @@ def test_add_missing_reflected_edges_old():
 
 def test_remove_duplicate_edges():
     """Test the remove_duplicate_edges function."""
-    pass
+    # define graph
+    G = nx.MultiGraph()
+    # add some nodes and edges
+    G.add_node(1, x=0, y=0)
+    G.add_node(2, x=0, y=1)
+    G.add_node(3, x=0, y=2)
+    G.add_edge(1, 2, length=1)
+    G.add_edge(2, 3, length=1)
+    G.add_edge(1, 2, length=1)
+    # count number of edges
+    assert len(G.edges) == 3
+    # call the function
+    G = core.remove_duplicate_edges(G)
+    # count number of edges
+    assert len(G.edges) < 3
 
 
 def test_convert_to_MultiDiGraph():
     """Test the convert_to_MultiDiGraph function."""
-    pass
+    # input graph
+    G = nx.Graph()
+    # add some nodes and edges
+    G.add_node(1, x=0, y=0)
+    G.add_node(2, x=0, y=1)
+    G.add_edge(1, 2, length=1)
+    # assert
+    assert isinstance(G, nx.Graph)
+    # call the function
+    G = core.convert_to_MultiDiGraph(G)
+    # assert
+    assert isinstance(G, nx.MultiDiGraph)
 
 
 def test_simplify_junctions():
@@ -193,7 +300,12 @@ def test_new_edge_generator():
 
 def test_project_gdf():
     """Test the project_gdf function."""
-    pass
+    # make input gdf
+    gdf = gpd.GeoDataFrame({"geometry": [Point(0, 0), Point(1, 1)]}, crs="epsg:4326")
+    # call the function
+    projected_gdf = core.project_gdf(gdf, to_crs="epsg:32633", to_latlong=False)
+    # check the output
+    assert projected_gdf.crs == "epsg:32633"
 
 
 def test_gn_project_graph():
@@ -208,12 +320,32 @@ def test_reproject_graph():
 
 def test_euclidean_distance():
     """Test the euclidean_distance function."""
-    pass
+    # define the lon/lat points
+    lon1 = 0.00
+    lat1 = 0.00
+    lon2 = 0.00
+    lat2 = 0.00
+    # calculate the haversine distance
+    distance = core.euclidean_distance(lon1, lat1, lon2, lat2)
+    # check the result
+    assert distance == 0.0
 
 
+def mocked_node_gdf_from_graph(G):
+    """Mock the node_gdf_from_graph function."""
+    return gpd.GeoDataFrame({"geometry": [Point(0, 0), Point(1, 1)], "osmid": [1, 2]})
+
+
+@mock.patch("GOSTnets.core.node_gdf_from_graph", mocked_node_gdf_from_graph)
 def test_utm_of_graph():
     """Test the utm_of_graph function."""
-    pass
+    # make the input graph
+    G = nx.Graph()
+    # call the function
+    utm = core.utm_of_graph(G)
+    # check the output
+    assert isinstance(utm, str)
+    assert utm == "+proj=utm +zone=31 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 
 
 def test_advanced_snap():
