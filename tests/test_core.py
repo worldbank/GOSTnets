@@ -5,8 +5,74 @@ from unittest import mock
 import pandas as pd
 import os
 import geopandas as gpd
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 import shutil
+
+
+def test_convert():
+    """Test convert() function."""
+    # make pandas dataframe
+    df = pd.DataFrame(
+        {
+            "a": [1, 2, 3],
+            "b": [4, 5, 6],
+            "geometry": [Point(0, 0), Point(1, 1), Point(2, 2)],
+            "data": [1, 2, 3],
+        }
+    )
+    # convert geometry to wkt-loadable string
+    df["geometry"] = df["geometry"].apply(lambda x: x.wkt)
+    # call the function
+    G = core.convert(df.iloc[0, :], "a", "b", "geometry", ["data"])
+    # check the output
+    assert isinstance(G, tuple)
+    assert G[0] == 1
+    assert G[1] == 4
+
+
+def test_check():
+    """Test the check() function."""
+    # call the function
+    G = core.check(1, set([1, 2, 3]))
+    # check the output
+    assert G == 1
+    # call again with different input
+    G = core.check(4, set([1, 2, 3]))
+    # check the output
+    assert G == 0
+
+
+def test_selector():
+    """Test the selector() function."""
+    # call the function
+    G = core.selector(1)
+    # check the output
+    assert G == 1
+
+
+def test_flatten():
+    """Test the flatten() function."""
+    # call the function
+    G = core.flatten([[1, 2], [3, 4], [5, 6]])
+    # check the output
+    assert G == [1, 2, 3, 4, 5, 6]
+
+
+def test_chck():
+    """Test the chck() function."""
+    # define the polygon and point
+    poly = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+    pt = Point(0.5, 0.5)
+    # call the function
+    G = core.chck(pt, poly)
+    # check the output
+    assert G == 1
+    # case where point is outside the polygon
+    pt = Point(2, 2)
+    # call the function
+    G = core.chck(pt, poly)
+    # check the output
+    assert G == 0
 
 
 def test_combo_csv_to_graph():
@@ -107,6 +173,18 @@ def test_example_node(capsys):
 def test_convert_network_to_time():
     """Test the convert_network_to_time function."""
     pass
+
+
+def test_first_val():
+    """Test the first_val function."""
+    # call function
+    G = core.first_val([1, 2, 3])
+    # check the output
+    assert G == 1
+    # call function with single value
+    G = core.first_val("test")
+    # check the output
+    assert G == "test"
 
 
 def test_assign_traffic_times():
