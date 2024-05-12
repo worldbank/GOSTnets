@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 
-def mocked_pandana_snap(G, point_gdf):
+def mocked_pandana_snap(G, point_gdf, target_crs=None):
     """Mock the pandana_snap function."""
     gdf = gpd.GeoDataFrame(
         {"geometry": [Point(0, 0), Point(0, 1)], "NN": [0, 1], "NN_dist": [0, 1]},
@@ -40,6 +40,69 @@ def test_calculateOD_gdf(tmp_path):
     )
     calculate_snap = False
     wgs84 = "epsg:4326"
+
+    # Run the function
+    result = calculate_od_raw.calculateOD_gdf(
+        G,
+        origins,
+        destinations,
+        calculate_snap=calculate_snap,
+        wgs84=wgs84,
+    )
+    # Check the result
+    assert isinstance(result, np.ndarray)
+    assert result.shape == (2, 2)
+
+
+@mock.patch("GOSTnets.calculate_od_raw.pandana_snap", mocked_pandana_snap)
+@mock.patch("GOSTnets.calculate_od_raw.calc_od", mocked_calc_od)
+def test_calculateOD_gdf_crs_transform(tmp_path):
+    """Test the calculateOD_gdf function doing CRS transforms."""
+    # generate inputs for the function
+    G = nx.Graph(
+        x=0,
+        y=0,
+    )
+    origins = gpd.GeoDataFrame(
+        {"geometry": [Point(0, 0), Point(0, 1)]}, crs="epsg:4326"
+    )
+    destinations = gpd.GeoDataFrame(
+        {"geometry": [Point(0, 0), Point(0, 1)]}, crs="epsg:4326"
+    )
+    calculate_snap = False
+    wgs84 = "epsg:3857"
+
+    # Run the function
+    result = calculate_od_raw.calculateOD_gdf(
+        G,
+        origins,
+        destinations,
+        calculate_snap=calculate_snap,
+        wgs84=wgs84,
+    )
+    # Check the result
+    assert isinstance(result, np.ndarray)
+    assert result.shape == (2, 2)
+
+
+@mock.patch("GOSTnets.calculate_od_raw.pandana_snap", mocked_pandana_snap)
+@mock.patch("GOSTnets.calculate_od_raw.calc_od", mocked_calc_od)
+def test_calculateOD_gdf_snap(tmp_path):
+    """Test the calculateOD_gdf function doing CRS transforms."""
+    # generate inputs for the function
+    G = nx.Graph(
+        x=0,
+        y=0,
+    )
+    origins = gpd.GeoDataFrame(
+        {"geometry": [Point(0, 0), Point(0, 1)]}, crs="epsg:3857"
+    )
+    destinations = gpd.GeoDataFrame(
+        {"geometry": [Point(0, 0), Point(0, 1)]}, crs="epsg:3857"
+    )
+    calculate_snap = True
+    wgs84 = "epsg:3857"
+
     # Run the function
     result = calculate_od_raw.calculateOD_gdf(
         G,
@@ -83,6 +146,20 @@ def test_calculateOD_csv(tmp_path):
     # Check the result
     assert result == 1
     assert calculate_od_raw.calculateOD_gdf.call_count == 1
+
+    # make call without the destinationCSV
+    # Run the function
+    result = calculate_od_raw.calculateOD_csv(
+        G,
+        originCSV,
+        fail_value=fail_value,
+        weight=weight,
+        calculate_snap=calculate_snap,
+    )
+
+    # Check the result
+    assert result == 1
+    assert calculate_od_raw.calculateOD_gdf.call_count == 2
 
 
 def test_calculate_gravity():
