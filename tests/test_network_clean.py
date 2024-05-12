@@ -45,6 +45,11 @@ def mocked_remove_duplicate_edges(G):
     return G
 
 
+def mocked_save(v, s, p):
+    """Mock the core.save function."""
+    print("save")
+
+
 @mock.patch("GOSTnets.network_clean.simplify_junctions", mocked_simplify_junctions)
 @mock.patch(
     "GOSTnets.network_clean.add_missing_reflected_edges",
@@ -72,3 +77,38 @@ def test_clean_network():
     # make assertions
     assert isinstance(sg, nodes)
     assert sg.number_of_edges() == 1
+
+
+@mock.patch("GOSTnets.network_clean.simplify_junctions", mocked_simplify_junctions)
+@mock.patch(
+    "GOSTnets.network_clean.add_missing_reflected_edges",
+    mocked_add_missing_reflected_edges,
+)
+@mock.patch("GOSTnets.network_clean.custom_simplify", mocked_custom_simplify)
+@mock.patch("GOSTnets.network_clean.unbundle_geometry", mocked_unbundle_geometry)
+@mock.patch(
+    "GOSTnets.network_clean.convert_to_MultiDiGraph", mocked_convert_to_MultiDiGraph
+)
+@mock.patch(
+    "GOSTnets.network_clean.remove_duplicate_edges", mocked_remove_duplicate_edges
+)
+@mock.patch("GOSTnets.network_clean.save", mocked_save)
+def test_clean_network_verbose(capfd):
+    """Test the clean_network function with verbosity."""
+    sg = network_clean.clean_network(
+        G=nodes(),
+        UTM=None,
+        WGS=None,
+        junctdist=None,
+        verbose=True,
+        wpath="wpath",
+        output_file_name=None,
+    )
+    # make assertions
+    assert isinstance(sg, nodes)
+    assert sg.number_of_edges() == 1
+    # check mocked save was called 3 times in succession
+    captured = capfd.readouterr()
+    assert captured.out[:5] == "save\n"
+    assert captured.out[5:10] == "save\n"
+    assert captured.out[10:15] == "save\n"
