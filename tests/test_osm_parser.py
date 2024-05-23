@@ -59,13 +59,16 @@ def test_read_osm():
     pass
 
 
-def test_node():
+def test_node(capsys):
     """Test the Node class."""
     node = osm_parser.Node(10, 3.3, 4.4)
     assert node.id == 10
     assert node.lon == 3.3
     assert node.lat == 4.4
     assert isinstance(node.tags, dict)
+    print(node)
+    captured = capsys.readouterr()
+    assert captured.out[:14] == "Node (id : 10)"
 
 
 def test_way():

@@ -8,7 +8,7 @@ from math import radians, cos, sin, asin, sqrt
 import copy
 
 # Graph module
-import networkx
+import networkx as nx
 
 # Specific modules
 import xml.sax  # parse osm file
@@ -210,40 +210,40 @@ def read_osm(filename_or_stream, only_roads=True):
 
     """
     osm = OSM(filename_or_stream)
-    G = networkx.DiGraph()
+    G = nx.DiGraph()
 
     ## Add ways
     for w in osm.ways.values():
-        if only_roads and "highway" not in w.tags:
+        if (only_roads) and ("highway" not in w.tags):
             continue
 
         if "oneway" in w.tags:
             if w.tags["oneway"] == "yes":
                 # ONLY ONE DIRECTION
-                G.add_path(w.nds, id=w.id, highway=w.tags["highway"])
+                nx.add_path(G, w.nds, id=w.id, highway=w.tags["highway"])
             else:
                 # BOTH DIRECTION
-                G.add_path(w.nds, id=w.id, highway=w.tags["highway"])
-                G.add_path(w.nds[::-1], id=w.id, highway=w.tags["highway"])
+                nx.add_path(G, w.nds, id=w.id, highway=w.tags["highway"])
+                nx.add_path(G, w.nds[::-1], id=w.id, highway=w.tags["highway"])
         else:
             # BOTH DIRECTION
-            G.add_path(w.nds, id=w.id, highway=w.tags["highway"])
-            G.add_path(w.nds[::-1], id=w.id, highway=w.tags["highway"])
+            nx.add_path(G, w.nds, id=w.id, highway=w.tags["highway"])
+            nx.add_path(G, w.nds[::-1], id=w.id, highway=w.tags["highway"])
 
     ## Complete the used nodes' information
     for n_id in G.nodes.keys():
         n = osm.nodes[n_id]
-        G.node[n_id]["lat"] = n.lat
-        G.node[n_id]["lon"] = n.lon
-        G.node[n_id]["id"] = n.id
+        G.nodes[n_id]["lat"] = n.lat
+        G.nodes[n_id]["lon"] = n.lon
+        G.nodes[n_id]["id"] = n.id
 
     ## Estimate the length of each way
     for u, v in G.edges():
         distance = haversine(
-            G.node[u]["lon"],
-            G.node[u]["lat"],
-            G.node[v]["lon"],
-            G.node[v]["lat"],
+            G.nodes[u]["lon"],
+            G.nodes[u]["lat"],
+            G.nodes[v]["lon"],
+            G.nodes[v]["lat"],
             unit_m=True,
         )  # Give a realistic distance estimation (neither EPSG nor projection nor reference system are specified)
 
