@@ -1,4 +1,5 @@
 """Integrative tests for load_osm.py"""
+
 import pytest  # noqa: F401
 from GOSTnets import load_osm
 import os

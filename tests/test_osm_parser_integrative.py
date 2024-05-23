@@ -1,4 +1,5 @@
 """Integrative tests for osm_parser.py"""
+
 import pytest  # noqa: F401
 from GOSTnets import osm_parser
 import networkx as nx
