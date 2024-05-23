@@ -128,9 +128,8 @@ def download_osm(
         )  ## Create cache path if not exists
 
         osmFile = Path(
-            cacheTempDir + cachedTileFilename
+            cacheTempDir, cachedTileFilename
         ).resolve()  ## Replace the relative cache folder path to absolute path
-
         if osmFile.is_file():
             # download from the cache folder
             if verbose:

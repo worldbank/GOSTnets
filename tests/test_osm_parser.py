@@ -3,6 +3,7 @@ from GOSTnets import osm_parser
 from unittest import mock
 import geopandas as gpd
 from shapely.geometry import LineString
+import os
 
 
 def test_haversine():
@@ -30,6 +31,25 @@ def test_download_osm():
     left, bottom, right, top = (0, 0, 0, 0)
     # run the function
     result = osm_parser.download_osm(left, bottom, right, top)
+    # check the result
+    assert result == "test"
+
+
+@mock.patch("urllib.request.urlopen", mocked_urllib_request_urlopen)
+def test_download_osm_cache(tmpdir):
+    """Test the download_osm function with file from cache."""
+    # define inputs
+    left, bottom, right, top = (0, 0, 0, 0)
+    # define file in cache
+    with open(
+        os.path.join(tmpdir, "osm_map_0.00000000_0.00000000_0.00000000_0.00000000.map"),
+        "w",
+    ) as f:
+        f.write("x")
+    # run the function
+    result = osm_parser.download_osm(
+        left, bottom, right, top, cache=True, cacheTempDir=tmpdir
+    )
     # check the result
     assert result == "test"
 
