@@ -1,4 +1,5 @@
 """Integrative test for the GOSTnets workflow based on tutorial notebooks."""
+
 import pytest
 import geopandas as gpd
 import os
