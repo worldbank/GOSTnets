@@ -6,6 +6,7 @@ import pandas as pd
 import os
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
+from shapely import LineString
 import shutil
 
 
@@ -48,6 +49,12 @@ def test_selector():
     G = core.selector(1)
     # check the output
     assert G == 1
+
+
+def test_selector_non_int():
+    """Test selector() if not an int."""
+    x = core.selector("y")
+    assert x == "y"
 
 
 def test_flatten():
@@ -329,6 +336,19 @@ def test_simplify_junctions():
 def test_custom_simplify():
     """Test the custom_simplify function."""
     pass
+
+
+def test_cut():
+    """Test the cut function."""
+    # define parameters
+    line = LineString([[0, 0], [1, 0], [1, 1]])
+    distance = 0.5
+    # call function
+    two_lines = core.cut(line, distance)
+    assert line.length == 2.0
+    assert two_lines[0].length == 0.5
+    assert two_lines[1].length == 1.5
+    assert line.length == (two_lines[0].length + two_lines[1].length)
 
 
 def test_salt_long_lines():

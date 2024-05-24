@@ -14,3 +14,13 @@ def test_OSM_to_network():
     assert isinstance(otn, load_osm.OSM_to_network)
     assert isinstance(otn.osmFile, str)
     assert isinstance(otn.roads_raw, gpd.GeoDataFrame)
+
+
+def test_OSM_to_network_ferries():
+    """Test the OSM_to_network class with ferries."""
+    fpath = os.path.join("Tutorials", "tutorial_data", "iceland-latest.osm.pbf")
+    # load the class
+    otn = load_osm.OSM_to_network(fpath, includeFerries=True)
+    assert isinstance(otn, load_osm.OSM_to_network)
+    assert isinstance(otn.osmFile, str)
+    assert isinstance(otn.roads_raw, gpd.GeoDataFrame)
