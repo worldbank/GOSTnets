@@ -8,6 +8,7 @@ import geopandas as gpd
 from shapely.geometry import Point, Polygon
 from shapely import LineString
 import shutil
+import io
 
 
 def test_convert():
@@ -82,9 +83,29 @@ def test_chck():
     assert G == 0
 
 
+def mocked_convert(x, y, z, f, g):
+    return ["one", "two", "three"]
+
+
+@mock.patch("GOSTnets.core.convert", mocked_convert)
 def test_combo_csv_to_graph():
     """Test the combo_csv_to_graph function."""
-    pass
+    # create the test csv object
+    f_df = pd.DataFrame(
+        data={"u_col": ["a", "b", "c"], "v_col": ["x", "y", "z"], "geo_col": [1, 2, 3]}
+    )
+    # write to buffer
+    s_buf = io.StringIO()
+    f_df.to_csv(s_buf)
+    s_buf.seek(0)
+    # call function
+    G = core.combo_csv_to_graph(
+        s_buf, u_tag="u_col", v_tag="v_col", geometry_tag="geo_col"
+    )
+    # assertions
+    assert isinstance(G, nx.MultiDiGraph)
+    assert "a" in G.nodes
+    assert "x" in G.nodes
 
 
 def test_edges_and_nodes_gdf_to_graph():

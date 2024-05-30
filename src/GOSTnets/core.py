@@ -96,7 +96,7 @@ def combo_csv_to_graph(
     nx.MultiDiGraph
 
     """
-    edges_1 = pd.read_csv(os.path.join(fpath))
+    edges_1 = pd.read_csv(fpath)
 
     edges = edges_1.copy()
 
