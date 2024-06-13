@@ -15,19 +15,19 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
@@ -35,12 +35,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -73,27 +73,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -115,8 +111,13 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
     </header>
   
 
@@ -181,8 +182,7 @@
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="README.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.</a></li>
-
+<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract from OSM</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Clean Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
@@ -193,10 +193,10 @@
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">GOSTnets documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">GOSTnets documentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api/GOSTnets.html">GOSTnets package</a></li>
 </ul>
-</li>
+</details></li>
 
 </ul>
 
@@ -213,7 +213,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -222,14 +222,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -338,9 +338,9 @@ document.write(`
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -385,20 +385,18 @@ document.write(`
   <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">rasterio</span>
 
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># add to your system path the location of the LoadOSM.py and GOSTnet.py scripts</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the GOSTnets library</span>
 <span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
 </pre></div>
 </div>
@@ -414,8 +412,11 @@ document.write(`
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define input data</span>
 <span class="n">pth</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span>
 <span class="c1"># Read in cleaned pickle from earlier analysis and convert to time</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">read_gpickle</span><span class="p">(</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_outputs&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;iceland_network_clean.pickle&quot;</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">pkl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="nb">open</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_outputs&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;iceland_network_clean.pickle&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;rb&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 <span class="n">G_time</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">convert_network_to_time</span><span class="p">(</span>
     <span class="n">G</span><span class="p">,</span> <span class="n">distance_tag</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="n">road_col</span><span class="o">=</span><span class="s2">&quot;infra_type&quot;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">1000</span>
@@ -424,24 +425,6 @@ document.write(`
 <span class="n">rek_grid_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_data&quot;</span><span class="p">,</span> <span class="s2">&quot;rek_grid.shp&quot;</span><span class="p">)</span>
 <span class="n">rek_pop_grid_file</span> <span class="o">=</span> <span class="n">rek_grid_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.shp&quot;</span><span class="p">,</span> <span class="s2">&quot;_pop.shp&quot;</span><span class="p">)</span>
 <span class="n">churches_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_data&quot;</span><span class="p">,</span> <span class="s2">&quot;churches.shp&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">pth</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># Read in cleaned pickle from earlier analysis and convert to time</span>
-<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">read_gpickle</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_outputs&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;iceland_network_clean.pickle&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">G_time</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">convert_network_to_time</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">G</span><span class="p">,</span> <span class="n">distance_tag</span><span class="o">=</span><span class="s2">&quot;length&quot;</span><span class="p">,</span> <span class="n">road_col</span><span class="o">=</span><span class="s2">&quot;infra_type&quot;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">1000</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="c1"># Define origins and destinations</span>
-
-<span class="ne">AttributeError</span>: module &#39;networkx&#39; has no attribute &#39;read_gpickle&#39;
 </pre></div>
 </div>
 </div>
@@ -473,19 +456,6 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># Sample rek_grid with population - the data should already be in the tutorial inputs, so this attribution is not necessary</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rek_pop_grid_file</span><span class="p">):</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">population_data</span> <span class="o">=</span> <span class="s2">&quot;R:\GLOBAL\POP&amp;DEMO\LandScan_2012\lspop2012.tif&quot;</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">in_grid</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">rek_grid_file</span><span class="p">)</span>
-
-<span class="ne">NameError</span>: name &#39;rek_pop_grid_file&#39; is not defined
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="check-out-data">
@@ -498,19 +468,6 @@ document.write(`
 <span class="n">rek_grid</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">rek_pop_grid_file</span><span class="p">)</span>
 <span class="n">in_churches</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">churches_file</span><span class="p">)</span>
 <span class="n">in_churches</span> <span class="o">=</span> <span class="n">in_churches</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">rek_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># Read in the input</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">rek_grid</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">rek_pop_grid_file</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">in_churches</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">churches_file</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">in_churches</span> <span class="o">=</span> <span class="n">in_churches</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">rek_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-
-<span class="ne">NameError</span>: name &#39;rek_pop_grid_file&#39; is not defined
 </pre></div>
 </div>
 </div>
@@ -537,44 +494,10 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># calculate the origins and destinations by snapping to the road network</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">origins_df</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">pandana_snap_c</span><span class="p">(</span>
-<span class="ne">----&gt; </span><span class="mi">3</span>     <span class="n">G_time</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">rek_grid</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">source_crs</span><span class="o">=</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">target_crs</span><span class="o">=</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">add_dist_to_node_col</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">origins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">origins_df</span><span class="p">[</span><span class="s2">&quot;NN&quot;</span><span class="p">]))</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">destinations_df</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">pandana_snap_c</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span>     <span class="n">G_time</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span>     <span class="n">in_churches</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">add_dist_to_node_col</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="p">)</span>
-
-<span class="ne">NameError</span>: name &#39;G_time&#39; is not defined
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">OD</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">calculate_OD</span><span class="p">(</span><span class="n">G_time</span><span class="p">,</span> <span class="n">origins</span><span class="p">,</span> <span class="n">destinations</span><span class="p">,</span> <span class="n">fail_value</span><span class="o">=</span><span class="mi">9999999</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">OD</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">calculate_OD</span><span class="p">(</span><span class="n">G_time</span><span class="p">,</span> <span class="n">origins</span><span class="p">,</span> <span class="n">destinations</span><span class="p">,</span> <span class="n">fail_value</span><span class="o">=</span><span class="mi">9999999</span><span class="p">)</span>
-
-<span class="ne">NameError</span>: name &#39;G_time&#39; is not defined
 </pre></div>
 </div>
 </div>
@@ -592,21 +515,6 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">GOSTnets.calculate_od_raw</span> <span class="k">as</span> <span class="nn">calcOD</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># For this calculation the origins are all weighted equally with a value of 1</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">gravity</span> <span class="o">=</span> <span class="n">calcOD</span><span class="o">.</span><span class="n">calculate_gravity</span><span class="p">(</span>
-<span class="ne">----&gt; </span><span class="mi">6</span>     <span class="n">OD</span><span class="p">,</span> <span class="n">oWeight</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">OD</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dWeight</span><span class="o">=</span><span class="n">destinations_df</span><span class="p">[</span><span class="s2">&quot;Pop&quot;</span><span class="p">]</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">gravity</span><span class="p">[</span><span class="s2">&quot;NN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origins</span>
-
-<span class="ne">NameError</span>: name &#39;OD&#39; is not defined
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -617,14 +525,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># merge the gravity results with the origins</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">origins_gravity</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">origins_df</span><span class="p">,</span> <span class="n">gravity</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;NN&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">origins_gravity</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">rek_pop_grid_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.shp&quot;</span><span class="p">,</span> <span class="s2">&quot;_gravity.shp&quot;</span><span class="p">))</span>
-
-<span class="ne">NameError</span>: name &#39;origins_df&#39; is not defined
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_1951/4100008754.py:3: UserWarning: Column names longer than 10 characters will be truncated when saved to ESRI Shapefile.
+  origins_gravity.to_file(rek_pop_grid_file.replace(&quot;.shp&quot;, &quot;_gravity.shp&quot;))
 </pre></div>
 </div>
 </div>
@@ -638,19 +540,7 @@ document.write(`
 <span class="n">gravity</span> <span class="o">=</span> <span class="n">calcOD</span><span class="o">.</span><span class="n">calculate_gravity</span><span class="p">(</span>
     <span class="n">OD</span><span class="p">,</span> <span class="n">oWeight</span><span class="o">=</span><span class="n">origins_df</span><span class="p">[</span><span class="s2">&quot;Pop&quot;</span><span class="p">],</span> <span class="n">dWeight</span><span class="o">=</span><span class="n">destinations_df</span><span class="p">[</span><span class="s2">&quot;Pop&quot;</span><span class="p">]</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># Now let&#39;s introduce the population numbers into the origins</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">origins</span> <span class="o">=</span> <span class="n">origins_df</span><span class="p">[</span><span class="s2">&quot;NN&quot;</span><span class="p">]</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">destinations</span> <span class="o">=</span> <span class="n">destinations_df</span><span class="p">[</span><span class="s2">&quot;NN&quot;</span><span class="p">]</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">OD</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">calculate_OD</span><span class="p">(</span><span class="n">G_time</span><span class="p">,</span> <span class="n">origins</span><span class="p">,</span> <span class="n">destinations</span><span class="p">,</span> <span class="n">fail_value</span><span class="o">=</span><span class="mi">9999999</span><span class="p">)</span>
-
-<span class="ne">NameError</span>: name &#39;origins_df&#39; is not defined
+<span class="n">gravity</span><span class="p">[</span><span class="s2">&quot;NN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origins</span>
 </pre></div>
 </div>
 </div>
@@ -664,14 +554,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># merge the gravity results with the origins</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">origins_gravity</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">origins_df</span><span class="p">,</span> <span class="n">gravity</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;NN&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">origins_gravity</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">rek_pop_grid_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.shp&quot;</span><span class="p">,</span> <span class="s2">&quot;_gravity2.shp&quot;</span><span class="p">))</span>
-
-<span class="ne">NameError</span>: name &#39;origins_df&#39; is not defined
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_1951/1925333871.py:3: UserWarning: Column names longer than 10 characters will be truncated when saved to ESRI Shapefile.
+  origins_gravity.to_file(rek_pop_grid_file.replace(&quot;.shp&quot;, &quot;_gravity2.shp&quot;))
 </pre></div>
 </div>
 </div>
@@ -712,7 +596,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -807,8 +691,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
   <footer class="bd-footer">
   </footer>

@@ -9,25 +9,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library. &#8212; GOSTnets</title>
+    <title>Step 1: Extract from OSM &#8212; GOSTnets</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
@@ -35,12 +35,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -73,27 +73,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -115,8 +111,13 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
     </header>
   
 
@@ -181,8 +182,7 @@
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="README.html">Tutorial</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.</a></li>
-
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Step 1: Extract from OSM</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Clean Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
@@ -193,10 +193,10 @@
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">GOSTnets documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">GOSTnets documentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api/GOSTnets.html">GOSTnets package</a></li>
 </ul>
-</li>
+</details></li>
 
 </ul>
 
@@ -213,7 +213,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -222,14 +222,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -338,9 +338,7 @@ document.write(`
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</label>
+
 </div></div>
       
     </div>
@@ -351,21 +349,11 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.</h1>
+    <h1>Step 1: Extract from OSM</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-extract-from-osm">Step 1: Extract from OSM</a></li>
-</ul>
-
-            </nav>
         </div>
     </div>
 </div>
@@ -375,10 +363,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="note-as-of-jan-21-2020-this-tutorial-is-using-the-gostnets-version-from-this-repo-s-master-branch-make-sure-that-the-gostnets-version-from-pypi-is-uninstalled-and-that-you-are-pointing-your-path-to-the-correct-location-of-the-library">
-<h1>note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.<a class="headerlink" href="#note-as-of-jan-21-2020-this-tutorial-is-using-the-gostnets-version-from-this-repo-s-master-branch-make-sure-that-the-gostnets-version-from-pypi-is-uninstalled-and-that-you-are-pointing-your-path-to-the-correct-location-of-the-library" title="Permalink to this heading">#</a></h1>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="step-1-extract-from-osm">
+  <section class="tex2jax_ignore mathjax_ignore" id="step-1-extract-from-osm">
 <h1>Step 1: Extract from OSM<a class="headerlink" href="#step-1-extract-from-osm" title="Permalink to this heading">#</a></h1>
 <p>The purpose of this script is to show how to go from a .osm.pbf file to a network format that GOSTnets will accept.
 Additional modifications in this script include: clipping the roads to an input polygon (here, rek2.shp), and filtering the roads DataFrame by a list of accepted road types, as tagged in OSM (see accepted_road_types list).</p>
@@ -386,7 +371,6 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 </pre></div>
 </div>
 </div>
@@ -401,12 +385,10 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>Add to your system path the location of the <a class="reference external" href="http://LoadOSM.py">LoadOSM.py</a> and <a class="reference external" href="http://GOSTnet.py">GOSTnet.py</a> scripts.<br />
-In this case, we use relative paths (“..”) to locate the parent directory (one level up). One dot (“.”) means current directory.</p>
+<p>Import the GOSTnets library as gn.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../&quot;</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
 </pre></div>
 </div>
 </div>
@@ -593,14 +575,8 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clip_shp</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_data&quot;</span><span class="p">,</span> <span class="s2">&quot;rek2.shp&quot;</span><span class="p">))</span>
-<span class="n">clip_shp</span> <span class="o">=</span> <span class="n">clip_shp</span><span class="o">.</span><span class="n">to_crs</span><span class="p">({</span><span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="s2">&quot;epsg:4326&quot;</span><span class="p">})</span>
+<span class="n">clip_shp</span> <span class="o">=</span> <span class="n">clip_shp</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">)</span>
 <span class="n">clip_shp_obj</span> <span class="o">=</span> <span class="n">clip_shp</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyproj/crs/crs.py:141: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
-  in_crs_string = _prepare_from_proj_string(in_crs_string)
 </pre></div>
 </div>
 </div>
@@ -687,7 +663,7 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span> <span class="o">=</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-    <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+    <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>  <span class="c1"># noqa: E712</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -697,7 +673,7 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span> <span class="o">=</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>  <span class="c1"># noqa: E712</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="p">]</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
@@ -723,6 +699,25 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># view the first 5 rows of the newly created roads GeoDataFrame</span>
+<span class="n">iceland</span><span class="o">.</span><span class="n">roadsGPD</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">20</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># view the first 5 rows of the newly created roads GeoDataFrame</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roadsGPD</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
 <p>With the initialReadIn() function, we transform this to a graph object</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -733,7 +728,7 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">20</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">21</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span><span class="o">.</span><span class="n">initialReadIn</span><span class="p">()</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
@@ -758,7 +753,7 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">22</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">23</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">gn</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">iceland</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="s2">&quot;iceland_unclean&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_outputs&quot;</span><span class="p">))</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
@@ -796,7 +791,7 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -823,23 +818,6 @@ In this case, we use relative paths (“..”) to locate the parent directory (o
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-extract-from-osm">Step 1: Extract from OSM</a></li>
-</ul>
-
-  </nav></div>
-
-</div></div>
               
             
           </div>
@@ -884,8 +862,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
   <footer class="bd-footer">
   </footer>

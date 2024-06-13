@@ -15,19 +15,19 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
@@ -35,12 +35,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -73,27 +73,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -115,8 +111,13 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
     </header>
   
 
@@ -181,8 +182,7 @@
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="README.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.</a></li>
-
+<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract from OSM</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Clean Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
@@ -193,10 +193,10 @@
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">GOSTnets documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">GOSTnets documentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api/GOSTnets.html">GOSTnets package</a></li>
 </ul>
-</li>
+</details></li>
 
 </ul>
 
@@ -213,7 +213,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -222,14 +222,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -369,17 +369,16 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># add to your system path the location of the LoadOSM.py and GOSTnet.py scripts</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the GOSTnets library</span>
 <span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
 </pre></div>
 </div>
@@ -395,20 +394,8 @@ document.write(`
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pth</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span>  <span class="c1"># change this path to your working folder</span>
 <span class="n">data_pth</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_outputs&quot;</span><span class="p">)</span>
 
-<span class="c1"># read back your graph from step 1 from you saved pickle</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">read_gpickle</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;iceland_network_clean.pickle&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">data_pth</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_outputs&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># read back your graph from step 1 from you saved pickle</span>
-<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">read_gpickle</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;iceland_network_clean.pickle&quot;</span><span class="p">))</span>
-
-<span class="ne">AttributeError</span>: module &#39;networkx&#39; has no attribute &#39;read_gpickle&#39;
+<span class="c1"># read back your graph from step 2 from you saved pickle</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">pkl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;iceland_network_clean.pickle&quot;</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -423,87 +410,22 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># note the use of sorted to sort by number of edges</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">list_of_subgraphs</span> <span class="o">=</span> <span class="p">[</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">G</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="nn">----&gt; 4     for c</span> in <span class="ni">sorted(nx.strongly_connected_components</span><span class="nt">(G), key=len, reverse=True)</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="p">]</span>
-
-<span class="ne">NameError</span>: name &#39;G&#39; is not defined
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G_largest</span> <span class="o">=</span> <span class="n">list_of_subgraphs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">G_second_largest</span> <span class="o">=</span> <span class="n">list_of_subgraphs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">G_largest</span> <span class="o">=</span> <span class="n">list_of_subgraphs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">G_second_largest</span> <span class="o">=</span> <span class="n">list_of_subgraphs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-<span class="ne">NameError</span>: name &#39;list_of_subgraphs&#39; is not defined
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">G_largest</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">G_largest</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="nb">print</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">G_largest</span><span class="p">))</span>
-
-<span class="ne">AttributeError</span>: module &#39;networkx&#39; has no attribute &#39;info&#39;
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">G_second_largest</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="nb">print</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">G_second_largest</span><span class="p">))</span>
-
-<span class="ne">AttributeError</span>: module &#39;networkx&#39; has no attribute &#39;info&#39;
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">list_of_subgraphs</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="nb">print</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">list_of_subgraphs</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
-
-<span class="ne">AttributeError</span>: module &#39;networkx&#39; has no attribute &#39;info&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MultiDiGraph with 14740 nodes and 37322 edges
 </pre></div>
 </div>
 </div>
@@ -515,43 +437,41 @@ document.write(`
 <span class="n">G_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
 
 <span class="c1"># largest connected subgraph</span>
-<span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_largest</span><span class="p">,</span> <span class="n">fig_width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_largest</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># plotting functions only work if the graphs have a name and a crs attribute</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">G_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:32646&quot;</span>
+<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">G_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
 <span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="c1"># largest connected subgraph</span>
+<span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_largest</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 
-<span class="ne">NameError</span>: name &#39;G_largest&#39; is not defined
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G_second_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:32646&quot;</span>
-<span class="n">G_second_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/osmnx/plot.py:225,</span> in <span class="ni">plot_graph</span><span class="nt">(G, ax, figsize, bgcolor, node_color, node_size, node_alpha, node_edgecolor, node_zorder, edge_color, edge_linewidth, edge_alpha, show, close, save, filepath, dpi, bbox)</span>
+<span class="g g-Whitespace">    </span><span class="mi">153</span> <span class="k">def</span> <span class="nf">plot_graph</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">154</span>     <span class="n">G</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">155</span>     <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">171</span>     <span class="n">bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">172</span> <span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">173</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">174</span><span class="sd">     Visualize a graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">175</span><span class="sd"> </span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">223</span><span class="sd">         matplotlib figure, axis</span>
+<span class="g g-Whitespace">    </span><span class="mi">224</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">225</span>     <span class="n">_verify_mpl</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">226</span>     <span class="n">max_node_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">node_size</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">node_size</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">node_size</span>
+<span class="g g-Whitespace">    </span><span class="mi">227</span>     <span class="n">max_edge_lw</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">edge_linewidth</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">edge_linewidth</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">edge_linewidth</span>
 
-<span class="c1"># second largest connected subgraph</span>
-<span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_second_largest</span><span class="p">,</span> <span class="n">fig_width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">G_second_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:32646&quot;</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">G_second_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># second largest connected subgraph</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/osmnx/plot.py:1020,</span> in <span class="ni">_verify_mpl</span><span class="nt">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1018</span> <span class="k">if</span> <span class="n">cm</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">colors</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">plt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">colormaps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="g g-Whitespace">   </span><span class="mi">1019</span>     <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;matplotlib must be installed as an optional dependency for visualization&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1020</span>     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<span class="ne">NameError</span>: name &#39;G_second_largest&#39; is not defined
+<span class="ne">ImportError</span>: matplotlib must be installed as an optional dependency for visualization
 </pre></div>
 </div>
 </div>
@@ -560,36 +480,6 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edges_largest</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">edge_gdf_from_graph</span><span class="p">(</span><span class="n">G_largest</span><span class="p">)</span>
 <span class="n">edges_largest</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;edges_largest.csv&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">edges_largest</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">edge_gdf_from_graph</span><span class="p">(</span><span class="n">G_largest</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">edges_largest</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;edges_largest.csv&quot;</span><span class="p">))</span>
-
-<span class="ne">NameError</span>: name &#39;G_largest&#39; is not defined
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edges_second</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">edge_gdf_from_graph</span><span class="p">(</span><span class="n">G_second_largest</span><span class="p">)</span>
-<span class="n">edges_second</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;edges_second.csv&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">edges_second</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">edge_gdf_from_graph</span><span class="p">(</span><span class="n">G_second_largest</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">edges_second</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;edges_second.csv&quot;</span><span class="p">))</span>
-
-<span class="ne">NameError</span>: name &#39;G_second_largest&#39; is not defined
 </pre></div>
 </div>
 </div>
@@ -624,7 +514,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -651,8 +541,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -697,8 +585,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
   <footer class="bd-footer">
   </footer>

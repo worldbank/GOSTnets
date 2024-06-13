@@ -15,19 +15,19 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
@@ -35,12 +35,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -72,27 +72,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -114,8 +110,13 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
     </header>
   
 
@@ -180,8 +181,7 @@
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/README.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Tutorials/Step_1-Extract_From_OSM.html">note: As of Jan 21, 2020 This tutorial is using the GOSTnets version from this repo’s master branch. Make sure that the GOSTnets version from PyPi is uninstalled and that you are pointing your path to the correct location of the library.</a></li>
-
+<li class="toctree-l1"><a class="reference internal" href="../Tutorials/Step_1-Extract_From_OSM.html">Step 1: Extract from OSM</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/Step_2-Clean_Network.html">Step 2: Clean Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/Step_3-Using_your_Graph.html">Step 3: Using your Graph</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
@@ -192,10 +192,10 @@
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">GOSTnets documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">GOSTnets documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">GOSTnets package</a></li>
 </ul>
-</li>
+</details></li>
 
 </ul>
 
@@ -212,7 +212,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -221,14 +221,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -337,9 +337,9 @@ document.write(`
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -495,7 +495,7 @@ document.write(`
 <span id="gostnets-calculate-od-raw-module"></span><h2>GOSTnets.calculate_od_raw module<a class="headerlink" href="#module-GOSTnets.calculate_od_raw" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="GOSTnets.calculate_od_raw.calculateOD_csv">
-<span class="sig-prename descclassname"><span class="pre">GOSTnets.calculate_od_raw.</span></span><span class="sig-name descname"><span class="pre">calculateOD_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">originCSV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinationCSV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oLat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oLon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lon'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dLat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dLon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lon'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'init':</span> <span class="pre">'epsg:4326'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_snap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.calculate_od_raw.calculateOD_csv" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">GOSTnets.calculate_od_raw.</span></span><span class="sig-name descname"><span class="pre">calculateOD_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">originCSV</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinationCSV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oLat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oLon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lon'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dLat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dLon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Lon'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'epsg:4326'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_snap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.calculate_od_raw.calculateOD_csv" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculate OD matrix from csv files of points</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -507,7 +507,7 @@ document.write(`
 <li><p><strong>oLon</strong> (<em>str</em>) – Origin longitude field</p></li>
 <li><p><strong>dLat</strong> (<em>str</em>) – Destination latitude field</p></li>
 <li><p><strong>dLon</strong> (<em>str</em>) – Destination longitude field</p></li>
-<li><p><strong>crs</strong> (<em>dict</em>) – crs of input origins and destinations, defaults to {‘init’:’epsg:4326’}</p></li>
+<li><p><strong>crs</strong> (<em>str</em>) – crs of input origins and destinations, defaults to ‘epsg:4326’</p></li>
 <li><p><strong>fail-value</strong> (<em>int</em>) – value to put in OD matrix if no route found, defaults to -1</p></li>
 <li><p><strong>weight</strong> (<em>str</em>) – variable in G used to define edge impedance, defaults to ‘time’</p></li>
 <li><p><strong>calculate_snap</strong> (<em>bool</em>) – variable to add snapping distance to travel time, default is false</p></li>
@@ -525,7 +525,7 @@ destinations</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="GOSTnets.calculate_od_raw.calculateOD_gdf">
-<span class="sig-prename descclassname"><span class="pre">GOSTnets.calculate_od_raw.</span></span><span class="sig-name descname"><span class="pre">calculateOD_gdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_snap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wgs84</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'init':</span> <span class="pre">'epsg:4326'}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.calculate_od_raw.calculateOD_gdf" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">GOSTnets.calculate_od_raw.</span></span><span class="sig-name descname"><span class="pre">calculateOD_gdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_snap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wgs84</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'epsg:4326'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.calculate_od_raw.calculateOD_gdf" title="Permalink to this definition">#</a></dt>
 <dd><p>Calculate Origin destination matrix from GeoDataframes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -900,7 +900,7 @@ defaults</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<em>nx.Graph</em>) – (required) a graph object G</p></li>
-<li><p><strong>crs</strong> (<em>str</em>) – (optional) projection of format {‘init’ :’epsg:4326’}. Defaults to WGS84. Note: here we are defining the crs of the input geometry -we do NOT reproject to this crs. To reproject, consider using geopandas’ to_crs method on the returned gdf.</p></li>
+<li><p><strong>crs</strong> (<em>str</em>) – (optional) projection of format ‘epsg:4326’. Defaults to WGS84. Note: here we are defining the crs of the input geometry -we do NOT reproject to this crs. To reproject, consider using geopandas’ to_crs method on the returned gdf.</p></li>
 <li><p><strong>attr_list</strong> (<em>list</em>) – (optional) list of the keys which you want to be moved over to the GeoDataFrame.</p></li>
 <li><p><strong>geometry_tag</strong> (<em>str</em>) – (optional) the key in the data dictionary for each edge which contains the geometry info.</p></li>
 <li><p><strong>xCol</strong> (<em>str</em>) – (optional) if no geometry is present in the edge data dictionary, the function will try to construct a straight line between the start and end nodes, if geometry information is present in their data dictionaries.  Pass the Longitude info as ‘xCol’.</p></li>
@@ -1143,7 +1143,7 @@ defined by to_crs.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<em>nx.Graph</em><em> or </em><em>gpd.GeoDataFrame</em>) – a Graph object OR node geodataframe</p></li>
-<li><p><strong>crs</strong> (<em>dict</em>) – a crs object of form {‘init’:’epsg:XXXX’}. If passed, matches both inputs to this crs.</p></li>
+<li><p><strong>crs</strong> (<em>str</em>) – a crs object of form ‘epsg:XXXX’. If passed, matches both inputs to this crs.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1215,7 +1215,7 @@ defined by to_crs.</p>
 <li><p><strong>node_buff</strong> (<em>int</em>) – the thickness with witch to buffer included nodes</p></li>
 <li><p><strong>infill</strong> (<em>bool</em>) – If True, will remove any holes in isochrones</p></li>
 <li><p><strong>weight</strong> (<em>str</em>) – The edge weight to use when appraising travel times.</p></li>
-<li><p><strong>measure_crs</strong> (<em>str</em>) – measurement crs, object of form {‘init’:’epsg:XXXX’}</p></li>
+<li><p><strong>measure_crs</strong> (<em>str</em>) – measurement crs, object of form ‘epsg:XXXX’</p></li>
 <li><p><strong>edge_filters</strong> (<em>dict</em>) – you can optionally add a dictionary with key values, where the key is the attribute and the value you want to ignore from creating isochrones. An example might be an underground subway line.</p></li>
 </ul>
 </dd>
@@ -1242,7 +1242,7 @@ defined by to_crs.</p>
 <li><p><strong>node_buff</strong> (<em>int</em>) – the thickness with witch to buffer included nodes</p></li>
 <li><p><strong>infill</strong> (<em>bool</em>) – If True, will remove any holes in isochrones</p></li>
 <li><p><strong>weight</strong> (<em>str</em>) – The edge weight to use when appraising travel times.</p></li>
-<li><p><strong>measure_crs</strong> (<em>str</em>) – measurement crs, object of form {‘init’:’epsg:XXXX’}</p></li>
+<li><p><strong>measure_crs</strong> (<em>str</em>) – measurement crs, object of form ‘epsg:XXXX’</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1286,7 +1286,7 @@ defined by to_crs.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<em>nx.Graph</em>) – a graph object G</p></li>
-<li><p><strong>crs</strong> (<em>str</em>) – projection of format {‘init’ :’epsg:4326’}. Defaults to WGS84. note: here we are defining the crs of the input geometry - we do NOT reproject to this crs. To reproject, consider using geopandas’ to_crs method on the returned gdf.</p></li>
+<li><p><strong>crs</strong> (<em>str</em>) – projection of format ‘epsg:4326’. Defaults to WGS84. note: here we are defining the crs of the input geometry - we do NOT reproject to this crs. To reproject, consider using geopandas’ to_crs method on the returned gdf.</p></li>
 <li><p><strong>attr_list</strong> (<em>list</em>) – list of the keys which you want to be moved over to the GeoDataFrame, if not all. Defaults to None, which will move all.</p></li>
 <li><p><strong>geometry_tag</strong> (<em>str</em>) – specify geometry attribute of graph, default ‘geometry’</p></li>
 <li><p><strong>xCol</strong> (<em>str</em>) – if no shapely geometry but Longitude present, assign here</p></li>
@@ -1575,7 +1575,7 @@ Svalbard or far northern Norway.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="GOSTnets.core.simplify_junctions">
-<span class="sig-prename descclassname"><span class="pre">GOSTnets.core.</span></span><span class="sig-name descname"><span class="pre">simplify_junctions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure_crs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'init':</span> <span class="pre">'epsg:4326'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.core.simplify_junctions" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">GOSTnets.core.</span></span><span class="sig-name descname"><span class="pre">simplify_junctions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure_crs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'epsg:4326'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.core.simplify_junctions" title="Permalink to this definition">#</a></dt>
 <dd><p>simplifies topology of networks by simplifying node clusters into single nodes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1768,7 +1768,7 @@ Svalbard or far northern Norway.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">education</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;amenity&#39;</span><span class="p">:[</span><span class="s1">&#39;school&#39;</span><span class="p">,</span> <span class="s1">&#39;kindergarten&#39;</span><span class="p">,</span><span class="s1">&#39;university&#39;</span><span class="p">,</span> <span class="s1">&#39;college&#39;</span><span class="p">]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">health</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;amenity&#39;</span><span class="p">:[</span><span class="s1">&#39;clinic&#39;</span><span class="p">,</span> <span class="s1">&#39;pharmacy&#39;</span><span class="p">,</span> <span class="s1">&#39;hospital&#39;</span><span class="p">,</span> <span class="s1">&#39;health&#39;</span><span class="p">]}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">crs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;init&#39;</span> <span class="p">:</span><span class="s1">&#39;epsg:4326&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crs</span> <span class="o">=</span> <span class="s1">&#39;epsg:4326&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">buf_width</span> <span class="o">=</span> <span class="mf">0.0005</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">amenities</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">curr_amenity</span> <span class="o">=</span> <span class="n">amenities</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
@@ -1873,7 +1873,7 @@ geometry’s constituent geometries.</p>
 <span id="gostnets-network-clean-module"></span><h2>GOSTnets.network_clean module<a class="headerlink" href="#module-GOSTnets.network_clean" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="GOSTnets.network_clean.clean_network">
-<span class="sig-prename descclassname"><span class="pre">GOSTnets.network_clean.</span></span><span class="sig-name descname"><span class="pre">clean_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UTM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'init':</span> <span class="pre">'epsg:3857'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'init':</span> <span class="pre">'epsg:4326'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctdist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.network_clean.clean_network" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">GOSTnets.network_clean.</span></span><span class="sig-name descname"><span class="pre">clean_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UTM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'epsg:3857'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'epsg:4326'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctdist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GOSTnets.network_clean.clean_network" title="Permalink to this definition">#</a></dt>
 <dd><p>Topologically simplifies an input graph object by collapsing junctions and removing interstital nodes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2219,7 +2219,7 @@ or stream/file object.</p></li>
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -2410,8 +2410,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
   <footer class="bd-footer">
   </footer>
