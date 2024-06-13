@@ -500,7 +500,7 @@ def fetch_roads_OSM(
         road_gdf = gpd.GeoDataFrame(
             roads,
             columns=["osm_id", "infra_type", "geometry"],
-            crs={"init": "epsg:4326"},
+            crs="epsg:4326",
         )
         return road_gdf
     else:

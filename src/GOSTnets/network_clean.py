@@ -13,8 +13,8 @@ def clean_network(
     G,
     wpath="",
     output_file_name="",
-    UTM={"init": "epsg:3857"},
-    WGS={"init": "epsg:4326"},
+    UTM="epsg:3857",
+    WGS="epsg:4326",
     junctdist=50,
     verbose=False,
 ):

@@ -8,6 +8,7 @@ logo: images/logo.png
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
+  timeout: 600  # 10 minutes
   execute_notebooks: force
   allow_errors: true
 

@@ -207,7 +207,7 @@ class OSM_to_network(object):
                 road_gdf = gpd.GeoDataFrame(
                     roads,
                     columns=["osm_id", "infra_type", "one_way", "geometry"],
-                    crs={"init": "epsg:4326"},
+                    crs="epsg:4326",
                 )
                 return road_gdf
 
@@ -291,7 +291,7 @@ class OSM_to_network(object):
                 road_gdf = gpd.GeoDataFrame(
                     roads,
                     columns=["osm_id", "infra_type", "geometry"],
-                    crs={"init": "epsg:4326"},
+                    crs="epsg:4326",
                 )
                 return road_gdf
 
@@ -319,7 +319,7 @@ class OSM_to_network(object):
             Length of line in kilometers
 
         """
-        if line.geometryType() == "MultiLineString":
+        if line.geom_type == "MultiLineString":
             return sum(self.line_length(segment) for segment in line)
 
         return sum(
@@ -398,9 +398,9 @@ class OSM_to_network(object):
                     # Save intersecting point
                     # updating to be compatible with Shapely ver 2
                     # if "Point" == inter.type:
-                    if "Point" == inter.type:
+                    if "Point" == inter.geom_type:
                         idx_inters.insert(0, inter.bounds, inter)
-                    elif "MultiPoint" == inter.type:
+                    elif "MultiPoint" == inter.geom_type:
                         # updating to be compatible with Shapely ver 2
                         # for pt in inter:
                         for pt in inter.geoms:
@@ -455,7 +455,7 @@ class OSM_to_network(object):
 
         # Transform into geodataframe and add coordinate system
         full_gpd = gpd.GeoDataFrame(flat_list, geometry="geometry")
-        full_gpd.crs = {"init": "epsg:4326"}
+        full_gpd.crs = "epsg:4326"
 
         return full_gpd
 
