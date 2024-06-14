@@ -695,16 +695,14 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
         a list of the nodes intersecting the polygons
 
     """
-    if type(G) == nx.classes.multidigraph.MultiDiGraph:
+    if isinstance(G, nx.Graph):
         graph_gdf = node_gdf_from_graph(G)
-
-    elif type(G) == gpd.geodataframe.GeoDataFrame:
+    elif isinstance(G, gpd.GeoDataFrame):
         graph_gdf = G
-
     else:
         raise ValueError("Expecting a graph or node geodataframe for G!")
 
-    if type(polygons) != gpd.geodataframe.GeoDataFrame:
+    if type(polygons) != gpd.GeoDataFrame:
         raise ValueError("Expecting a geodataframe for polygon(s)!")
 
     if (crs is not None) and (graph_gdf.crs != crs):
@@ -751,13 +749,13 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
         a list of the edges intersecting the polygons
 
     """
-    if type(G) == nx.classes.multidigraph.MultiDiGraph:
+    if isinstance(G, nx.Graph):
         node_graph_gdf = node_gdf_from_graph(G)
         edge_graph_gdf = edge_gdf_from_graph(G)
     else:
         raise ValueError("Expecting a graph for G!")
 
-    if type(polygons) != gpd.geodataframe.GeoDataFrame:
+    if type(polygons) != gpd.GeoDataFrame:
         raise ValueError("Expecting a geodataframe for polygon(s)!")
 
     if (crs is not None) and (node_graph_gdf.crs != crs):
