@@ -211,14 +211,14 @@ def edges_and_nodes_gdf_to_graph(
     oneway_tag=None,
 ):
     """
-    Function for generating a G object from a saved .csv of edges
+    Function for generating a G object from dataframse of nodes and one of edges
 
     Parameters
     ----------
-    fpath_nodes : str
-      path to a .csv containing nodes
-    fpath_edges : str
-      path to a .csv containing edges
+    nodes_df : str
+      Pandas DataFrame with node information
+    edges_df : str
+      Pandas DataFrame with edges information
     u_tag : str
       optional. specify column containing the node ID. This is used to only include entries that have a value.
     u_tag : str

@@ -224,12 +224,12 @@ def test_example_node(capsys):
     G.add_node(1, x=0, y=0)
     G.add_node(2, x=1, y=1)
     G.add_edge(1, 2, length=1)
-    # call example_edge function
-    core.example_edge(G, n=1)
+    # call example_node function
+    core.example_node(G, n=1)
     # capture the output
     captured = capsys.readouterr()
     # check the output
-    assert captured.out == "(1, 2, {'length': 1})\n"
+    assert captured.out == "(1, {'x': 0, 'y': 0})\n"
 
 
 def test_convert_network_to_time():
