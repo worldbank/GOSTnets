@@ -527,7 +527,7 @@ def line_length(line, ellipsoid="WGS-84"):
 
     """
     if line.geometryType() == "MultiLineString":
-        return sum(line_length(segment) for segment in line)
+        return sum(line_length(segment) for segment in line.geoms)
 
     return sum(
         distance.geodesic(

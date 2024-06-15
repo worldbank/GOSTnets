@@ -3,6 +3,7 @@ from GOSTnets import osm_parser
 from unittest import mock
 import geopandas as gpd
 from shapely.geometry import LineString
+from shapely.geometry import MultiLineString
 import os
 
 
@@ -119,3 +120,10 @@ def test_line_length():
     # check the result
     assert isinstance(result, float)
     assert result > 0
+    # make a multilinestring
+    mline = MultiLineString([[[0, 0], [1, 2]], [[4, 4], [5, 6]]])
+    # run the function
+    mresult = osm_parser.line_length(mline)
+    # check the result
+    assert isinstance(mresult, float)
+    assert mresult > 0
