@@ -87,9 +87,11 @@ def combo_csv_to_graph(
     u_tag : str
         specify column containing u node ID if not labelled 'u'
     v_tag : str
-        specify column containing u node ID if not labelled 'v'
+        specify column containing v node ID if not labelled 'v'
     geometry_tag : str
-        specify column containing u node ID if not
+        specify column containing geometry if not "Wkt"
+    largest_G : bool, optional
+        Boolean that if True, returns only the largest sub-graph, default is False
 
     Returns
     -------
@@ -138,7 +140,7 @@ def combo_csv_to_graph(
     # G = nx.convert_node_labels_to_integers(G)
 
     if largest_G is True:
-        list_of_subgraphs = list(nx.strongly_connected_component_subgraphs(G))
+        list_of_subgraphs = [G.subgraph(c) for c in nx.strongly_connected_components(G)]
         line = 0
         cur_max = 0
         for i in list_of_subgraphs:
@@ -355,7 +357,7 @@ def edges_and_nodes_gdf_to_graph(
     # G = nx.convert_node_labels_to_integers(G)
 
     if largest_G is True:
-        list_of_subgraphs = list(nx.strongly_connected_component_subgraphs(G))
+        list_of_subgraphs = [G.subgraph(c) for c in nx.strongly_connected_components(G)]
         line = 0
         cur_max = 0
         for i in list_of_subgraphs:
@@ -686,6 +688,8 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
     ----------
     G : nx.Graph or gpd.GeoDataFrame
         a Graph object OR node geodataframe
+    polygons : gpd.GeoDataFrame
+        a GeoDataFrame containing one or more polygons
     crs : str
         a crs object of form 'epsg:XXXX'. If passed, matches both inputs to this crs.
 
@@ -700,10 +704,14 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
     elif isinstance(G, gpd.GeoDataFrame):
         graph_gdf = G
     else:
-        raise ValueError("Expecting a graph or node geodataframe for G!")
+        raise TypeError(
+            f"Expected a graph or node geodataframe for G, input was a: {type(G)}"
+        )
 
     if type(polygons) != gpd.GeoDataFrame:
-        raise ValueError("Expecting a geodataframe for polygon(s)!")
+        raise TypeError(
+            f"Expected a geodataframe for polygon(s), input was a: {type(polygons)}"
+        )
 
     if (crs is not None) and (graph_gdf.crs != crs):
         graph_gdf = graph_gdf.to_crs(crs)
@@ -753,10 +761,12 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
         node_graph_gdf = node_gdf_from_graph(G)
         edge_graph_gdf = edge_gdf_from_graph(G)
     else:
-        raise ValueError("Expecting a graph for G!")
+        raise TypeError(f"Expected a graph for G, input was a: {type(G)}")
 
     if type(polygons) != gpd.GeoDataFrame:
-        raise ValueError("Expecting a geodataframe for polygon(s)!")
+        raise TypeError(
+            f"Expected a geodataframe for polygon(s), input was a {type(polygons)}"
+        )
 
     if (crs is not None) and (node_graph_gdf.crs != crs):
         node_graph_gdf = node_graph_gdf.to_crs(crs)
@@ -822,7 +832,9 @@ def sample_raster(G, tif_path, property_name="RasterValue"):
     ):
         pass
     else:
-        raise ValueError("Expecting a graph or geodataframe for G!")
+        raise TypeError(
+            f"Expected a graph or geodataframe for G, input was a: {type(G)}"
+        )
 
     # generate dictionary of {node ID: point} pairs
     try:
@@ -1231,7 +1243,7 @@ def find_hwy_distances_by_class(G, distance_tag="length"):
     ):
         pass
     else:
-        raise ValueError("Expecting a graph or geodataframe for G!")
+        raise TypeError(f"Expected a graph or geodataframe for G, input was: {type(G)}")
 
     G_adj = G.copy()
 
@@ -1286,7 +1298,7 @@ def find_graph_avg_speed(G, distance_tag, time_tag):
     ):
         pass
     else:
-        raise ValueError("Expecting a graph or geodataframe for G!")
+        raise TypeError(f"Expected a graph or geodataframe for G, input was: {type(G)}")
 
     G_adj = G.copy()
 
@@ -1400,13 +1412,13 @@ def convert_network_to_time(
     ):
         pass
     else:
-        raise ValueError("Expecting a graph for G!")
+        raise TypeError(f"Expected a graph or geodataframe for G, input was: {type(G)}")
 
     try:
         # checks the first edge to see if the 'time' attribute already exists
         if list(G.edges(data=True))[0][2]["time"]:
             warnings.warn(
-                "Aree you sure you want to convert length to time? This graph already has a time attribute"
+                "Are you sure you want to convert length to time? This graph already has a time attribute"
             )
     except Exception:
         pass
@@ -1458,7 +1470,9 @@ def convert_network_to_time(
                     speed = default
 
         else:
-            raise ValueError('Expecting either a graph_type of "walk" or "drive"!')
+            raise ValueError(
+                f'Expecting either a graph_type of "walk" or "drive", value of graph_type was: {graph_type}'
+            )
 
         # perform conversion
         kmph = (orig_len / 1000) / speed

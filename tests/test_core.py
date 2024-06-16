@@ -16,8 +16,8 @@ def test_convert():
     # make pandas dataframe
     df = pd.DataFrame(
         {
-            "a": [1, 2, 3],
-            "b": [4, 5, 6],
+            "a": [1, "2", "s"],
+            "b": [4, "5", "x"],
             "geometry": [Point(0, 0), Point(1, 1), Point(2, 2)],
             "data": [1, 2, 3],
         }
@@ -30,6 +30,18 @@ def test_convert():
     assert isinstance(G, tuple)
     assert G[0] == 1
     assert G[1] == 4
+    # call the function - next row
+    G = core.convert(df.iloc[1, :], "a", "b", "geometry", ["data"])
+    # check the output
+    assert isinstance(G, tuple)
+    assert G[0] == 2
+    assert G[1] == 5
+    # call the function - last row
+    G = core.convert(df.iloc[2, :], "a", "b", "geometry", ["data"])
+    # check the output
+    assert isinstance(G, tuple)
+    assert G[0] == "s"
+    assert G[1] == "x"
 
 
 def test_check():
@@ -95,7 +107,7 @@ class TestGraphCreationFunctions:
         f_df = pd.DataFrame(
             data={
                 "u_col": ["a", "b", "c"],
-                "v_col": ["x", "y", "z"],
+                "v_col": ["x", "2", 3],
                 "geo_col": [1, 2, 3],
             }
         )
@@ -157,13 +169,20 @@ class TestGDFfromGraph:
         assert "endnode" in edge_gdf.columns
         assert "geometry" in edge_gdf.columns
 
+    def test_graph_nodes_intersecting_polygon_errors(self):
+        """Test raising errors for graph_nodes_intersection_polygon."""
+        # invalid graph type
+        with pytest.raises(TypeError):
+            core.graph_nodes_intersecting_polygon("str", self.poly_gdf)
+        # invalid polygon parameter
+        with pytest.raises(TypeError):
+            core.graph_nodes_intersecting_polygon(self.G, "str")
+
     # def test_graph_nodes_intersecting_polgyon(self):
     #     """Test the graph_nodes_intersecting_polygon function."""
     #     # call function
     #     int_list = core.graph_nodes_intersecting_polygon(self.G, self.poly_gdf)
-    #     import pdb
-
-    #     pdb.set_trace()
+    #     import pdb; pdb.set_trace()
 
     # def test_graph_edges_intersecting_polgyon(self):
     #     """Test the graph_edges_intersecting_polygon function."""
@@ -192,14 +211,16 @@ def test_make_iso_polys_original():
     pass
 
 
-def test_find_hwy_distances_by_class():
-    """Test the find_hwy_distances_by_class function."""
-    pass
+def test_find_hwy_distances_by_class_error():
+    """Test the find_hwy_distances_by_class function type error."""
+    with pytest.raises(TypeError):
+        core.find_hwy_distances_by_class("str")
 
 
-def test_find_graph_avg_speed():
-    """Test the find_graph_avg_speed function."""
-    pass
+def test_find_graph_avg_speed_error():
+    """Test the find_graph_avg_speed function type error."""
+    with pytest.raises(TypeError):
+        core.find_graph_avg_speed("str", "km", "distance")
 
 
 def test_example_edge(capsys):
@@ -232,9 +253,10 @@ def test_example_node(capsys):
     assert captured.out == "(1, {'x': 0, 'y': 0})\n"
 
 
-def test_convert_network_to_time():
-    """Test the convert_network_to_time function."""
-    pass
+def test_convert_network_to_time_error():
+    """Test the convert_network_to_time function type error."""
+    with pytest.raises(TypeError):
+        core.convert_network_to_time("str", "dist")
 
 
 def test_first_val():
