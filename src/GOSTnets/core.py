@@ -21,7 +21,7 @@ from shapely.geometry import (
     box,
     Polygon,
 )
-from shapely.ops import linemerge, unary_union, transform
+from shapely.ops import linemerge, unary_union, transform, split, snap
 from collections import Counter
 
 import math

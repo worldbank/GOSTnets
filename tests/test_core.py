@@ -5,7 +5,7 @@ from unittest import mock
 import pandas as pd
 import os
 import geopandas as gpd
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point, Polygon, MultiPoint
 from shapely import LineString
 import shutil
 import io
@@ -426,6 +426,16 @@ def test_cut():
     assert two_lines[0].length == 0.5
     assert two_lines[1].length == 1.5
     assert line.length == (two_lines[0].length + two_lines[1].length)
+
+
+def test_split_line():
+    """Test the split_line function."""
+    # define parameters
+    line = LineString([[0, 0], [1, 0], [1, 1]])
+    pps = MultiPoint([[0.1, 0.0], [1.0, 0.5]])
+    # call function
+    line_list = core.split_line(line, pps)
+    assert isinstance(line_list, list)
 
 
 def test_salt_long_lines():
