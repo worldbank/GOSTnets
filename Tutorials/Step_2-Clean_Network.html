@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Step 2: Clean Network &#8212; GOSTnets</title>
+    <title>Step 2: Cleaning an OSM Road Network &#8212; GOSTnets</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -38,9 +38,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -62,8 +62,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'Tutorials/Step_2-Clean_Network';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Step 3: Using your Graph" href="Step_3-Using_your_Graph.html" />
-    <link rel="prev" title="Step 1: Extract from OSM" href="Step_1-Extract_From_OSM.html" />
+    <link rel="next" title="Step 3: Using your Graph to Calculate Travel Times Along the Network" href="Step_3-Using_your_Graph.html" />
+    <link rel="prev" title="Step 1: Extract Road Network from OpenStreetMap (OSM)" href="Step_1-Extract_From_OSM.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -141,6 +141,8 @@
         <div class="sidebar-primary-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../README.html">
   
@@ -162,7 +164,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -181,15 +183,13 @@
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract from OSM</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Step 2: Clean Network</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorials README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract Road Network from OpenStreetMap (OSM)</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Step 2: Cleaning an OSM Road Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph to Calculate Travel Times Along the Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Fixing_your_road_network.html">Fixing your road network graph</a></li>
-<li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Gravity_Calculations.html">Gravity calculations</a></li>
-
-
+<li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Gravity_Calculations.html">Example Network Gravity Calculations</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="nav bd-sidenav">
@@ -322,10 +322,10 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -333,7 +333,7 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
@@ -351,7 +351,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Step 2: Clean Network</h1>
+    <h1>Step 2: Cleaning an OSM Road Network</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -361,10 +361,17 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-step-only-use-the-largest-sub-graph">Optional step: Only use the largest sub-graph</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-compare-networks-original-clean-version-largest-subgraph">Optional: Compare networks (original / clean-version / largest subgraph)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-the-notebook">Setup the Notebook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-file-paths">Set File Paths</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-and-clean-the-network">Inspect and Clean the Network</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-clean-network-function">Run the <code class="docutils literal notranslate"><span class="pre">clean_network</span></code> Function</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-step-only-use-the-largest-sub-graph">Optional step: Only use the largest sub-graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-compare-networks-original-clean-version-largest-subgraph">Optional: Compare networks (original / clean-version / largest subgraph)</a></li>
 </ul>
             </nav>
         </div>
@@ -376,23 +383,34 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="step-2-clean-network">
-<h1>Step 2: Clean Network<a class="headerlink" href="#step-2-clean-network" title="Permalink to this heading">#</a></h1>
-<p>This is a further post-processing function now found within the network_clean GOSTnets submodule. This function cleans the network by removing excessive nodes, and ensures all edges are bi-directional (except in the case of one-way roads).</p>
-<p>WARNING: The Clean Network function is a computationally expensive function, so it may take a while to run. It outputs a pickled graph object, a dataframe of the edges, and a dataframe of the nodes. The expectation is that this will only have to be run once.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="step-2-cleaning-an-osm-road-network">
+<h1>Step 2: Cleaning an OSM Road Network<a class="headerlink" href="#step-2-cleaning-an-osm-road-network" title="Permalink to this heading">#</a></h1>
+<p>This notebook contains further post-processing, also found within the <code class="docutils literal notranslate"><span class="pre">network_clean</span></code> GOSTnets submodule.
+This function cleans the network by removing excessive nodes, and ensures all edges are bi-directional (except in the case of one-way roads).</p>
+<p><strong>WARNING:</strong> The <code class="docutils literal notranslate"><span class="pre">network_clean</span></code> function is a computationally expensive function, so it may take a while to run.
+It outputs a pickled graph object, a dataframe of the edges, and a dataframe of the nodes.
+The expectation is that this function will only be run once.</p>
+<section id="setup-the-notebook">
+<h2>Setup the Notebook<a class="headerlink" href="#setup-the-notebook" title="Permalink to this heading">#</a></h2>
+<p>First we need to import the necessary libraries and set the file paths.</p>
+<section id="import-libraries">
+<h3>Import Libraries<a class="headerlink" href="#import-libraries" title="Permalink to this heading">#</a></h3>
+<p>We will use the following libraries:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">os</span></code> to set the file paths</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time</span></code> to time the function</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">networkx</span></code> to work with the graph object</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pickle</span></code> to load the graph object</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GOSTnets</span></code> to use the <code class="docutils literal notranslate"><span class="pre">network_clean</span></code> function</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the GOSTnets library</span>
+
+<span class="c1"># import the GOSTnets library</span>
 <span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
 </pre></div>
 </div>
@@ -403,6 +421,10 @@ document.write(`
 </div>
 </div>
 </div>
+</section>
+<section id="set-file-paths">
+<h3>Set File Paths<a class="headerlink" href="#set-file-paths" title="Permalink to this heading">#</a></h3>
+<p>We will set the file paths to read the output from the “Step 1” tutorial.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pth</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span>  <span class="c1"># change this path to your working folder</span>
@@ -416,7 +438,7 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">data_pth</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_outputs&quot;</span><span class="p">)</span>
 <span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># read back your graph from step 1 from you saved pickle</span>
 <span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">G</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_pth</span><span class="p">,</span> <span class="s2">&quot;iceland_unclean.pickle&quot;</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
@@ -435,6 +457,11 @@ document.write(`
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="inspect-and-clean-the-network">
+<h2>Inspect and Clean the Network<a class="headerlink" href="#inspect-and-clean-the-network" title="Permalink to this heading">#</a></h2>
+<p>We will inspect the network and then clean it using the <code class="docutils literal notranslate"><span class="pre">network_clean</span></code> function.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># inspect the graph</span>
@@ -450,7 +477,7 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># inspect the graph</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
@@ -471,7 +498,7 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># you can also print general graph information with networkx</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="nb">print</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
 
@@ -488,18 +515,19 @@ gn.clean_network<span class="o">?</span>
 </div>
 </div>
 </div>
-<p>Set up some parameters for the CleanNetwork function</p>
+<p>Now we set up some parameters for the CleanNetwork function</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Iceland_UTMZ</span> <span class="o">=</span> <span class="s2">&quot;epsg:32627&quot;</span>
 
-<span class="n">WGS</span> <span class="o">=</span> <span class="s2">&quot;epsg:4326&quot;</span>  <span class="c1"># do not adjust. OSM natively comes in ESPG 4326</span>
+<span class="n">WGS</span> <span class="o">=</span> <span class="s2">&quot;epsg:4326&quot;</span>  <span class="c1"># do not adjust. OSM natively comes in ESPG 4326 (Web Mercator)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Run the CleanNetwork Function.<br />
-Changing verbose to True will write the outputs in the specified wpath.</p>
+<section id="run-the-clean-network-function">
+<h3>Run the <code class="docutils literal notranslate"><span class="pre">clean_network</span></code> Function<a class="headerlink" href="#run-the-clean-network-function" title="Permalink to this heading">#</a></h3>
+<p>Changing the keyword <code class="docutils literal notranslate"><span class="pre">verbose</span></code> to True will write the outputs in the specified wpath.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">())</span>
@@ -515,12 +543,12 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>start: Thu Jun 13 13:20:15 2024
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>start: Wed Jun 26 19:08:07 2024
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">())</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">G_clean</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">clean_network</span><span class="p">(</span>
 <span class="ne">----&gt; </span><span class="mi">3</span>     <span class="n">G</span><span class="p">,</span> <span class="n">UTM</span><span class="o">=</span><span class="n">Iceland_UTMZ</span><span class="p">,</span> <span class="n">WGS</span><span class="o">=</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">,</span> <span class="n">junctdist</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
@@ -544,7 +572,7 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># let&#39;s print info on our clean version</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="nb">print</span><span class="p">(</span><span class="n">G_clean</span><span class="p">)</span>
 
@@ -553,10 +581,14 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 </div>
 </div>
 </div>
-<p>The clean_network function helps snapping points that are very close to one another. However, it does not conduct any check on whether the network is fully connected.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">clean_network</span></code> function helps snapping points that are very close to one another. However, it does not conduct any check on whether the network is fully connected.</p>
+</section>
+</section>
 <section id="optional-step-only-use-the-largest-sub-graph">
 <h2>Optional step: Only use the largest sub-graph<a class="headerlink" href="#optional-step-only-use-the-largest-sub-graph" title="Permalink to this heading">#</a></h2>
-<p>Network analysis is often done on only connected graphs. Disconnected graphs can result in paths that cannot reach their destination. Also, you can evaluate how connected your network is and have the option of going back and making more edits.</p>
+<p>Network analysis is often done on only connected graphs.
+Disconnected graphs can result in paths that cannot reach their destination.
+Also, you can evaluate how connected your network is and have the option of going back and making more edits.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Identify only the largest graph</span>
@@ -580,7 +612,7 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># Identify only the largest graph</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> 
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># compatible with NetworkX 2.4</span>
@@ -605,7 +637,7 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># print info about the largest sub-graph</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="nb">print</span><span class="p">(</span><span class="n">G_largest</span><span class="p">)</span>
 
@@ -625,7 +657,7 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">gn</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">G_largest</span><span class="p">,</span> <span class="s2">&quot;iceland_network_clean&quot;</span><span class="p">,</span> <span class="n">data_pth</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;G_largest&#39; is not defined
@@ -643,7 +675,7 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_subgraphs</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;list_of_subgraphs&#39; is not defined
@@ -652,12 +684,27 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 </div>
 </div>
 <p>Move on to Step 3 to see how we can use this network for some travel time analysis!</p>
+</section>
 <section id="optional-compare-networks-original-clean-version-largest-subgraph">
-<h3>Optional: Compare networks (original / clean-version / largest subgraph)<a class="headerlink" href="#optional-compare-networks-original-clean-version-largest-subgraph" title="Permalink to this heading">#</a></h3>
+<h2>Optional: Compare networks (original / clean-version / largest subgraph)<a class="headerlink" href="#optional-compare-networks-original-clean-version-largest-subgraph" title="Permalink to this heading">#</a></h2>
 <p>OSMNX is one of the key libraries that GostNETS is based on. Here, we load it to access graph-plotting functions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the OSMnx library and matplotlib library for visualizations</span>
+<span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># import the OSMnx library and matplotlib library for visualizations</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;matplotlib&#39;
 </pre></div>
 </div>
 </div>
@@ -669,14 +716,18 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <span class="n">G</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
 
 <span class="c1"># original graph</span>
-<span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Iceland - Original Network&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># plotting functions only work if the graphs have a name and a crs attribute</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">G</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:32646&quot;</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">G</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
@@ -693,14 +744,18 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <span class="n">G_clean</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
 
 <span class="c1"># cleaned graph</span>
-<span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_clean</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Iceland - Cleaned Network&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_clean</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">G_clean</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:32646&quot;</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">G_clean</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
 <span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># cleaned graph</span>
@@ -716,14 +771,18 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 <span class="n">G_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
 
 <span class="c1"># largest subgraph</span>
-<span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_largest</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Iceland - The Largest Subgraph&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">G_largest</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">edge_linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">G_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:32646&quot;</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">G_largest</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Iceland&quot;</span>
 <span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># largest subgraph</span>
@@ -733,7 +792,6 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
 </div>
 </div>
 </div>
-</section>
 </section>
 </section>
 
@@ -773,7 +831,7 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Step 1: Extract from OSM</p>
+        <p class="prev-next-title">Step 1: Extract Road Network from OpenStreetMap (OSM)</p>
       </div>
     </a>
     <a class="right-next"
@@ -781,7 +839,7 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Step 3: Using your Graph</p>
+        <p class="prev-next-title">Step 3: Using your Graph to Calculate Travel Times Along the Network</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -801,10 +859,17 @@ Changing verbose to True will write the outputs in the specified wpath.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-step-only-use-the-largest-sub-graph">Optional step: Only use the largest sub-graph</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-compare-networks-original-clean-version-largest-subgraph">Optional: Compare networks (original / clean-version / largest subgraph)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-the-notebook">Setup the Notebook</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-file-paths">Set File Paths</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspect-and-clean-the-network">Inspect and Clean the Network</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-clean-network-function">Run the <code class="docutils literal notranslate"><span class="pre">clean_network</span></code> Function</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-step-only-use-the-largest-sub-graph">Optional step: Only use the largest sub-graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-compare-networks-original-clean-version-largest-subgraph">Optional: Compare networks (original / clean-version / largest subgraph)</a></li>
 </ul>
   </nav></div>
 
@@ -853,8 +918,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

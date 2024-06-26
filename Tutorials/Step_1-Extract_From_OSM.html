@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Step 1: Extract from OSM &#8212; GOSTnets</title>
+    <title>Step 1: Extract Road Network from OpenStreetMap (OSM) &#8212; GOSTnets</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -38,9 +38,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -62,8 +62,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'Tutorials/Step_1-Extract_From_OSM';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Step 2: Clean Network" href="Step_2-Clean_Network.html" />
-    <link rel="prev" title="Tutorial" href="README.html" />
+    <link rel="next" title="Step 2: Cleaning an OSM Road Network" href="Step_2-Clean_Network.html" />
+    <link rel="prev" title="Tutorials README" href="README.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -141,6 +141,8 @@
         <div class="sidebar-primary-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../README.html">
   
@@ -162,7 +164,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -181,15 +183,13 @@
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorial</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Step 1: Extract from OSM</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Clean Network</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorials README</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Step 1: Extract Road Network from OpenStreetMap (OSM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Cleaning an OSM Road Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph to Calculate Travel Times Along the Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Fixing_your_road_network.html">Fixing your road network graph</a></li>
-<li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Gravity_Calculations.html">Gravity calculations</a></li>
-
-
+<li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Gravity_Calculations.html">Example Network Gravity Calculations</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="nav bd-sidenav">
@@ -322,10 +322,10 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -333,12 +333,14 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -349,11 +351,32 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Step 1: Extract from OSM</h1>
+    <h1>Step 1: Extract Road Network from OpenStreetMap (OSM)</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#download-data-and-set-filepaths">Download data and set filepaths</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-osm-data-as-a-gostnets-object">Load the OSM data as a GOSTnets object</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-accepted-road-types-list">Define the accepted road types list</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filter-the-roads-dataframe">Filter the roads DataFrame</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clip-the-roads-to-a-polygon">Clip the roads to a polygon</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-to-ensure-some-roads-intersect-the-aoi">Check to ensure some roads intersect the AOI</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-roadsgpd-object">Generate the RoadsGPD object</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-gostnets-graph-object">Generate the GOSTnets graph object</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#save-the-graph-object-to-file">Save the graph object to file</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -363,32 +386,28 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="step-1-extract-from-osm">
-<h1>Step 1: Extract from OSM<a class="headerlink" href="#step-1-extract-from-osm" title="Permalink to this heading">#</a></h1>
-<p>The purpose of this script is to show how to go from a .osm.pbf file to a network format that GOSTnets will accept.
-Additional modifications in this script include: clipping the roads to an input polygon (here, rek2.shp), and filtering the roads DataFrame by a list of accepted road types, as tagged in OSM (see accepted_road_types list).</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="step-1-extract-road-network-from-openstreetmap-osm">
+<h1>Step 1: Extract Road Network from OpenStreetMap (OSM)<a class="headerlink" href="#step-1-extract-road-network-from-openstreetmap-osm" title="Permalink to this heading">#</a></h1>
+<p>This notebook will show you how to go from an .osm.pbf file to a GOSTnets-compatible network format.
+In addition, this notebook will show you how to:</p>
+<ul class="simple">
+<li><p>Clip the roads to an input polygon (here we demonstrate with an ESRI Shapefile, rek2.shp)</p></li>
+<li><p>Filter the roads DataFrame by a list of accepted road types, as tagged in OSM (see the list <code class="docutils literal notranslate"><span class="pre">accepted_road_types</span></code> that we define in the code)</p></li>
+</ul>
+<section id="import-libraries">
+<h2>Import Libraries<a class="headerlink" href="#import-libraries" title="Permalink to this heading">#</a></h2>
+<p>First, we import the necessary libraries.
+In this notebook, we use the following libraries:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">geopandas</span></code> to manipulate geospatial data (e.g. clipping the roads to a polygon)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">os</span></code> to define the path to the .osm.pbf file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GOSTnets</span></code> to import the OSM data and to save the network in a GOSTnets-compatible format (.gpickle in this case)</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">os</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is a Jupyter Notebook extension which reloads all of the modules whenever you run the code</span>
-<span class="c1"># This is optional but good if you are modifying and testing source code</span>
-<span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
-</pre></div>
-</div>
-</div>
-</div>
-<p>Import the GOSTnets library as gn.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
+<span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
 </pre></div>
 </div>
 </div>
@@ -408,7 +427,7 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">GOSTnets.load_osm</span> <span class="kn">import</span> <span class="n">OSM_to_network</span>
 
 <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.10.14</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.10</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">GOSTnets</span><span class="o">/</span><span class="n">load_osm</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">17</span>
@@ -423,7 +442,12 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>Define filepaths.</p>
+</section>
+<section id="download-data-and-set-filepaths">
+<h2>Download data and set filepaths<a class="headerlink" href="#download-data-and-set-filepaths" title="Permalink to this heading">#</a></h2>
+<p>We will use the <code class="docutils literal notranslate"><span class="pre">osm.pbf</span></code> file for the entire country of Iceland. You can download the file from <a class="reference external" href="https://download.geofabrik.de/europe/iceland.html">Geofabrik</a>, if you didn’t download it from the GOSTnets repository “tutorial_data” folder.
+Once you have downloaded the file, set the filepath to the .osm.pbf file, this can be a relative or absolute path.
+We demonstrate construction of a relative file path using the <code class="docutils literal notranslate"><span class="pre">os.path</span></code> module to define a relative path to the “tutorial_data” folder.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pth</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span>  <span class="c1"># change this path to your working folder</span>
@@ -438,28 +462,42 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># check if the file exists, raise an exception if it does not</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File found.&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;File not found.&quot;</span><span class="p">)</span>
+<span class="c1"># print the file path</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;./tutorial_data/iceland-latest.osm.pbf&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>File found.
+./tutorial_data/iceland-latest.osm.pbf
 </pre></div>
 </div>
 </div>
 </div>
-<p>GOSTNets creates a special ‘OSM_to_network’ object. This object gets initialized with both a copy of the OSM file itself and the roads extracted from the OSM file in a GeoPandas DataFrame. This DataFrame is a property of the object called ‘roads_raw’ and is the starting point for our network.</p>
+</section>
+<section id="load-the-osm-data-as-a-gostnets-object">
+<h2>Load the OSM data as a GOSTnets object<a class="headerlink" href="#load-the-osm-data-as-a-gostnets-object" title="Permalink to this heading">#</a></h2>
+<p>GOSTNets can load OSM data as a special ‘OSM_to_network’ object.
+This object gets initialized with both a copy of the OSM file itself and the roads extracted from the OSM file in a GeoPandas DataFrame.
+This DataFrame is a property of the object called ‘roads_raw’ and is the starting point for our network.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iceland</span> <span class="o">=</span> <span class="n">OSM_to_network</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># convert the .osm.pbf file to a GOSTnets object</span>
+<span class="n">iceland</span> <span class="o">=</span> <span class="n">OSM_to_network</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span> <span class="o">=</span> <span class="n">OSM_to_network</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># convert the .osm.pbf file to a GOSTnets object</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span> <span class="o">=</span> <span class="n">OSM_to_network</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;OSM_to_network&#39; is not defined
 </pre></div>
@@ -468,7 +506,8 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">?</span>iceland
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># show the doc-string for the OSM_to_network object</span>
+<span class="o">?</span>iceland
 </pre></div>
 </div>
 </div>
@@ -480,15 +519,17 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># display the first 5 rows of the extracted dataframe of the roads network</span>
+<span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># display the first 5 rows of the extracted dataframe of the roads network</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
 </pre></div>
@@ -497,7 +538,7 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># show the different highway types and counts</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># show the different road types and counts</span>
 <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">infra_type</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -505,8 +546,8 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># show the different highway types and counts</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># show the different road types and counts</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">infra_type</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
@@ -514,7 +555,10 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>We define a list of the types of roads from the above that we consider acceptable for our road network</p>
+<section id="define-the-accepted-road-types-list">
+<h3>Define the accepted road types list<a class="headerlink" href="#define-the-accepted-road-types-list" title="Permalink to this heading">#</a></h3>
+<p>We define a list of the types of roads from the above that we consider acceptable for our road network.
+This list is used to filter the roads DataFrame to only include the types specified.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">accepted_road_types</span> <span class="o">=</span> <span class="p">[</span>
@@ -536,7 +580,11 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>We call the filterRoads method and pass it a list of acceptable road types</p>
+</section>
+<section id="filter-the-roads-dataframe">
+<h3>Filter the roads DataFrame<a class="headerlink" href="#filter-the-roads-dataframe" title="Permalink to this heading">#</a></h3>
+<p>We call the <code class="docutils literal notranslate"><span class="pre">filterRoads</span></code> method and pass it a list of acceptable road types.
+Then we can look at the infrastructure types in the filtered roads DataFrame (similar to what was done above), except now we have filtered the roads to only include the types we want.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iceland</span><span class="o">.</span><span class="n">filterRoads</span><span class="p">(</span><span class="n">acceptedRoads</span><span class="o">=</span><span class="n">accepted_road_types</span><span class="p">)</span>
@@ -546,7 +594,7 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span><span class="o">.</span><span class="n">filterRoads</span><span class="p">(</span><span class="n">acceptedRoads</span><span class="o">=</span><span class="n">accepted_road_types</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
@@ -563,7 +611,7 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">infra_type</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
@@ -571,10 +619,15 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="clip-the-roads-to-a-polygon">
+<h2>Clip the roads to a polygon<a class="headerlink" href="#clip-the-roads-to-a-polygon" title="Permalink to this heading">#</a></h2>
 <p>Here, we import a shapefile for our area of interest. We want to make a map of Reykjavik, Iceland. We clip the extent of the country file to just the area around the capital (rek2.shp) below using standard GeoPandas functions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clip_shp</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_data&quot;</span><span class="p">,</span> <span class="s2">&quot;rek2.shp&quot;</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># read the shapefile for the clip area</span>
+<span class="n">clip_shp</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_data&quot;</span><span class="p">,</span> <span class="s2">&quot;rek2.shp&quot;</span><span class="p">))</span>
 <span class="n">clip_shp</span> <span class="o">=</span> <span class="n">clip_shp</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s2">&quot;epsg:4326&quot;</span><span class="p">)</span>
 <span class="n">clip_shp_obj</span> <span class="o">=</span> <span class="n">clip_shp</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
@@ -583,7 +636,7 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># this is a geopandas dataframe</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># visualize the clip area</span>
 <span class="n">clip_shp</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -591,38 +644,38 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:673,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, **style_kwds)</span>
-<span class="g g-Whitespace">    </span><span class="mi">672</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">673</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="g g-Whitespace">    </span><span class="mi">674</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:647,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, autolim, **style_kwds)</span>
+<span class="g g-Whitespace">    </span><span class="mi">646</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">647</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="g g-Whitespace">    </span><span class="mi">648</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
 
 <span class="ne">ModuleNotFoundError</span>: No module named &#39;matplotlib&#39;
 
 <span class="n">During</span> <span class="n">handling</span> <span class="n">of</span> <span class="n">the</span> <span class="n">above</span> <span class="n">exception</span><span class="p">,</span> <span class="n">another</span> <span class="n">exception</span> <span class="n">occurred</span><span class="p">:</span>
 
 <span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># this is a geopandas dataframe</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># visualize the clip area</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">clip_shp</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:979,</span> in <span class="ni">GeoplotAccessor.__call__</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">977</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span> <span class="s2">&quot;geo&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">978</span> <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;geo&quot;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">979</span>     <span class="k">return</span> <span class="n">plot_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">980</span> <span class="k">if</span> <span class="n">kind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pandas_kinds</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">981</span>     <span class="c1"># Access pandas plots</span>
-<span class="g g-Whitespace">    </span><span class="mi">982</span>     <span class="k">return</span> <span class="n">PlotAccessor</span><span class="p">(</span><span class="n">data</span><span class="p">)(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:968,</span> in <span class="ni">GeoplotAccessor.__call__</span><span class="nt">(self, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">966</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span> <span class="s2">&quot;geo&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">967</span> <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;geo&quot;</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">968</span>     <span class="k">return</span> <span class="n">plot_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">969</span> <span class="k">if</span> <span class="n">kind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pandas_kinds</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">970</span>     <span class="c1"># Access pandas plots</span>
+<span class="g g-Whitespace">    </span><span class="mi">971</span>     <span class="k">return</span> <span class="n">PlotAccessor</span><span class="p">(</span><span class="n">data</span><span class="p">)(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:675,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, **style_kwds)</span>
-<span class="g g-Whitespace">    </span><span class="mi">673</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="g g-Whitespace">    </span><span class="mi">674</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">675</span>     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">676</span>         <span class="s2">&quot;The matplotlib package is required for plotting in geopandas. &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">677</span>         <span class="s2">&quot;You can install it using &#39;conda install -c conda-forge matplotlib&#39; or &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">678</span>         <span class="s2">&quot;&#39;pip install matplotlib&#39;.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">679</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">681</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">682</span>     <span class="k">if</span> <span class="n">cax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:649,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, autolim, **style_kwds)</span>
+<span class="g g-Whitespace">    </span><span class="mi">647</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="g g-Whitespace">    </span><span class="mi">648</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">649</span>     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">650</span>         <span class="s2">&quot;The matplotlib package is required for plotting in geopandas. &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">651</span>         <span class="s2">&quot;You can install it using &#39;conda install -c conda-forge matplotlib&#39; or &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">652</span>         <span class="s2">&quot;&#39;pip install matplotlib&#39;.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">653</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">655</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">656</span>     <span class="k">if</span> <span class="n">cax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
 <span class="ne">ImportError</span>: The matplotlib package is required for plotting in geopandas. You can install it using &#39;conda install -c conda-forge matplotlib&#39; or &#39;pip install matplotlib&#39;.
 </pre></div>
@@ -639,7 +692,10 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <img alt="../_images/c215179840c767af32035240966a9b139cda2d9e3ec210575031b7034bdbb921.svg" src="../_images/c215179840c767af32035240966a9b139cda2d9e3ec210575031b7034bdbb921.svg" /></div>
 </div>
-<p>We check to see everything lines up by running intersect and counting the True / False returns. The count of the True values are the number of roads that intersect the AOI</p>
+<section id="check-to-ensure-some-roads-intersect-the-aoi">
+<h3>Check to ensure some roads intersect the AOI<a class="headerlink" href="#check-to-ensure-some-roads-intersect-the-aoi" title="Permalink to this heading">#</a></h3>
+<p>We check to see everything lines up by running intersect and counting the True / False returns.
+The count of the True values are the number of roads that intersect the AOI</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># intersects is a Shapely function that returns True if the boundary or interior of the object intersect in any way with those of the other</span>
@@ -650,7 +706,7 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># intersects is a Shapely function that returns True if the boundary or interior of the object intersect in any way with those of the other</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 
@@ -659,7 +715,7 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>Remove any roads that don’t intersect the capital area, by modifying the roads_raw from the ‘OSM_to_network’ object</p>
+<p>Next we remove any roads that don’t intersect the capital area, by modifying the <code class="docutils literal notranslate"><span class="pre">roads_raw</span></code> DataFrame contained within the <code class="docutils literal notranslate"><span class="pre">OSM_to_network</span></code> object</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span> <span class="o">=</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
@@ -671,7 +727,7 @@ Additional modifications in this script include: clipping the roads to an input 
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span> <span class="o">=</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>  <span class="c1"># noqa: E712</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="p">]</span>
@@ -681,18 +737,63 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>Having narrowed the DataFrame to the roads we are interested in, we generate the RoadsGPD object, which is stored as a property of the ‘OSM_to_network’ object. The RoadsGPD object is a GeoDataFrame that further processes the roads. This includes splitting the edges where intersections occur, adding unique edge IDs, and adding to/from columns to the GeoDataFrame.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iceland</span><span class="o">.</span><span class="n">generateRoadsGDF</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># reprint the intersects value counts (should only be True now)</span>
+<span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">iceland</span><span class="o">.</span><span class="n">generateRoadsGDF</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># reprint the intersects value counts (should only be True now)</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roads_raw</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">clip_shp_obj</span><span class="p">)</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+
+<span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># view the first 5 rows of the newly created roads GeoDataFrame</span>
+<span class="n">iceland</span><span class="o">.</span><span class="n">roadsGPD</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># view the first 5 rows of the newly created roads GeoDataFrame</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span><span class="o">.</span><span class="n">roadsGPD</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="generate-the-roadsgpd-object">
+<h3>Generate the RoadsGPD object<a class="headerlink" href="#generate-the-roadsgpd-object" title="Permalink to this heading">#</a></h3>
+<p>Having narrowed the DataFrame to the roads we are interested in, we generate the <code class="docutils literal notranslate"><span class="pre">RoadsGPD</span></code> object, which is stored as a property of the <code class="docutils literal notranslate"><span class="pre">OSM_to_network</span></code> object.
+The <code class="docutils literal notranslate"><span class="pre">RoadsGPD</span></code> object is a GeoDataFrame that further processes the roads.
+This includes splitting the edges where intersections occur, adding unique edge IDs, and adding to/from columns to the GeoDataFrame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate the roads GeoDataFrame, may take a few minutes</span>
+<span class="n">iceland</span><span class="o">.</span><span class="n">generateRoadsGDF</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># generate the roads GeoDataFrame, may take a few minutes</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">iceland</span><span class="o">.</span><span class="n">generateRoadsGDF</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;iceland&#39; is not defined
 </pre></div>
@@ -718,7 +819,10 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>With the initialReadIn() function, we transform this to a graph object</p>
+</section>
+<section id="generate-the-gostnets-graph-object">
+<h3>Generate the GOSTnets graph object<a class="headerlink" href="#generate-the-gostnets-graph-object" title="Permalink to this heading">#</a></h3>
+<p>With the <code class="docutils literal notranslate"><span class="pre">initialReadIn()</span></code> method, we transform the roads GeoDataFrame into a graph object</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">iceland</span><span class="o">.</span><span class="n">initialReadIn</span><span class="p">()</span>
@@ -736,7 +840,11 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>We save this graph object down to file using gn.save(). The save function produces three outputs: a node GeoDataFrame as a CSV, an edge GeoDataFrame as a CSV, and a graph object saved as a pickle.</p>
+</section>
+</section>
+<section id="save-the-graph-object-to-file">
+<h2>Save the graph object to file<a class="headerlink" href="#save-the-graph-object-to-file" title="Permalink to this heading">#</a></h2>
+<p>We save this graph object down to file using <code class="docutils literal notranslate"><span class="pre">gn.save()</span></code>. The save function produces three outputs: a node GeoDataFrame as a CSV, an edge GeoDataFrame as a CSV, and a graph object saved as a pickle.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>gn.save<span class="o">?</span>
@@ -761,7 +869,8 @@ Additional modifications in this script include: clipping the roads to an input 
 </div>
 </div>
 </div>
-<p>Move on to Step 2 to see how we clean up this rough network.</p>
+<p>Move on to <a class="reference internal" href="Step_2-Clean_Network.html"><span class="std std-doc">Step 2</span></a> to see how we clean up this rough network.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -800,7 +909,7 @@ Additional modifications in this script include: clipping the roads to an input 
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Tutorial</p>
+        <p class="prev-next-title">Tutorials README</p>
       </div>
     </a>
     <a class="right-next"
@@ -808,7 +917,7 @@ Additional modifications in this script include: clipping the roads to an input 
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Step 2: Clean Network</p>
+        <p class="prev-next-title">Step 2: Cleaning an OSM Road Network</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -818,6 +927,34 @@ Additional modifications in this script include: clipping the roads to an input 
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#download-data-and-set-filepaths">Download data and set filepaths</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-osm-data-as-a-gostnets-object">Load the OSM data as a GOSTnets object</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-accepted-road-types-list">Define the accepted road types list</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filter-the-roads-dataframe">Filter the roads DataFrame</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clip-the-roads-to-a-polygon">Clip the roads to a polygon</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-to-ensure-some-roads-intersect-the-aoi">Check to ensure some roads intersect the AOI</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-roadsgpd-object">Generate the RoadsGPD object</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-gostnets-graph-object">Generate the GOSTnets graph object</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#save-the-graph-object-to-file">Save the graph object to file</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
@@ -862,8 +999,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

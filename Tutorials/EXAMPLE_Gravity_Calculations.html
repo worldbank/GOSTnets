@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Gravity calculations &#8212; GOSTnets</title>
+    <title>Example Network Gravity Calculations &#8212; GOSTnets</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -38,9 +38,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -141,6 +141,8 @@
         <div class="sidebar-primary-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../README.html">
   
@@ -162,7 +164,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -181,15 +183,13 @@
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract from OSM</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Clean Network</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorials README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract Road Network from OpenStreetMap (OSM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Cleaning an OSM Road Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_3-Using_your_Graph.html">Step 3: Using your Graph to Calculate Travel Times Along the Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Fixing_your_road_network.html">Fixing your road network graph</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Gravity calculations</a></li>
-
-
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Example Network Gravity Calculations</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="nav bd-sidenav">
@@ -322,10 +322,10 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -333,7 +333,7 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
@@ -351,7 +351,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Gravity calculations</h1>
+    <h1>Example Network Gravity Calculations</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -361,17 +361,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Gravity calculations</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#check-out-data">Check out data</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#open-qgis-and-check-out-rek-grid-and-the-churches-file">open QGIS and check out rek_grid and the churches file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries-and-load-data">Import Libraries and Load Data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-data">Load Data</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Check out data</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">open QGIS and check out rek_grid and the churches file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gravity-calculations">Gravity calculations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-the-data-and-calculate-origin-destination-table">Read the data and calculate origin-destination table</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-the-origin-destination-table-and-gravity">Calculate the origin-destination table and gravity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-the-data">Examine the data</a></li>
 </ul>
 </li>
 </ul>
-
             </nav>
         </div>
     </div>
@@ -382,7 +383,25 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <div class="cell docutils container">
+  <section class="tex2jax_ignore mathjax_ignore" id="example-network-gravity-calculations">
+<h1>Example Network Gravity Calculations<a class="headerlink" href="#example-network-gravity-calculations" title="Permalink to this heading">#</a></h1>
+<p>This notebook demonstrates how to calculate network gravity using the gravity model.
+The gravity model is a simple model that estimates the flow of people, goods, or information between two locations.
+The model is based on the idea that the flow between two locations is proportional to the product of their masses and inversely proportional to the distance between them.</p>
+<section id="import-libraries-and-load-data">
+<h2>Import Libraries and Load Data<a class="headerlink" href="#import-libraries-and-load-data" title="Permalink to this heading">#</a></h2>
+<section id="import-libraries">
+<h3>Import Libraries<a class="headerlink" href="#import-libraries" title="Permalink to this heading">#</a></h3>
+<p>We import the following libraries:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">os</span></code> to define paths</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rasterio</span></code> to read raster files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geopandas</span></code> to read vector files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pandas</span></code> to manipulate data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pickle</span></code> to load the network data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GOSTnets</span></code> to access custom GOST functions</p></li>
+</ul>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">rasterio</span>
@@ -390,13 +409,8 @@ document.write(`
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the GOSTnets library</span>
+
+<span class="c1"># import the GOSTnets library</span>
 <span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
 </pre></div>
 </div>
@@ -407,6 +421,10 @@ document.write(`
 </div>
 </div>
 </div>
+</section>
+<section id="load-data">
+<h3>Load Data<a class="headerlink" href="#load-data" title="Permalink to this heading">#</a></h3>
+<p>Define the path information and load the data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define input data</span>
@@ -429,8 +447,10 @@ document.write(`
 </div>
 </div>
 </div>
-<section class="tex2jax_ignore mathjax_ignore" id="gravity-calculations">
-<h1>Gravity calculations<a class="headerlink" href="#gravity-calculations" title="Permalink to this heading">#</a></h1>
+</section>
+</section>
+<section id="gravity-calculations">
+<h2>Gravity calculations<a class="headerlink" href="#gravity-calculations" title="Permalink to this heading">#</a></h2>
 <p>When we discuss gravity calculations, we are combining two measures to identify the attractiveness between pairs of locations</p>
 <ol class="arabic simple">
 <li><p>Travel time between origins and destinations</p></li>
@@ -458,10 +478,10 @@ document.write(`
 </div>
 </div>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="check-out-data">
-<h1>Check out data<a class="headerlink" href="#check-out-data" title="Permalink to this heading">#</a></h1>
-<section id="open-qgis-and-check-out-rek-grid-and-the-churches-file">
-<h2>open QGIS and check out rek_grid and the churches file<a class="headerlink" href="#open-qgis-and-check-out-rek-grid-and-the-churches-file" title="Permalink to this heading">#</a></h2>
+<section id="read-the-data-and-calculate-origin-destination-table">
+<h2>Read the data and calculate origin-destination table<a class="headerlink" href="#read-the-data-and-calculate-origin-destination-table" title="Permalink to this heading">#</a></h2>
+<p>We will use the GOSTnets library to calculate the origin-destination table.
+This table will be used to calculate the gravity model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read in the input</span>
@@ -502,6 +522,9 @@ document.write(`
 </div>
 </div>
 </div>
+<section id="calculate-the-origin-destination-table-and-gravity">
+<h3>Calculate the origin-destination table and gravity<a class="headerlink" href="#calculate-the-origin-destination-table-and-gravity" title="Permalink to this heading">#</a></h3>
+<p>We will calculate the origin-destination table and gravity using the GOSTnets library.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The calculate_od_raw contains functions for performing OD and gravity calculations</span>
@@ -527,6 +550,16 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_1951/4100008754.py:3: UserWarning: Column names longer than 10 characters will be truncated when saved to ESRI Shapefile.
   origins_gravity.to_file(rek_pop_grid_file.replace(&quot;.shp&quot;, &quot;_gravity.shp&quot;))
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_0.0007701635&#39; to &#39;d_0.000770&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_0.0003850818&#39; to &#39;d_0.000385&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_0.0001925409&#39; to &#39;d_0.000192&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_9.62704e-05&#39; to &#39;d_9.62704e&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_3.85082e-05&#39; to &#39;d_3.85082e&#39;
+  ogr_write(
 </pre></div>
 </div>
 </div>
@@ -556,16 +589,225 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_1951/1925333871.py:3: UserWarning: Column names longer than 10 characters will be truncated when saved to ESRI Shapefile.
   origins_gravity.to_file(rek_pop_grid_file.replace(&quot;.shp&quot;, &quot;_gravity2.shp&quot;))
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_0.0007701635&#39; to &#39;d_0.000770&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_0.0003850818&#39; to &#39;d_0.000385&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_0.0001925409&#39; to &#39;d_0.000192&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_9.62704e-05&#39; to &#39;d_9.62704e&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Normalized/laundered field name: &#39;d_3.85082e-05&#39; to &#39;d_3.85082e&#39;
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -89114530.4903174937 of field d_0.01 of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -17020289200.8247509 of field d_0.005 of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -7405644076238.89648 of field d_0.001 of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -14945759041259.3496 of field d_0.000770 of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -53771043037337.75 of field d_0.000385 of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -106586370004729.594 of field d_0.000192 of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -151649564484115.594 of field d_9.62704e of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -188007527416798.219 of field d_3.85082e of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -209238233646066.5 of field d_1e-05 of feature 297 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -108276566.691201225 of field d_0.01 of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -18793014587.7341805 of field d_0.005 of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -9228969925135.61328 of field d_0.001 of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -18077208871598.0898 of field d_0.000770 of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -60064695992862.9922 of field d_0.000385 of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -113061808517245.016 of field d_0.000192 of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -156328925407603.469 of field d_9.62704e of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -190348142405023.906 of field d_3.85082e of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -209917453560851.125 of field d_1e-05 of feature 1529 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -136067506.530316323 of field d_0.01 of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -21067180965.2851639 of field d_0.005 of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -9442244146621.69531 of field d_0.001 of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -18398098279697.9688 of field d_0.000770 of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -60595456693908.9609 of field d_0.000385 of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -113560244242594.797 of field d_0.000192 of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -156673136210048.438 of field d_9.62704e of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -190515678198498.406 of field d_3.85082e of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -209965417280130.938 of field d_1e-05 of feature 1530 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 117735696.635691434 of field d_0.001 of feature 2301 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 129626025.412699938 of field d_0.000770 of feature 2301 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 160948391.401395589 of field d_0.000385 of feature 2301 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 191550102.83994478 of field d_0.000192 of feature 2301 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 216555827.319359571 of field d_9.62704e of feature 2301 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 237058300.227430075 of field d_3.85082e of feature 2301 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 249273713.877570361 of field d_1e-05 of feature 2301 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 120684540.235675648 of field d_0.001 of feature 2302 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 133437412.618094221 of field d_0.000770 of feature 2302 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 166772395.967107624 of field d_0.000385 of feature 2302 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 198908092.352440506 of field d_0.000192 of feature 2302 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 224902471.635857344 of field d_9.62704e of feature 2302 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 246082364.134398133 of field d_3.85082e of feature 2302 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 258655319.148201644 of field d_1e-05 of feature 2302 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 121891935.164825335 of field d_0.001 of feature 2303 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 138404992.860440165 of field d_0.000770 of feature 2303 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 180704086.601596087 of field d_0.000385 of feature 2303 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 219972543.735816061 of field d_0.000192 of feature 2303 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 251002041.442577899 of field d_9.62704e of feature 2303 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 275984431.891035557 of field d_3.85082e of feature 2303 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 290723917.092220604 of field d_1e-05 of feature 2303 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 107445649.820934296 of field d_0.001 of feature 2304 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 123926813.459728986 of field d_0.000770 of feature 2304 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 165935244.805468261 of field d_0.000385 of feature 2304 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 204139465.147550344 of field d_0.000192 of feature 2304 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 233794545.594576538 of field d_9.62704e of feature 2304 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 257407622.866155863 of field d_3.85082e of feature 2304 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 271250517.310042679 of field d_1e-05 of feature 2304 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -653383574331.90918 of field d_0.01 of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -7325711223606.07324 of field d_0.005 of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -75445560495091.5156 of field d_0.001 of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -89404385119916.6094 of field d_0.000770 of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -125240999556408 of field d_0.000385 of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -157435647702498.188 of field d_0.000192 of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -182098412385906.531 of field d_9.62704e of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -201583143589809.75 of field d_3.85082e of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value -212957156185013.25 of field d_1e-05 of feature 2305 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 104515675.596232668 of field d_3.85082e of feature 2308 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 111209694.642492279 of field d_1e-05 of feature 2308 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 108775613.976799414 of field d_0.001 of feature 2404 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 122536196.553994969 of field d_0.000770 of feature 2404 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 157629078.63281551 of field d_0.000385 of feature 2404 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 190278260.829178154 of field d_0.000192 of feature 2404 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 216134546.736906707 of field d_9.62704e of feature 2404 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 236968598.846873581 of field d_3.85082e of feature 2404 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 249263243.440391213 of field d_1e-05 of feature 2404 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 106231255.580975756 of field d_0.001 of feature 2405 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 120385852.937915623 of field d_0.000770 of feature 2405 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 156542479.980100065 of field d_0.000385 of feature 2405 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 189882920.220074207 of field d_0.000192 of feature 2405 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 216029686.43626821 of field d_9.62704e of feature 2405 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 236961995.901919067 of field d_3.85082e of feature 2405 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 249267364.631145179 of field d_1e-05 of feature 2405 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 131371064.943968415 of field d_0.000385 of feature 2406 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 162252302.789988846 of field d_0.000192 of feature 2406 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 186068735.050026298 of field d_9.62704e of feature 2406 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 204940776.951874882 of field d_3.85082e of feature 2406 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 215970898.221021652 of field d_1e-05 of feature 2406 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 113856802.231737792 of field d_9.62704e of feature 2508 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 125102551.988364667 of field d_3.85082e of feature 2508 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 131732954.799315751 of field d_1e-05 of feature 2508 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 111046530.452700958 of field d_9.62704e of feature 2509 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 121921360.203260973 of field d_3.85082e of feature 2509 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 128295883.211535603 of field d_1e-05 of feature 2509 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 113922268.695896342 of field d_0.000192 of feature 2598 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 132442057.087966517 of field d_9.62704e of feature 2598 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 146683670.221521378 of field d_3.85082e of feature 2598 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 154857876.696638942 of field d_1e-05 of feature 2598 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 112027191.146841288 of field d_0.000385 of feature 2674 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 142735995.452453464 of field d_0.000192 of feature 2674 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 165824921.768010288 of field d_9.62704e of feature 2674 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 183830637.513553143 of field d_3.85082e of feature 2674 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/pyogrio/raw.py:709: RuntimeWarning: Value 194259790.093860835 of field d_1e-05 of feature 2674 not successfully written. Possibly due to too larger number with respect to field width
+  ogr_write(
 </pre></div>
 </div>
 </div>
 </div>
 </section>
+<section id="examine-the-data">
+<h3>Examine the data<a class="headerlink" href="#examine-the-data" title="Permalink to this heading">#</a></h3>
+<p>You can explore and examine the data by opening it up and loading it in QGIS.</p>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="id1">
-<h1>Check out data<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h1>
-<section id="id2">
-<h2>open QGIS and check out rek_grid and the churches file<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h2>
 </section>
 </section>
 
@@ -633,17 +875,18 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Gravity calculations</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#check-out-data">Check out data</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#open-qgis-and-check-out-rek-grid-and-the-churches-file">open QGIS and check out rek_grid and the churches file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries-and-load-data">Import Libraries and Load Data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-data">Load Data</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Check out data</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">open QGIS and check out rek_grid and the churches file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gravity-calculations">Gravity calculations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-the-data-and-calculate-origin-destination-table">Read the data and calculate origin-destination table</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-the-origin-destination-table-and-gravity">Calculate the origin-destination table and gravity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examine-the-data">Examine the data</a></li>
 </ul>
 </li>
 </ul>
-
   </nav></div>
 
 </div></div>
@@ -691,8 +934,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

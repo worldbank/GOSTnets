@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Step 3: Using your Graph &#8212; GOSTnets</title>
+    <title>Step 3: Using your Graph to Calculate Travel Times Along the Network &#8212; GOSTnets</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -38,9 +38,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -63,7 +63,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Calculate connections" href="EXAMPLE_Finding_links_between_pairs.html" />
-    <link rel="prev" title="Step 2: Clean Network" href="Step_2-Clean_Network.html" />
+    <link rel="prev" title="Step 2: Cleaning an OSM Road Network" href="Step_2-Clean_Network.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -141,6 +141,8 @@
         <div class="sidebar-primary-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../README.html">
   
@@ -162,7 +164,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -181,15 +183,13 @@
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract from OSM</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Clean Network</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Step 3: Using your Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html">Tutorials README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_1-Extract_From_OSM.html">Step 1: Extract Road Network from OpenStreetMap (OSM)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Step_2-Clean_Network.html">Step 2: Cleaning an OSM Road Network</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Step 3: Using your Graph to Calculate Travel Times Along the Network</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Finding_links_between_pairs.html">Calculate connections</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Fixing_your_road_network.html">Fixing your road network graph</a></li>
-<li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Gravity_Calculations.html">Gravity calculations</a></li>
-
-
+<li class="toctree-l1"><a class="reference internal" href="EXAMPLE_Gravity_Calculations.html">Example Network Gravity Calculations</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="nav bd-sidenav">
@@ -322,10 +322,10 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -333,7 +333,7 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
@@ -351,7 +351,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Step 3: Using your Graph</h1>
+    <h1>Step 3: Using your Graph to Calculate Travel Times Along the Network</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -361,6 +361,13 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries-and-load-the-graph">Import Libraries and Load the Graph</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#read-in-the-graph">Read in the Graph</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-travel-times-for-each-edge-of-the-graph">Calculate Travel Times For Each Edge of the Graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-travel-times-to-churches">Calculate Travel Times to Churches</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-analysis">Further Analysis</a></li>
 </ul>
             </nav>
@@ -373,19 +380,25 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="step-3-using-your-graph">
-<h1>Step 3: Using your Graph<a class="headerlink" href="#step-3-using-your-graph" title="Permalink to this heading">#</a></h1>
-<p>In step 3 of this tutorial, we use our cleaned graph to create an Origin-Destination matrix (OD). Our setting remains Reykjavik, Iceland, as we look at travel times along the network to churches.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is a Jupyter Notebook extension which reloads all of the modules whenever you run the code</span>
-<span class="c1"># This is optional but good if you are modifying and testing source code</span>
-<span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
-</pre></div>
-</div>
-</div>
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="step-3-using-your-graph-to-calculate-travel-times-along-the-network">
+<h1>Step 3: Using your Graph to Calculate Travel Times Along the Network<a class="headerlink" href="#step-3-using-your-graph-to-calculate-travel-times-along-the-network" title="Permalink to this heading">#</a></h1>
+<p>In step 3 of this tutorial, we use our cleaned graph to create an Origin-Destination matrix (OD).
+Our setting remains Reykjavik, Iceland, as we look at travel times along the network to churches.</p>
+<section id="import-libraries-and-load-the-graph">
+<h2>Import Libraries and Load the Graph<a class="headerlink" href="#import-libraries-and-load-the-graph" title="Permalink to this heading">#</a></h2>
+<p>We start by importing the necessary libraries and loading the graph we created in step 2.</p>
+<section id="import-libraries">
+<h3>Import Libraries<a class="headerlink" href="#import-libraries" title="Permalink to this heading">#</a></h3>
+<p>We start by importing the necessary libraries:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">os</span></code> to set the working directory</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">networkx</span></code> to work with the graph</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geopandas</span></code> to work with the geospatial data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pandas</span></code> to work with the data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pickle</span></code> to load the graph</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shapely</span></code> to work with the geometry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GOSTnets</span></code> to apply custom functions to the network</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -393,13 +406,9 @@ document.write(`
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import GOSTnet library</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+
+<span class="c1"># import GOSTnet library</span>
 <span class="kn">import</span> <span class="nn">GOSTnets</span> <span class="k">as</span> <span class="nn">gn</span>
 </pre></div>
 </div>
@@ -410,14 +419,10 @@ document.write(`
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>First, we read in the graph from the result of the cleaning process (Step 2)</p>
+</section>
+<section id="read-in-the-graph">
+<h3>Read in the Graph<a class="headerlink" href="#read-in-the-graph" title="Permalink to this heading">#</a></h3>
+<p>We set the path and read in the graph from the result of the cleaning process (Step 2)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pth</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span>  <span class="c1"># change this path to your working folder</span>
@@ -428,6 +433,10 @@ document.write(`
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="calculate-travel-times-for-each-edge-of-the-graph">
+<h2>Calculate Travel Times For Each Edge of the Graph<a class="headerlink" href="#calculate-travel-times-for-each-edge-of-the-graph" title="Permalink to this heading">#</a></h2>
 <p>At this stage each edge in the network has a property called ‘length’. This was actually computed during Step 1 when the generateRoadsGDF function was run. The units of this length are in kilometres.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -442,8 +451,10 @@ document.write(`
 </div>
 </div>
 <p>We want to convert length to time, so that we can conduct analysis on how long it takes to reach certain destinations.</p>
-<p>We do this using the convert_network_to_time function. We have used a factor of 1000, because the function is expecting meters, so we need to convert the units of kilometers to meters.</p>
-<p>The convert_network_to_time function uses a default speed dictionary that assigns speed limits to OSM highway types. However, it is possible to specify your own speed dictionary.</p>
+<p>We do this using the <code class="docutils literal notranslate"><span class="pre">convert_network_to_time</span></code> function.
+We have used a factor of 1000, because the function is expecting meters, so we need to convert the units of kilometers to meters.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">convert_network_to_time</span></code> function uses a default speed dictionary that assigns speed limits to OSM highway types.
+However, it is possible to specify your own speed dictionary.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G_time</span> <span class="o">=</span> <span class="n">gn</span><span class="o">.</span><span class="n">convert_network_to_time</span><span class="p">(</span>
@@ -466,7 +477,8 @@ document.write(`
 </div>
 </div>
 </div>
-<p>To do this for just one journey, we could call nx.shortest_path_length on any given origin or destination node. Let’s list 10 of our nodes using this networkX function:</p>
+<p>To do this for just one journey, we could call <code class="docutils literal notranslate"><span class="pre">nx.shortest_path_length</span></code> on any given origin or destination node.
+Let’s list 10 of our nodes using this networkX function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">G_time</span><span class="o">.</span><span class="n">nodes</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
@@ -479,6 +491,7 @@ document.write(`
 </div>
 </div>
 </div>
+<p>Now we will calculate the travel time between the first and tenth node in the list.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">G_time</span><span class="o">.</span><span class="n">nodes</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># first node in list</span>
@@ -497,6 +510,9 @@ document.write(`
 </div>
 </div>
 </div>
+</section>
+<section id="calculate-travel-times-to-churches">
+<h2>Calculate Travel Times to Churches<a class="headerlink" href="#calculate-travel-times-to-churches" title="Permalink to this heading">#</a></h2>
 <p>In our example, we want to use our network for Reykjavik to work out the travel time to local churches.</p>
 <p>Here, we import a shapefile for Reykjavik, and reproject it to WGS 84:</p>
 <div class="cell docutils container">
@@ -507,7 +523,7 @@ document.write(`
 </div>
 </div>
 </div>
-<p>Next, We set a variable poly equal to just the geometry</p>
+<p>Next, we set a variable poly equal to just the geometry</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poly</span> <span class="o">=</span> <span class="n">rek</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -525,7 +541,8 @@ document.write(`
 <div class="cell_output docutils container">
 <img alt="../_images/c215179840c767af32035240966a9b139cda2d9e3ec210575031b7034bdbb921.svg" src="../_images/c215179840c767af32035240966a9b139cda2d9e3ec210575031b7034bdbb921.svg" /></div>
 </div>
-<p>With this in hand, we can read in a shapefile of destinations - here, the churches in Iceland. We use Shapely’s ‘within’ command to select just those in the Reykjavik area:</p>
+<p>With this in hand, we can read in a shapefile of destinations - here, the churches in Iceland.
+We use Shapely’s ‘within’ command to select just those in the Reykjavik area:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">churches</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;tutorial_data&quot;</span><span class="p">,</span> <span class="s2">&quot;churches.shp&quot;</span><span class="p">))</span>
@@ -534,7 +551,8 @@ document.write(`
 </div>
 </div>
 </div>
-<p>In order to perform network analysis we want to know the closest network node to each church. For this, we use the pandana snap function to snap the church locations to the road network:</p>
+<p>In order to perform network analysis we want to know the closest network node to each church.
+For this, we use the GOSTnets <code class="docutils literal notranslate"><span class="pre">pandana_snap</span></code> function to snap the church locations to the road network:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">churches</span>
@@ -585,7 +603,7 @@ document.write(`
       <td>muslim</td>
       <td>Félag Múslima á Íslandi</td>
       <td>5979</td>
-      <td>POINT (-21.87575 64.13430)</td>
+      <td>POINT (-21.87575 64.1343)</td>
     </tr>
     <tr>
       <th>11</th>
@@ -754,7 +772,7 @@ gn.pandana_snap<span class="o">?</span>
       <td>muslim</td>
       <td>Félag Múslima á Íslandi</td>
       <td>5979</td>
-      <td>POINT (-21.87575 64.13430)</td>
+      <td>POINT (-21.87575 64.1343)</td>
       <td>6557</td>
       <td>26.170603</td>
     </tr>
@@ -859,9 +877,12 @@ gn.pandana_snap<span class="o">?</span>
 </div>
 </div>
 </div>
+</section>
 <section id="further-analysis">
 <h2>Further Analysis<a class="headerlink" href="#further-analysis" title="Permalink to this heading">#</a></h2>
-<p>We would like to make an OD matrix where the origin is the cottage we are renting in the city, and the destinations are the churches in Reykjavik. This will help us work out how many churches we can see today!. First, we need to create the origin. It has coordinates: 64.152215, -22.002099 (Lat,Lon), so I make a point of this:</p>
+<p>We would like to make an OD matrix where the origin is the cottage we are renting in the city, and the destinations are the churches in Reykjavik.
+This will help us work out how many churches we can see today!
+First, we need to create the origin, it has coordinates: 64.152215, -22.002099 (Lat,Lon), so we make a <code class="docutils literal notranslate"><span class="pre">shapely.geometry.Point</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># A list with a single Shapely Point object is created with (x,y)</span>
@@ -870,7 +891,7 @@ gn.pandana_snap<span class="o">?</span>
 </div>
 </div>
 </div>
-<p>Next, I load it into a geodataframe and snap it to the network:</p>
+<p>Next, we load it into a GeoDataFrame and snap it to the network:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mini_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
@@ -911,7 +932,7 @@ gn.pandana_snap<span class="o">?</span>
   <tbody>
     <tr>
       <th>1</th>
-      <td>POINT (-22.00210 64.15221)</td>
+      <td>POINT (-22.0021 64.15222)</td>
     </tr>
   </tbody>
 </table>
@@ -959,7 +980,7 @@ gn.pandana_snap<span class="o">?</span>
   <tbody>
     <tr>
       <th>1</th>
-      <td>POINT (-22.00210 64.15221)</td>
+      <td>POINT (-22.0021 64.15222)</td>
       <td>2302</td>
       <td>79.027786</td>
     </tr>
@@ -975,12 +996,13 @@ gn.pandana_snap<span class="o">?</span>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2302
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.int64(2302)
 </pre></div>
 </div>
 </div>
 </div>
-<p>Now, We can calculate the OD matrix using the GOSTNets calculate_OD function. Bear in mind it takes list objects as inputs:</p>
+<p>Now, we can calculate the OD matrix using the GOSTNets <code class="docutils literal notranslate"><span class="pre">calculate_OD</span></code> function.
+Bear in mind it takes list objects as inputs:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span> <span class="o">=</span> <span class="p">[</span><span class="n">origin_gdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">NN</span><span class="p">]</span>
@@ -1066,7 +1088,7 @@ gn.pandana_snap<span class="o">?</span>
 </div></div></div>
 </div>
 <p>It appears nearly all of the churches less than twenty minutes away.</p>
-<p>Now that you are up to speed on the basics, check out some of the example notebooks in the GOSTNets_PublicGoods ‘Implementations’ folder.</p>
+<p>Now you are up to speed on the basics!</p>
 </section>
 </section>
 
@@ -1106,7 +1128,7 @@ gn.pandana_snap<span class="o">?</span>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Step 2: Clean Network</p>
+        <p class="prev-next-title">Step 2: Cleaning an OSM Road Network</p>
       </div>
     </a>
     <a class="right-next"
@@ -1134,6 +1156,13 @@ gn.pandana_snap<span class="o">?</span>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries-and-load-the-graph">Import Libraries and Load the Graph</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-libraries">Import Libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#read-in-the-graph">Read in the Graph</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-travel-times-for-each-edge-of-the-graph">Calculate Travel Times For Each Edge of the Graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-travel-times-to-churches">Calculate Travel Times to Churches</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-analysis">Further Analysis</a></li>
 </ul>
   </nav></div>
@@ -1183,8 +1212,8 @@ By Benjamin P. Stewart
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>
