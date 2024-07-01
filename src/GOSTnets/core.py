@@ -807,7 +807,9 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
 
 def sample_raster(G, tif_path, property_name="RasterValue"):
     """
-    Function for attaching raster values to corresponding graph nodes. Ensure any GeoDataFrames / graphs are in the same projection before using function, or pass a crs
+    Function for attaching raster values to corresponding graph nodes.
+
+    Ensure any GeoDataFrames / graphs are in the same projection before using function.
 
     Parameters
     ----------
@@ -912,11 +914,11 @@ def generate_isochrones(G, origins, thresh, weight=None, stacking=False):
             "Ensure isochrone centers (origins object) is a list containing at least one node ID!"
         )
 
-    ddict = list(G.nodes(data=True))[:1][0][1]
+    ddict = list(G.edges(data=True))[:1][0][-1]
 
     if weight is None:
         if "time" not in ddict.keys():
-            raise ValueError('need "time" key in edge value dictionary!')
+            raise ValueError('need "time" key in edges value dictionary!')
         else:
             weight = "time"
 

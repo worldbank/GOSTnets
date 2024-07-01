@@ -9,6 +9,7 @@ from shapely.geometry import Point, Polygon, MultiPoint
 from shapely import LineString
 import shutil
 import io
+import copy
 
 
 def test_convert():
@@ -125,16 +126,6 @@ class TestGraphCreationFunctions:
         assert "x" in G.nodes
 
 
-def test_edges_and_nodes_gdf_to_graph():
-    """Test the edges_and_nodes_gdf_to_graph function."""
-    pass
-
-
-def test_edges_and_nodes_csv_to_graph():
-    """Test the edges_and_nodes_csv_to_graph function."""
-    pass
-
-
 class TestGDFfromGraph:
     # create graph to use for tests
     G = nx.Graph()
@@ -189,26 +180,6 @@ class TestGDFfromGraph:
     #     int_list = core.graph_edges_intersecting_polygon(
     #         self.G, self.poly_gdf, mode="contains"
     #     )
-
-
-def test_sample_raster():
-    """Test the sample_raster function."""
-    pass
-
-
-def test_generate_isochrones():
-    """Test the generate_isochrones function."""
-    pass
-
-
-def test_make_iso_polys():
-    """Test the make_iso_polys function."""
-    pass
-
-
-def test_make_iso_polys_original():
-    """Test the make_iso_polys_original function."""
-    pass
 
 
 def test_find_hwy_distances_by_class_error():
@@ -271,16 +242,6 @@ def test_first_val():
     assert G == "test"
 
 
-def test_assign_traffic_times():
-    """Test the assign_traffic_times function."""
-    pass
-
-
-def test_calculate_OD():
-    """Test the calculate_OD function."""
-    pass
-
-
 def test_disrupt_network():
     """Test the disrupt_network function."""
     # make a graph object
@@ -296,21 +257,6 @@ def test_disrupt_network():
     # assert type of function
     assert isinstance(disrupted_G, nx.classes.graph.Graph)
     # need to check function and make sure graph actually gets modified
-
-
-def test_randomly_disrupt_network():
-    """Test the randomly_disrupt_network function."""
-    pass
-
-
-def test_gravity_demand():
-    """Test the gravity_demand function."""
-    pass
-
-
-def test_unbundle_geometry():
-    """Test the unbundle_geometry function."""
-    pass
 
 
 @mock.patch("GOSTnets.core.node_gdf_from_graph", return_value=pd.DataFrame())
@@ -360,16 +306,6 @@ def test_save_03(tmp_path):
         shutil.rmtree("MagicMock")
 
 
-def test_add_missing_reflected_edges():
-    """Test the add_missing_reflected_edges function."""
-    pass
-
-
-def test_add_missing_reflected_edges_old():
-    """Test the add_missing_reflected_edges_old function."""
-    pass
-
-
 def test_remove_duplicate_edges():
     """Test the remove_duplicate_edges function."""
     # define graph
@@ -405,16 +341,6 @@ def test_convert_to_MultiDiGraph():
     assert isinstance(G, nx.MultiDiGraph)
 
 
-def test_simplify_junctions():
-    """Test the simplify_junctions function."""
-    pass
-
-
-def test_custom_simplify():
-    """Test the custom_simplify function."""
-    pass
-
-
 def test_cut():
     """Test the cut function."""
     # define parameters
@@ -438,51 +364,6 @@ def test_split_line():
     assert isinstance(line_list, list)
 
 
-def test_salt_long_lines():
-    """Test the salt_long_lines function."""
-    pass
-
-
-def test_pandana_snap():
-    """Test the pandana_snap function."""
-    pass
-
-
-def test_pandana_snap_c():
-    """Test the pandana_snap_c function."""
-    pass
-
-
-def test_pandana_snap_to_many():
-    """Test the pandana_snap_to_many function."""
-    pass
-
-
-def test_pandana_snap_single_point():
-    """Test the pandana_snap_single_point function."""
-    pass
-
-
-def test_pandana_snap_points():
-    """Test the pandana_snap_points function."""
-    pass
-
-
-def test_join_networks():
-    """Test the join_networks function."""
-    pass
-
-
-def test_clip():
-    """Test the clip function."""
-    pass
-
-
-def test_new_edge_generator():
-    """Test the new_edge_generator function."""
-    pass
-
-
 def test_project_gdf():
     """Test the project_gdf function."""
     # make input gdf
@@ -491,16 +372,6 @@ def test_project_gdf():
     projected_gdf = core.project_gdf(gdf, to_crs="epsg:32633", to_latlong=False)
     # check the output
     assert projected_gdf.crs == "epsg:32633"
-
-
-def test_gn_project_graph():
-    """Test the gn_project_graph function."""
-    pass
-
-
-def test_reproject_graph():
-    """Test the reproject_graph function."""
-    pass
 
 
 def test_euclidean_distance():
@@ -533,11 +404,53 @@ def test_utm_of_graph():
     assert utm == "+proj=utm +zone=31 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 
 
-def test_advanced_snap():
-    """Test the advanced_snap function."""
-    pass
+def test_isochrones():
+    """Test the generate_isochrones() function."""
+    # create a networkx graph object
+    G = nx.Graph()
 
+    # Add four nodes to the graph
+    G.add_nodes_from(["A", "B", "C", "D"])
 
-def test_add_intersection_delay():
-    """Test the add_intersection_delay function."""
-    pass
+    # Add edges with time values as dictionaries
+    edge_data = [
+        {"source": "A", "target": "B", "time": 10},
+        {"source": "A", "target": "C", "time": 15},
+        {"source": "A", "target": "D", "time": 20},
+        {"source": "B", "target": "B", "time": 11},
+        {"source": "B", "target": "C", "time": 16},
+        {"source": "B", "target": "D", "time": 21},
+    ]
+
+    G.add_edges_from([(edge["source"], edge["target"], edge) for edge in edge_data])
+
+    G_nodes = copy.deepcopy(list(G.nodes(data=True)))
+
+    # call the function
+    new_G = core.generate_isochrones(G, ["A", "B"], 0)
+    new_G_nodes = copy.deepcopy(list(new_G.nodes(data=True)))
+
+    # assert new G nodes are not the same as the old ones
+    assert G_nodes != new_G_nodes
+
+    # call again with higher threshold
+    newer_G = core.generate_isochrones(G, ["A", "B"], 50)
+    newer_G_nodes = copy.deepcopy(list(newer_G.nodes(data=True)))
+
+    # assert new G nodes are not the same as the old ones
+    assert G_nodes != newer_G_nodes
+    assert new_G_nodes != newer_G_nodes
+
+    # call again as stacking
+    stacking_G = core.generate_isochrones(G, ["A", "B"], 50, stacking=True)
+    stacking_G_nodes = copy.deepcopy(list(stacking_G.nodes(data=True)))
+
+    # assert new G nodes are not the same as the old ones
+    assert stacking_G_nodes != newer_G_nodes
+    assert new_G_nodes != stacking_G_nodes
+
+    # raise error
+    with pytest.raises(ValueError):
+        core.generate_isochrones(G, "invalid", 1)
+    with pytest.raises(ValueError):
+        core.generate_isochrones(G, ["A"], 1, stacking="invalid")
