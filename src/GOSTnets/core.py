@@ -1245,7 +1245,9 @@ def find_hwy_distances_by_class(G, distance_tag="length"):
     ):
         pass
     else:
-        raise TypeError(f"Expected a graph or geodataframe for G, input was: {type(G)}")
+        raise TypeError(
+            f"Expected a MultiDiGraph or DiGraph input for G, provided input was: {type(G)}"
+        )
 
     G_adj = G.copy()
 
@@ -1818,8 +1820,11 @@ def randomly_disrupt_network(G, edge_frac, fail_value):
 
     Returns
     -------
-    nx.Graph
-        a modified graph with the edited 'time' attribute the list of edge IDs randomly chosen for destruction
+    tuple (nx.Graph, destroy_list)
+        nx.Graph
+            a modified graph with the edited 'time' attribute the list of edge IDs randomly chosen for destruction
+        destroy_list
+            list of the integers corresponding to the edge indices that were 'destroyed'
 
     """
     edgeid = []
@@ -1827,11 +1832,8 @@ def randomly_disrupt_network(G, edge_frac, fail_value):
     for u, v, data in G.edges(data=True):
         edgeid.append(data["edge_id"])
 
-    num_to_destroy = math.floor(len(edgeid) / 2 * (edge_frac / 100))
-
-    destroy_list = list(
-        np.random.randint(low=0, high=max(edgeid), size=[num_to_destroy])
-    )
+    num_to_destroy = math.floor(len(edgeid) * edge_frac / 100)
+    destroy_list = list(np.random.choice(edgeid, size=num_to_destroy))
 
     G_adj = G.copy()
 
@@ -2019,54 +2021,6 @@ def add_missing_reflected_edges(G, one_way_tag=None, verbose=False):
     G2 = G.copy()
     G2.add_edges_from(missing_edges)
     print(f"completed processing {G2.number_of_edges()} edges")
-    return G2
-
-
-def add_missing_reflected_edges_old(G, one_way_tag=None):
-    """
-    to-do: delete this function, it is slower, creating a unique edge list slows things down with a big graph
-
-    function for adding any missing reflected edges - makes all edges bidirectional. This is essential for routing with simplified graphs
-
-    Parameters
-    ----------
-    G : nx.Graph
-        a graph object
-    one_way_tag : str
-        if exists, then values that are True are one-way and will not be
-
-    Returns
-    -------
-    nx.Graph
-        a modified graph with the edited 'time' attribute
-
-    """
-    unique_edges = []
-    missing_edges = []
-
-    for u, v in G.edges(data=False):
-        unique_edges.append((u, v))
-
-    for u, v, data in G.edges(data=True):
-        if one_way_tag:
-            # print("print one_way_tag")
-            # print(one_way_tag)
-            # print("print data")
-            # print(data)
-            # print("data[one_way_tag]")
-            # print(data[one_way_tag])
-            if data[one_way_tag] is False:
-                # print("2-way road")
-                if (v, u) not in unique_edges:
-                    # print("appending to missing_edges")
-                    missing_edges.append((v, u, data))
-        else:
-            if (v, u) not in unique_edges:
-                missing_edges.append((v, u, data))
-
-    G2 = G.copy()
-    G2.add_edges_from(missing_edges)
-    print(G2.number_of_edges())
     return G2
 
 

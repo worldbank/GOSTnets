@@ -454,3 +454,69 @@ def test_isochrones():
         core.generate_isochrones(G, "invalid", 1)
     with pytest.raises(ValueError):
         core.generate_isochrones(G, ["A"], 1, stacking="invalid")
+
+
+def test_hwy_distances():
+    """Test the find_hwy_distances_by_class() function."""
+    # create a networkx graph object
+    G = nx.DiGraph()
+
+    # Add four nodes to the graph
+    G.add_nodes_from(["A", "B", "C", "D"])
+
+    # Add edges with length and highway data values
+    edge_data = [
+        {"source": "A", "target": "B", "length": 1, "highway": "S"},
+        {"source": "A", "target": "C", "length": 2, "highway": "S"},
+        {"source": "A", "target": "D", "length": 20, "highway": "L"},
+        {"source": "B", "target": "C", "length": 16, "highway": "L"},
+        {"source": "B", "target": "D", "length": 1, "highway": "S"},
+    ]
+
+    G.add_edges_from([(edge["source"], edge["target"], edge) for edge in edge_data])
+
+    # call function
+    hwy_dict = core.find_hwy_distances_by_class(G)
+    # assert things
+    assert "S" in hwy_dict.keys()
+    assert "L" in hwy_dict.keys()
+    assert hwy_dict["S"] == 1 + 2 + 1
+    assert hwy_dict["L"] == 20 + 16
+
+
+def test_random_disrupt():
+    """Test the randomly_disrupt_network() function."""
+    # create a networkx graph object
+    G = nx.Graph()
+
+    # Add four nodes to the graph
+    G.add_nodes_from(["A", "B", "C", "D"])
+
+    # Add 4 edges with edge_id values
+    edge_data = [
+        {"source": "A", "target": "B", "edge_id": 1, "time": 10},
+        {"source": "A", "target": "C", "edge_id": 2, "time": 20},
+        {"source": "A", "target": "D", "edge_id": 3, "time": 30},
+        {"source": "B", "target": "C", "edge_id": 4, "time": 40},
+    ]
+
+    G.add_edges_from([(edge["source"], edge["target"], edge) for edge in edge_data])
+
+    # call function 50% reduction
+    new_G, d_list = core.randomly_disrupt_network(G, 50, -1)
+    assert len(d_list) == 2
+    # call function with 25% reduction
+    new_G, d_list = core.randomly_disrupt_network(G, 25, -1)
+    assert len(d_list) == 1
+    # 75% reduction
+    new_G, d_list = core.randomly_disrupt_network(G, 75, -1)
+    assert len(d_list) == 3
+    # check flooring so 40% should be same as 25%
+    new_G, d_list = core.randomly_disrupt_network(G, 40, -1)
+    assert len(d_list) == 1
+    assert len(new_G.edges) == 4
+    one_edge = new_G.get_edge_data("A", "B")
+    assert "source" in one_edge.keys()
+    assert "target" in one_edge.keys()
+    assert "edge_id" in one_edge.keys()
+    assert "time" in one_edge.keys()
