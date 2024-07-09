@@ -682,7 +682,7 @@ def chck(x, poly):
 
 def graph_nodes_intersecting_polygon(G, polygons, crs=None):
     """
-    Function for generating GeoDataFrame from Graph. Note: ensure any GeoDataFrames are in the same projection before using function, or pass a crs
+    Function for identifying nodes of a graph that intersect polygon(s). Ensure any GeoDataFrames are in the same projection before using function, or pass a crs.
 
     Parameters
     ----------
@@ -1011,7 +1011,7 @@ def make_iso_polys(
         count = 0
         for _node_ in origins:
             subgraph = nx.ego_graph(G, _node_, radius=trip_time, distance=weight)
-            # subgraph = nx.ego_graph(G_service0002, _node_, radius = 3600, distance = 'length')
+
             node_points = [
                 Point((data["x"], data["y"]))
                 for node, data in subgraph.nodes(data=True)
@@ -1072,37 +1072,37 @@ def make_iso_polys(
             else:
                 pass
 
-        print("merge all edges and nodes")
+            print("merge all edges and nodes")
 
-        # drop duplicates
-        nodes_gdf.drop_duplicates(inplace=True, subset="coords")
-        edge_gdf.drop_duplicates(inplace=True, subset="coords")
+            # drop duplicates
+            nodes_gdf.drop_duplicates(inplace=True, subset="coords")
+            edge_gdf.drop_duplicates(inplace=True, subset="coords")
 
-        if (measure_crs is not None) and (nodes_gdf.crs != measure_crs):
-            nodes_gdf = nodes_gdf.to_crs(measure_crs)
-            edge_gdf = edge_gdf.to_crs(measure_crs)
+            if (measure_crs is not None) and (nodes_gdf.crs != measure_crs):
+                nodes_gdf = nodes_gdf.to_crs(measure_crs)
+                edge_gdf = edge_gdf.to_crs(measure_crs)
 
-        n = nodes_gdf.buffer(node_buff).geometry
-        e = edge_gdf.buffer(edge_buff).geometry
+            n = nodes_gdf.buffer(node_buff).geometry
+            e = edge_gdf.buffer(edge_buff).geometry
 
-        all_gs = list(n) + list(e)
+            all_gs = list(n) + list(e)
 
-        print("unary_union")
-        new_iso = gpd.GeoSeries(all_gs).unary_union
+            print("unary_union")
+            new_iso = gpd.GeoSeries(all_gs).unary_union
 
-        # If desired, try and "fill in" surrounded
-        # areas so that shapes will appear solid and blocks
-        # won't have white space inside of them
+            # If desired, try and "fill in" surrounded
+            # areas so that shapes will appear solid and blocks
+            # won't have white space inside of them
 
-        if infill:
-            new_iso = Polygon(new_iso.exterior)
+            if infill:
+                new_iso = Polygon(new_iso.exterior)
 
-        isochrone_polys.append(new_iso)
-        nodez.append(str(_node_))
-        tt.append(trip_time)
+            isochrone_polys.append(new_iso)
+            nodez.append(str(_node_))
+            tt.append(trip_time)
 
     gdf = gpd.GeoDataFrame(
-        {"geometry": isochrone_polys, "thresh": tt, "nodez": _node_},
+        {"geometry": isochrone_polys, "thresh": tt, "nodez": nodez},
         crs=measure_crs,
         geometry="geometry",
     )
@@ -1885,7 +1885,7 @@ def gravity_demand(
             else:
                 normalized_dist = shortest_time[o][d] / shortest_time.max()
                 demand[o][d] = (
-                    G.node[origins[o]][weight] * G.node[destinations[d]][weight]
+                    G.nodes[origins[o]][weight] * G.nodes[destinations[d]][weight]
                 ) * np.exp(-1 * dist_decay * normalized_dist)
 
     demand = (demand / demand.max()) * maxtrips

@@ -10,6 +10,7 @@ from shapely import LineString
 import shutil
 import io
 import copy
+import numpy as np
 
 
 def test_convert():
@@ -520,3 +521,67 @@ def test_random_disrupt():
     assert "target" in one_edge.keys()
     assert "edge_id" in one_edge.keys()
     assert "time" in one_edge.keys()
+
+
+def test_make_iso_polys():
+    """Test the make_iso_polys() function."""
+    # create a networkx graph object
+    G = nx.Graph()
+
+    # Add four nodes to the graph
+    node_attributes = [
+        ("A", "City", 10, 20),
+        ("B", "Town", 5, 30),
+        ("C", "Village", 15, 15),
+        ("D", "City", 12, 25),
+    ]
+    for name, node_type, x, y in node_attributes:
+        G.add_node(name, type=node_type, x=x, y=y)
+
+    # Add 4 edges with edge_id values
+    edge_data = [
+        {"source": "A", "target": "B", "edge_id": 1, "time": 10},
+        {"source": "A", "target": "C", "edge_id": 2, "time": 20},
+        {"source": "A", "target": "D", "edge_id": 3, "time": 30},
+        {"source": "B", "target": "C", "edge_id": 4, "time": 40},
+    ]
+
+    G.add_edges_from([(edge["source"], edge["target"], edge) for edge in edge_data])
+
+    # call newer and older function (values of results are not equivalent!?)
+    gdf = core.make_iso_polys(G, ["A", "B"], [5, 10, 40, 45])
+    old_gdf = core.make_iso_polys_original(G, ["A", "B"], [5, 10, 40, 45])
+
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert isinstance(old_gdf, gpd.GeoDataFrame)
+    assert gdf.shape == old_gdf.shape
+
+
+def test_gravity_demand():
+    """Testing the gravity_demand() function."""
+    # create a networkx graph object
+    G = nx.Graph()
+
+    # Add four nodes to the graph
+    node_attributes = [
+        ("A", "City", 10, 20),
+        ("B", "Town", 5, 30),
+        ("C", "Village", 15, 15),
+        ("D", "City", 12, 25),
+    ]
+    for name, node_type, x, y in node_attributes:
+        G.add_node(name, type=node_type, x=x, y=y)
+
+    # Add 4 edges with edge_id values
+    edge_data = [
+        {"source": "A", "target": "B", "edge_id": 1, "time": 10},
+        {"source": "A", "target": "C", "edge_id": 2, "time": 20},
+        {"source": "A", "target": "D", "edge_id": 3, "time": 30},
+        {"source": "B", "target": "C", "edge_id": 4, "time": 40},
+    ]
+
+    G.add_edges_from([(edge["source"], edge["target"], edge) for edge in edge_data])
+
+    # call function
+    grav = core.gravity_demand(G, ["A", "B"], ["C"], weight="x")
+    assert isinstance(grav, np.ndarray)
