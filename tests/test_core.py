@@ -141,7 +141,7 @@ class TestGDFfromGraph:
     G.add_edge(4, 5)
     # define polygon
     poly = Polygon([(-1, -1), (0.0, 1.0), (1.0, 0.0)])
-    poly_gdf = gpd.GeoDataFrame({"x": 1, "geometry": poly}, index=[1])
+    poly_gdf = gpd.GeoDataFrame({"x": 1, "geometry": poly}, index=[1], crs="EPSG:4326")
 
     def test_node_gdf_from_graph(self):
         """Test the node_gdf_from_graph function."""
@@ -170,17 +170,24 @@ class TestGDFfromGraph:
         with pytest.raises(TypeError):
             core.graph_nodes_intersecting_polygon(self.G, "str")
 
-    # def test_graph_nodes_intersecting_polgyon(self):
-    #     """Test the graph_nodes_intersecting_polygon function."""
-    #     # call function
-    #     int_list = core.graph_nodes_intersecting_polygon(self.G, self.poly_gdf)
-    #     import pdb; pdb.set_trace()
+    def test_graph_nodes_intersecting_polgyon(self):
+        """Test the graph_nodes_intersecting_polygon function."""
+        # call function
+        int_list = core.graph_nodes_intersecting_polygon(
+            self.G, self.poly_gdf, crs="EPSG:4326"
+        )
+        assert isinstance(int_list, list)
+        assert len(int_list) == 1
+        assert int_list[0] == 1
 
-    # def test_graph_edges_intersecting_polgyon(self):
-    #     """Test the graph_edges_intersecting_polygon function."""
-    #     int_list = core.graph_edges_intersecting_polygon(
-    #         self.G, self.poly_gdf, mode="contains"
-    #     )
+    def test_graph_edges_intersecting_polgyon(self):
+        """Test the graph_edges_intersecting_polygon function."""
+        int_gdf = core.graph_edges_intersecting_polygon(
+            self.G, self.poly_gdf, mode="intersects", crs="EPSG:4326"
+        )
+        assert isinstance(int_gdf, gpd.GeoDataFrame)
+        assert int_gdf.shape[0] == 1
+        assert int_gdf.shape[1] == 3
 
 
 def test_find_hwy_distances_by_class_error():
@@ -585,3 +592,125 @@ def test_gravity_demand():
     # call function
     grav = core.gravity_demand(G, ["A", "B"], ["C"], weight="x")
     assert isinstance(grav, np.ndarray)
+
+
+def test_calculate_OD_error():
+    """Test the calculate_OD function error handling."""
+    # create a networkx graph object
+    G = nx.Graph()
+
+    # Add four nodes to the graph
+    node_attributes = [
+        ("A", "City", 10, 20),
+        ("B", "Town", 5, 30),
+        ("C", "Village", 15, 15),
+        ("D", "City", 12, 25),
+    ]
+    for name, node_type, x, y in node_attributes:
+        G.add_node(name, type=node_type, x=x, y=y)
+
+    # Add 4 edges with edge_id values
+    edge_data = [
+        {"source": "A", "target": "B", "edge_id": 1, "time": np.nan},
+        {"source": "A", "target": "C", "edge_id": 2, "time": 20},
+        {"source": "A", "target": "D", "edge_id": 3, "time": 30},
+        {"source": "B", "target": "C", "edge_id": 4, "time": 40},
+    ]
+
+    G.add_edges_from([(edge["source"], edge["target"], edge) for edge in edge_data])
+
+    # call function
+    with pytest.raises(ValueError):
+        core.calculate_OD(G, ["A", "B"], ["C"], fail_value=np.nan)
+
+    # remove edge
+    G.remove_edge("A", "B")
+    # add edge
+    G.add_edge("A", "B", edge_id=1, time=0)
+
+    # call function
+    with pytest.raises(ValueError):
+        core.calculate_OD(G, ["A", "B"], ["C"], fail_value=np.nan)
+
+
+def test_is_endpoint():
+    """Test the is_endpoint function."""
+    # create a networkx graph object
+    G = nx.DiGraph()
+
+    # Add four nodes to the graph
+    node_attributes = [
+        ("A", "City", 10, 20),
+        ("B", "Town", 5, 30),
+        ("C", "Village", 15, 15),
+        ("D", "City", 12, 25),
+    ]
+    for name, node_type, x, y in node_attributes:
+        G.add_node(name, type=node_type, x=x, y=y)
+
+    # Add 4 edges with edge_id values
+    edge_data = [
+        {"source": "A", "target": "B", "edge_id": 1, "time": 10},
+        {"source": "A", "target": "C", "edge_id": 2, "time": 20},
+        {"source": "A", "target": "D", "edge_id": 3, "time": 30},
+        {"source": "B", "target": "C", "edge_id": 4, "time": 40},
+    ]
+
+    G.add_edges_from([(edge["source"], edge["target"], edge) for edge in edge_data])
+
+    # call function
+    is_endpoint = core.is_endpoint(G, "A")
+    assert is_endpoint == "condition 3"
+
+    # call function
+    is_endpoint = core.is_endpoint(G, "B")
+    assert is_endpoint is False
+
+    # call with strict==False
+    is_endpoint = core.is_endpoint(G, "A", strict=False)
+    assert is_endpoint == "condition 3"
+
+
+def test_pandana_snap():
+    """Test the pandana_snap function."""
+    # create a networkx graph object
+    G = nx.MultiDiGraph()
+
+    # Add two nodes to the graph
+    node_attributes = [
+        {"ID": "A", "geometry": Point(0, 0), "x": 0, "y": 0},
+        {"ID": "B", "geometry": Point(1, 1), "x": 1, "y": 1},
+    ]
+    G.add_nodes_from([(node["ID"], node) for node in node_attributes])
+
+    # define points gdf
+    points = gpd.GeoDataFrame(
+        {"geometry": [Point(0.25, 0.25), Point(0.75, 0.9)], "index": ["A", "B"]},
+        crs="epsg:4326",
+    )
+
+    # call function
+    G_tree = core.pandana_snap(G, points)
+    assert isinstance(G_tree, gpd.GeoDataFrame)
+    assert G_tree.shape[0] == 2
+    assert G_tree.shape[1] == 6
+    assert G_tree["NN"].iloc[0] == "A"
+    assert G_tree["NN"].iloc[1] == "B"
+    # call other function that does the same thing
+    G_tree_c = core.pandana_snap_c(G, points)
+    # assert they are the same
+    assert G_tree.equals(G_tree_c)
+
+    # try snap to many function
+    G_many = core.pandana_snap_to_many(
+        G, points, add_dist_to_node_col=False, k_nearest=1
+    )
+    assert isinstance(G_many, dict)
+    assert len(G_many) == 2
+    assert "A" in G_many.keys()
+    assert "B" in G_many.keys()
+
+    # try to snap one point
+    G_one = core.pandana_snap_single_point(G, points.geometry.iloc[0])
+    assert isinstance(G_one, str)
+    assert G_one == "A"

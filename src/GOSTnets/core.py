@@ -753,8 +753,8 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
 
     Returns
     -------
-    list
-        a list of the edges intersecting the polygons
+    geopandas.GeoDataFrame
+        a GeoDataFrame containing the edges intersecting the polygons
 
     """
     if isinstance(G, nx.Graph):
@@ -3016,6 +3016,10 @@ def pandana_snap_to_many(
         return distance to nearest node in the units of the target_crs
     time_it : bool
         return time to complete function
+    k_nearest : int
+        k nearest neighbors to query for the nearest node
+    origin_id : str
+        key for the id in the points_gdf input, defaults to 'index'
 
     Returns
     -------
@@ -3135,8 +3139,8 @@ def pandana_snap_single_point(
 
     Returns
     -------
-    int
-        returns the id of the nearest node in the graph
+    object
+        returns the id of the nearest node in the graph, could be an integer, float, string, or really any object
 
     """
     node_gdf = node_gdf_from_graph(G)
