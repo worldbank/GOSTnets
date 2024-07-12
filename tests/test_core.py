@@ -189,6 +189,17 @@ class TestGDFfromGraph:
         assert int_gdf.shape[0] == 1
         assert int_gdf.shape[1] == 3
 
+    def test_graph_edges_intersecting_polgyon_error(self):
+        """Test the graph_edges_intersecting_polygon function error."""
+        with pytest.raises(TypeError):
+            core.graph_edges_intersecting_polygon("str", self.poly_gdf, "intersects")
+        with pytest.raises(TypeError):
+            core.graph_edges_intersecting_polygon(self.G, "str", "intersects")
+        with pytest.raises(ValueError):
+            core.graph_edges_intersecting_polygon(
+                self.G, self.poly_gdf, mode="intersects", fast="str"
+            )
+
 
 def test_find_hwy_distances_by_class_error():
     """Test the find_hwy_distances_by_class function type error."""
@@ -714,3 +725,135 @@ def test_pandana_snap():
     G_one = core.pandana_snap_single_point(G, points.geometry.iloc[0])
     assert isinstance(G_one, str)
     assert G_one == "A"
+
+
+def test_pandana_snap_points():
+    """Test the pandana_snap_points function"""
+    # create points gdf
+    points = gpd.GeoDataFrame(
+        geometry=[Point(x, y) for x, y in zip(range(0, 10, 1), range(0, 10, 1))],
+        crs="epsg:4326",
+    )
+    target_points_gdf = gpd.GeoDataFrame(
+        geometry=[Point(x, y) for x, y in zip(range(1, 11, 1), range(1, 11, 1))],
+        crs="epsg:4326",
+    )
+    # call function
+    pt_gdf = core.pandana_snap_points(points, target_points_gdf)
+    # assertions
+    assert isinstance(pt_gdf, gpd.GeoDataFrame)
+    assert pt_gdf.shape[0] == points.shape[0]
+    assert "geometry" in pt_gdf.columns
+    assert "idx" in pt_gdf.columns
+    assert "idx_dist" in pt_gdf.columns
+
+
+def test_gn_project_graph():
+    """Test the gn_project_graph function."""
+    # make multidigraph
+    G = nx.MultiDiGraph()
+    # make some nodes with x and y attributes
+    G.add_nodes_from([1, 2, 3, 4, 5], x=0, y=0)
+    # make some edges
+    G.add_edges_from([(1, 2), (2, 3), (3, 4), (4, 5)])
+    # set crs as property of the graph
+    G.graph["crs"] = "epsg:4326"
+    # call function
+    G_proj = core.gn_project_graph(G, to_crs="epsg:32633")
+    # pull out node and edge information
+    nodes = [i for i in G_proj.nodes(data=True)]
+    edges = [i for i in G_proj.edges(data=True)]
+    old_nodes = [i for i in G.nodes(data=True)]
+    old_edges = [i for i in G.edges(data=True)]
+    # assertions
+    assert len(nodes) == len(old_nodes)
+    assert len(edges) == len(old_edges)
+    assert nodes != old_nodes
+    assert edges == old_edges
+
+
+def test_add_intersection_delay():
+    """Test the add_intersection_delay function."""
+    # create multidigraph
+    G = nx.MultiDiGraph()
+    # add nodes
+    G.add_nodes_from([1, 2, 3, 4])
+    # add edges with time and highway type values
+    G.add_edges_from(
+        [
+            (1, 2, {"time": 10, "highway": "motorway"}),
+            (1, 3, {"time": 20, "highway": "trunk"}),
+            (2, 3, {"time": 30, "highway": "secondary"}),
+            (3, 4, {"time": 40, "highway": "primary"}),
+        ]
+    )
+    # call function
+    G_new = core.add_intersection_delay(G, time_col="time", highway_col="highway")
+    # pull out node and edge information
+    nodes = [i for i in G_new.nodes(data=True)]
+    edges = [i for i in G_new.edges(data=True)]
+    old_nodes = [i for i in G.nodes(data=True)]
+    old_edges = [i for i in G.edges(data=True)]
+    # assertions
+    assert nodes == old_nodes
+    assert edges != old_edges
+
+
+def test_sample_raster():
+    """Test the sample_raster function."""
+    # test invalid graph input
+    with pytest.raises(TypeError):
+        core.sample_raster(1, "str")
+    # test invalid point geometry in graph
+    G = nx.MultiDiGraph()
+    G.add_nodes_from([1, 2, 3, 4])
+    with pytest.raises(ValueError):
+        core.sample_raster(G, "str")
+    # test invalid tif path
+    with pytest.raises(ValueError):
+        core.sample_raster(nx.MultiDiGraph(), 1)
+
+
+def test_salt_long_lines():
+    """Test the salt_long_lines function."""
+    # create a networkx graph object with 2 nodes and one long edge
+    G = nx.MultiDiGraph()
+    node_attributes = [
+        ("A", 0, 0),
+        ("B", 1, 0),
+    ]
+    for name, x, y in node_attributes:
+        G.add_node(name, x=x, y=y)
+    G.add_edges_from([("A", "B", {"length": 1})])
+    # call function
+    G_long = core.salt_long_lines(
+        G, source="epsg:4326", target="epsg:32638", thresh=100000
+    )
+    # assertions
+    assert isinstance(G_long, nx.MultiDiGraph)
+    assert G_long.number_of_nodes() > G.number_of_nodes()
+    assert G_long.number_of_edges() > G.number_of_edges()
+
+
+def test_clip():
+    """Test the clip function."""
+    # create graph to use for tests
+    G = nx.MultiDiGraph()
+    # add some nodes w/ (x, y) attributes
+    G.add_node(1, x=0, y=0)
+    G.add_node(2, x=-1, y=0.3)
+    G.add_node(3, x=2, y=0.17)
+    G.add_node(4, x=4, y=0.255)
+    G.add_node(5, x=5, y=0.03)
+    # create some edges with highway attribute and wkt
+    G.add_edge(1, 2, highway="motorway", Wkt="LineString(0 0, 1 1)")
+    G.add_edge(4, 5, highway="primary", Wkt="LineString(1 1, 2 2)")
+    # define polygon
+    poly = Polygon([(-1, -1), (0.0, 1.0), (1.0, 0.0)])
+    # call function
+    G_clip = core.clip(G, poly)
+    # assertions
+    assert isinstance(G_clip, nx.MultiDiGraph)
+    assert G_clip.nodes(data=True) != G.nodes(data=True)
+    assert G_clip.edges(data=True) != G.edges(data=True)
+    assert G_clip.number_of_nodes() < G.number_of_nodes()

@@ -2705,9 +2705,9 @@ def salt_long_lines(
                 new_nodes.append((new_node_ID, node_data))
 
             ## GENERATE NEW EDGES ##
-            result = None  # placeholder to define result tuple - will need to be debugged/fixed later
             # define geometry to be cutting (iterative)
             if i == 0:
+                result = None  # placeholder to define result tuple
                 geom_to_split = UTM_geom
 
             else:
@@ -3172,8 +3172,10 @@ def pandana_snap_points(
         a geodataframe of points
     target_gdf : gpd.GeoDataFrame
         a geodataframe of points, in the same source crs as the geometry of the source_gdfsg:32638'
-    target_crs : str
-        crs object in format 'epsg:32638'
+    source_crs : str, optional
+        crs object in format 'epsg:32638', by default 'epsg:4326'
+    target_crs : str, optional
+        crs object in format 'epsg:32638', by default 'epsg:4326'
     add_dist_to_node_col : bool
         return distance in metres to nearest node
 
@@ -3588,7 +3590,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
     gdf : geopandas.GeoDataFrame
         geopandas.GeoDataFrame the GeoDataFrame to be projected
     to_crs : str
-        string or pyproj.CRS if None, project to UTM zone in which gdf's centroid lies, otherwise project to this CRS
+        string or pyproj. CRS if None, project to UTM zone in which gdf's centroid lies, otherwise project to this CRS
     to_latlong : bool
         bool if True, project to settings.default_crs and ignore to_crs
 
@@ -3679,51 +3681,6 @@ def gn_project_graph(G, to_crs=None):
 
     # utils.log(f"Projected graph with {len(G)} nodes and {len(G.edges)} edges")
     return G_proj
-
-
-def reproject_graph(input_net, source_crs, target_crs):
-    """
-    to-do: delete, is not working
-
-    Converts the node coordinates of a graph. Assumes that there are straight lines between the start and end nodes.
-
-    Parameters
-    ----------
-    input_net : nx.MultiDiGraph
-        a base network object (nx.MultiDiGraph)
-    source_crs : str
-        The projection of the input_net (epsg code)
-    target_crs : str
-        The projection input_net will be converted to (epsg code)
-
-    Returns
-    -------
-    nx.MultiDiGraph
-        returns a new network object that is the combination of the two input networks
-
-    """
-    # pyproj < 2.1
-    # project_WGS_UTM = partial(
-    #             pyproj.transform,
-    #             pyproj.Proj(init=source_crs),
-    #             pyproj.Proj(init=target_crs))
-
-    # pyproj >= 2.1.0
-    wgs84 = pyproj.CRS(source_crs)
-    utm = pyproj.CRS(target_crs)
-    project_WGS_UTM = pyproj.Transformer.from_crs(wgs84, utm, always_xy=True).transform
-
-    i = list(input_net.nodes(data=True))
-
-    for j in i:
-        # print(j[1])
-        # print(j[1]['x'])
-        # print(transform(project_WGS_UTM,j[1]['geom']))
-        j[1]["x"] = transform(project_WGS_UTM, j[1]["geom"]).x
-        j[1]["y"] = transform(project_WGS_UTM, j[1]["geom"]).y
-        # j[1]['geom'] = transform(project_WGS_UTM,j[1]['geom'])
-
-    return input_net
 
 
 def euclidean_distance(lat1, lon1, lat2, lon2):
