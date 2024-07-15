@@ -391,6 +391,13 @@ def test_project_gdf():
     projected_gdf = core.project_gdf(gdf, to_crs="epsg:32633", to_latlong=False)
     # check the output
     assert projected_gdf.crs == "epsg:32633"
+    # with invalid CRS
+    gdf_invalid = gpd.GeoDataFrame({"geometry": [Point(0, 0), Point(1, 1)]}, crs=None)
+    with pytest.raises(ValueError):
+        core.project_gdf(gdf_invalid, to_crs="epsg:32633", to_latlong=False)
+    # with no "to_crs" parameter
+    utm_gdf = core.project_gdf(gdf, to_latlong=False)
+    assert "utm" in utm_gdf.crs.to_string()
 
 
 def test_euclidean_distance():
@@ -857,3 +864,42 @@ def test_clip():
     assert G_clip.nodes(data=True) != G.nodes(data=True)
     assert G_clip.edges(data=True) != G.edges(data=True)
     assert G_clip.number_of_nodes() < G.number_of_nodes()
+
+
+def test_find_kne():
+    """Test the find_kne function."""
+    # define a point
+    point = Point(0.5, 0.6)
+    # define some lines
+    line1 = LineString([(0, 0), (1, 1)])
+    line2 = LineString([(1, 1), (2, 2)])
+    line3 = LineString([(2, 2), (3, 3)])
+    # put lines in a geodataframe
+    gdf = gpd.GeoDataFrame({"geometry": [line1, line2, line3]})
+    # call function
+    kne_idx, kne = core.find_kne(point, gdf, [0, 1, 2])
+    assert isinstance(kne_idx, int)
+    assert isinstance(kne, pd.Series)
+    assert kne_idx == 0
+
+
+def test_get_pp():
+    """Test the get_pp function."""
+    # define a point
+    point = Point(0.5, 0.6)
+    # define the line
+    line = LineString([(0, 0), (1, 1)])
+    # call the function
+    pp = core.get_pp(point, line)
+    assert isinstance(pp, Point)
+    assert pp.x == 0.55
+    assert pp.y == 0.55
+
+
+def test_split_line_error():
+    """Test the split_line function error handling."""
+    # define line
+    line = LineString([(0, 0), (1, 1)])
+    # call function
+    with pytest.raises(TypeError):
+        core.split_line(line, "invalid")

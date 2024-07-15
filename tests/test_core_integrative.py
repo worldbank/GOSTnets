@@ -80,3 +80,17 @@ class TestGraphFunctions:
         G = core.edges_and_nodes_gdf_to_graph(nodes_df, edges_df, largest_G=True)
         # assert that the function returned a nx graph this time
         assert isinstance(G, nx.Graph)
+
+    def test_edges_nodes_df_to_graph_04(self):
+        # read csv files as dfs
+        nodes_df = pd.read_csv(self.fpath_nodes)
+        edges_df = pd.read_csv(self.fpath_edges)
+        # switch stnode and endnode to floats
+        edges_df["stnode"] = edges_df["stnode"].astype(float)
+        edges_df["endnode"] = edges_df["endnode"].astype(float)
+        # call function with adding missing reflected edges and the oneway tag
+        G = core.edges_and_nodes_gdf_to_graph(
+            nodes_df, edges_df, add_missing_reflected_edges=True, oneway_tag="one_way"
+        )
+        # assert that the function returned a nx graph this time
+        assert isinstance(G, nx.Graph)

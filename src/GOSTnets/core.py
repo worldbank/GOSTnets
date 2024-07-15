@@ -3615,7 +3615,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
 
     # otherwise, automatically project the gdf to UTM
     else:
-        if ox.CRS.from_user_input(gdf.crs).is_projected:
+        if ox.projection.is_projected(gdf.crs):
             raise ValueError("Geometry must be unprojected to calculate UTM zone")
 
         # calculate longitude of centroid of union of all geometries in gdf
@@ -3766,7 +3766,7 @@ def find_kne(point, lines, near_idx):
 
     """
     # getting the distances between the point and the lines
-    dists = np.array(list(map(lambda line: line.distance(point), lines)))
+    dists = np.array(lines.distance(point))
     kne_pos = dists.argsort()[0]
     kne = lines.iloc[kne_pos]
     kne_idx = near_idx[kne_pos]
@@ -3865,6 +3865,10 @@ def update_nodes(
         The updated nodes GeoDataFrame.
 
     """
+    ### NOTES
+    # node_highway_pp and node_highway_poi are not both needed, they are
+    # used conditionally depending on the ptype, so the parameters should be updated
+
     # create gdf of new nodes (projected PAPs)
     if ptype == "pp":
         new_nodes = gpd.GeoDataFrame(new_points, columns=["geometry"], crs=measure_crs)
@@ -3918,6 +3922,12 @@ def update_edges(edges, new_lines, replace=True, nodes_meter=None, pois_meter=No
         kne_idx refers to 'fid in Rtree'/'label'/'loc', not positional iloc
 
     """
+    ### NOTES
+    # line_pps_dict is never defined, where did it come from?
+    # same for 'itertools', 'measure_crs', 'pois', 'poi_key_col', 'oneway_tag',
+    # 'road_col', 'edge_highway', 'factor', 'u_tag', 'v_tag', 'nodes_id_dict',
+    # 'threshold', and maybe additional variables... DID THIS FUNCTION EVER WORK?
+
     # for interpolation (split by pp): replicate old line
     if replace:
         # create a flattened gdf with all line segs and corresponding kne_idx
