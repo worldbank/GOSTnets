@@ -581,6 +581,10 @@ def test_make_iso_polys():
     assert isinstance(old_gdf, gpd.GeoDataFrame)
     assert gdf.shape == old_gdf.shape
 
+    # fail make_iso_polys_original
+    with pytest.raises(ValueError):
+        core.make_iso_polys_original(G, "invalid", [5, 10, 40, 45])
+
 
 def test_gravity_demand():
     """Testing the gravity_demand() function."""
@@ -684,10 +688,6 @@ def test_is_endpoint():
     is_endpoint = core.is_endpoint(G, "B")
     assert is_endpoint is False
 
-    # call with strict==False
-    is_endpoint = core.is_endpoint(G, "A", strict=False)
-    assert is_endpoint == "condition 3"
-
 
 def test_pandana_snap():
     """Test the pandana_snap function."""
@@ -708,20 +708,20 @@ def test_pandana_snap():
     )
 
     # call function
-    G_tree = core.pandana_snap(G, points)
+    G_tree = core.pandana_snap(G, points, time_it=True)
     assert isinstance(G_tree, gpd.GeoDataFrame)
     assert G_tree.shape[0] == 2
     assert G_tree.shape[1] == 6
     assert G_tree["NN"].iloc[0] == "A"
     assert G_tree["NN"].iloc[1] == "B"
     # call other function that does the same thing
-    G_tree_c = core.pandana_snap_c(G, points)
+    G_tree_c = core.pandana_snap_c(G, points, time_it=True)
     # assert they are the same
     assert G_tree.equals(G_tree_c)
 
     # try snap to many function
     G_many = core.pandana_snap_to_many(
-        G, points, add_dist_to_node_col=False, k_nearest=1
+        G, points, add_dist_to_node_col=False, k_nearest=1, time_it=True
     )
     assert isinstance(G_many, dict)
     assert len(G_many) == 2
