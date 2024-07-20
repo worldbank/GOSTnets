@@ -29,4 +29,3 @@ jobs:
           conda install -c conda-forge pip
           pip install .[dev]
           coverage run -m pytest
-          coverage report
