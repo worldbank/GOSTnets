@@ -55,11 +55,6 @@ def test_download_osm_cache(tmpdir):
     assert result == "test"
 
 
-def test_read_osm():
-    """Test the read_osm function."""
-    pass
-
-
 def test_node(capsys):
     """Test the Node class."""
     node = osm_parser.Node(10, 3.3, 4.4)
@@ -92,11 +87,6 @@ def test_way_split():
     assert isinstance(result, list)
     assert isinstance(result[0], osm_parser.Way)
     assert isinstance(result[1], osm_parser.Way)
-
-
-def test_osm():
-    """Test the OSM class."""
-    pass
 
 
 def test_fetch_roads_OSM():
