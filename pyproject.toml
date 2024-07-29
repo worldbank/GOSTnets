@@ -37,7 +37,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "pytest", "pytest-cov", "tomli", "GOStnets[docs,osm,opt]"]
+dev = ["pre-commit", "pytest", "pytest-cov", "tomli", "coverage[toml]", "GOStnets[docs,osm,opt]", "pooch"]
 docs = [
 	"docutils==0.17.1",
 	"jupyter-book>=1,<2",
@@ -45,7 +45,7 @@ docs = [
 	"jupyter-cache>=0.6.0",
 	"nbconvert",
 ]
-osm = ["gdal", "geopy", "boltons"]
+osm = ["gdal"]
 opt = ["pulp"]
 
 [project.urls]
@@ -66,3 +66,12 @@ convention = "numpy"
 
 [tool.ruff]
 exclude = ["__init__.py"]
+
+[tool.coverage.run]
+omit = [
+	"tests/*",
+	"docs/*",
+	"Tutorials/*",
+	"src/GOSTnets/_version.py",
+	"src/GOSTnets/__init__.py",
+]

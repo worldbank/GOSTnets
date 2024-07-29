@@ -20,6 +20,8 @@ def rasterize_od_results(inD, outFile, field, template=None):
         path to save output raster
     field : string
         field to rasterize
+    template : string, optional
+        path to raster template file, by default None
 
     Returns
     -------

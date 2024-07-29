@@ -21,10 +21,57 @@ from shapely.geometry import (
     box,
     Polygon,
 )
-from shapely.ops import linemerge, unary_union, transform
+from shapely.ops import linemerge, unary_union, transform, split, snap
 from collections import Counter
 
 import math
+
+
+def convert(x, u_tag, v_tag, geometry_tag, attr_list):
+    """
+    Convert a row of a pandas dataframe to a tuple of (u, v, data) for use in a networkx graph
+
+    Parameters
+    ----------
+    x : pandas.Series
+        a row of a pandas dataframe
+    u_tag : str
+        the column name for the u node
+    v_tag : str
+        the column name for the v node
+    geometry_tag : str
+        the column name for the geometry
+    attr_list : list
+        a list of the columns to be included in the data dictionary
+
+    Returns
+    -------
+    tuple
+        a tuple of (u, v, data) for use in a networkx graph
+
+    """
+    u = x[u_tag]
+    v = x[v_tag]
+
+    if (isinstance(u, int)) or (isinstance(u, np.int64)) or (isinstance(u, np.int32)):
+        u = u
+    elif u.isnumeric():
+        u = int(u)
+    else:
+        u = u
+
+    if (isinstance(v, int)) or (isinstance(v, np.int64)) or (isinstance(v, np.int32)):
+        v = v
+    elif v.isnumeric():
+        v = int(v)
+    else:
+        v = v
+
+    data = {"Wkt": loads(x[geometry_tag])}
+    for i in attr_list:
+        data[i] = x[i]
+
+    return (u, v, data)
 
 
 def combo_csv_to_graph(
@@ -40,16 +87,18 @@ def combo_csv_to_graph(
     u_tag : str
         specify column containing u node ID if not labelled 'u'
     v_tag : str
-        specify column containing u node ID if not labelled 'v'
+        specify column containing v node ID if not labelled 'v'
     geometry_tag : str
-        specify column containing u node ID if not
+        specify column containing geometry if not "Wkt"
+    largest_G : bool, optional
+        Boolean that if True, returns only the largest sub-graph, default is False
 
     Returns
     -------
     nx.MultiDiGraph
 
     """
-    edges_1 = pd.read_csv(os.path.join(fpath))
+    edges_1 = pd.read_csv(fpath)
 
     edges = edges_1.copy()
 
@@ -70,31 +119,9 @@ def combo_csv_to_graph(
     drop_cols = [u_tag, v_tag, geometry_tag]
     attr_list = [col_entry for col_entry in col_list if col_entry not in drop_cols]
 
-    def convert(x, attr_list):
-        u = x[u_tag]
-        v = x[v_tag]
-
-        if isinstance(u, int):
-            u = u
-        elif u.isnumeric():
-            u = int(u)
-        else:
-            u = u
-
-        if isinstance(v, int):
-            v = v
-        elif v.isnumeric():
-            v = int(v)
-        else:
-            v = v
-
-        data = {"Wkt": loads(x[geometry_tag])}
-        for i in attr_list:
-            data[i] = x[i]
-
-        return (u, v, data)
-
-    edge_bunch = edges.apply(lambda x: convert(x, attr_list), axis=1).tolist()
+    edge_bunch = edges.apply(
+        lambda x: convert(x, u_tag, v_tag, geometry_tag, attr_list), axis=1
+    ).tolist()
 
     G = nx.MultiDiGraph()
 
@@ -113,7 +140,7 @@ def combo_csv_to_graph(
     # G = nx.convert_node_labels_to_integers(G)
 
     if largest_G is True:
-        list_of_subgraphs = list(nx.strongly_connected_component_subgraphs(G))
+        list_of_subgraphs = [G.subgraph(c) for c in nx.strongly_connected_components(G)]
         line = 0
         cur_max = 0
         for i in list_of_subgraphs:
@@ -124,6 +151,52 @@ def combo_csv_to_graph(
         G = list_of_subgraphs[max_ID]
 
     return G
+
+
+def check(x, chck_set):
+    """
+    Check if a value is in a set
+
+    Parameters
+    ----------
+    x : any
+        the value to be checked
+    chck_set : set
+        the set to be checked against
+
+    Returns
+    -------
+    int
+        1 if the value is in the set, 0 if not
+
+    """
+    if x in chck_set:
+        return 1
+    else:
+        return 0
+
+
+def selector(x):
+    """
+    Selects and returns an integer if the input is an integer, otherwise returns the input as is.
+
+    Parameters
+    ----------
+    x : int or any
+        The input value to be selected.
+
+    Returns
+    -------
+    int or any
+        The selected value.
+
+    """
+    if isinstance(x, int):
+        return x
+    # elif x.isnumeric():
+    #     return int(x)
+    else:
+        return x
 
 
 def edges_and_nodes_gdf_to_graph(
@@ -140,14 +213,14 @@ def edges_and_nodes_gdf_to_graph(
     oneway_tag=None,
 ):
     """
-    Function for generating a G object from a saved .csv of edges
+    Function for generating a G object from dataframse of nodes and one of edges
 
     Parameters
     ----------
-    fpath_nodes : str
-      path to a .csv containing nodes
-    fpath_edges : str
-      path to a .csv containing edges
+    nodes_df : str
+      Pandas DataFrame with node information
+    edges_df : str
+      Pandas DataFrame with edges information
     u_tag : str
       optional. specify column containing the node ID. This is used to only include entries that have a value.
     u_tag : str
@@ -178,12 +251,6 @@ def edges_and_nodes_gdf_to_graph(
         chck_set = list(edges_df[u_tag])
         chck_set.extend(list(edges_df[v_tag]))
         chck_set = list(set(chck_set))
-
-        def check(x, chck_set):
-            if x in chck_set:
-                return 1
-            else:
-                return 0
 
         nodes_df["node_in_edge_df"] = nodes_df[node_tag].apply(
             lambda x: check(x, chck_set)
@@ -282,28 +349,6 @@ def edges_and_nodes_gdf_to_graph(
 
     # node_attr = {(int(item[0]) if item[0].isnumeric() else item[0]):item[1] for item in node_attr.items() }
 
-    def selector(x):
-        """
-        Selects and returns an integer if the input is an integer, otherwise returns the input as is.
-
-        Parameters
-        ----------
-        x : int or any
-            The input value to be selected.
-
-        Returns
-        -------
-        int or any
-            The selected value.
-
-        """
-        if isinstance(x, int):
-            return x
-        # elif x.isnumeric():
-        #     return int(x)
-        else:
-            return x
-
     node_attr_dict = {selector(item[0]): item[1] for item in node_attr_dict.items()}
 
     nx.set_node_attributes(G, node_attr_dict)
@@ -312,7 +357,7 @@ def edges_and_nodes_gdf_to_graph(
     # G = nx.convert_node_labels_to_integers(G)
 
     if largest_G is True:
-        list_of_subgraphs = list(nx.strongly_connected_component_subgraphs(G))
+        list_of_subgraphs = [G.subgraph(c) for c in nx.strongly_connected_components(G)]
         line = 0
         cur_max = 0
         for i in list_of_subgraphs:
@@ -369,6 +414,24 @@ def edges_and_nodes_csv_to_graph(
     return G
 
 
+def flatten(line):
+    """
+    Flattens a nested list into a single list.
+
+    Parameters
+    ----------
+    line : list
+        The nested list to be flattened.
+
+    Returns
+    -------
+    list
+        The flattened list.
+
+    """
+    return [item for sublist in line for item in sublist]
+
+
 def node_gdf_from_graph(
     G, crs="epsg:4326", attr_list=None, geometry_tag="geometry", xCol="x", yCol="y"
 ):
@@ -398,23 +461,6 @@ def node_gdf_from_graph(
     """
     nodes = []
     keys = []
-
-    def flatten(line):
-        """
-        Flattens a nested list into a single list.
-
-        Parameters
-        ----------
-        line : list
-            The nested list to be flattened.
-
-        Returns
-        -------
-        list
-            The flattened list.
-
-        """
-        return [item for sublist in line for item in sublist]
 
     # finds all of the attributes
     if attr_list is None:
@@ -511,23 +557,6 @@ def edge_gdf_from_graph(
     """
     edges = []
     keys = []
-
-    def flatten(line):
-        """
-        Flattens a nested list into a single list.
-
-        Parameters
-        ----------
-        line : list
-            The nested list to be flattened.
-
-        Returns
-        -------
-        list
-            The flattened list.
-
-        """
-        return [item for sublist in line for item in sublist]
 
     if attr_list is None:
         for u, v, data in G.edges(data=True):
@@ -628,14 +657,39 @@ def edge_gdf_from_graph(
     return edges_gdf
 
 
+def chck(x, poly):
+    """
+    Check if a point is within a polygon
+
+    Parameters
+    ----------
+    x : shapely.geometry.Point
+        a point object
+    poly : shapely.geometry.Polygon
+        a polygon object
+
+    Returns
+    -------
+    int
+        1 if the point is within the polygon, 0 if not
+
+    """
+    if poly.contains(x):
+        return 1
+    else:
+        return 0
+
+
 def graph_nodes_intersecting_polygon(G, polygons, crs=None):
     """
-    Function for generating GeoDataFrame from Graph. Note: ensure any GeoDataFrames are in the same projection before using function, or pass a crs
+    Function for identifying nodes of a graph that intersect polygon(s). Ensure any GeoDataFrames are in the same projection before using function, or pass a crs.
 
     Parameters
     ----------
     G : nx.Graph or gpd.GeoDataFrame
         a Graph object OR node geodataframe
+    polygons : gpd.GeoDataFrame
+        a GeoDataFrame containing one or more polygons
     crs : str
         a crs object of form 'epsg:XXXX'. If passed, matches both inputs to this crs.
 
@@ -645,17 +699,19 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
         a list of the nodes intersecting the polygons
 
     """
-    if type(G) == nx.classes.multidigraph.MultiDiGraph:
+    if isinstance(G, nx.Graph):
         graph_gdf = node_gdf_from_graph(G)
-
-    elif type(G) == gpd.geodataframe.GeoDataFrame:
+    elif isinstance(G, gpd.GeoDataFrame):
         graph_gdf = G
-
     else:
-        raise ValueError("Expecting a graph or node geodataframe for G!")
+        raise TypeError(
+            f"Expected a graph or node geodataframe for G, input was a: {type(G)}"
+        )
 
-    if type(polygons) != gpd.geodataframe.GeoDataFrame:
-        raise ValueError("Expecting a geodataframe for polygon(s)!")
+    if type(polygons) != gpd.GeoDataFrame:
+        raise TypeError(
+            f"Expected a geodataframe for polygon(s), input was a: {type(polygons)}"
+        )
 
     if (crs is not None) and (graph_gdf.crs != crs):
         graph_gdf = graph_gdf.to_crs(crs)
@@ -668,13 +724,6 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
 
     intersecting_nodes = []
     for poly in polygons.geometry:
-
-        def chck(x, poly):
-            if poly.contains(x):
-                return 1
-            else:
-                return 0
-
         graph_gdf["intersecting"] = graph_gdf["geometry"].apply(lambda x: chck(x, poly))
         intersecting_nodes.append(
             list(graph_gdf["node_ID"].loc[graph_gdf["intersecting"] == 1])
@@ -704,18 +753,20 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
 
     Returns
     -------
-    list
-        a list of the edges intersecting the polygons
+    geopandas.GeoDataFrame
+        a GeoDataFrame containing the edges intersecting the polygons
 
     """
-    if type(G) == nx.classes.multidigraph.MultiDiGraph:
+    if isinstance(G, nx.Graph):
         node_graph_gdf = node_gdf_from_graph(G)
         edge_graph_gdf = edge_gdf_from_graph(G)
     else:
-        raise ValueError("Expecting a graph for G!")
+        raise TypeError(f"Expected a graph for G, input was a: {type(G)}")
 
-    if type(polygons) != gpd.geodataframe.GeoDataFrame:
-        raise ValueError("Expecting a geodataframe for polygon(s)!")
+    if type(polygons) != gpd.GeoDataFrame:
+        raise TypeError(
+            f"Expected a geodataframe for polygon(s), input was a {type(polygons)}"
+        )
 
     if (crs is not None) and (node_graph_gdf.crs != crs):
         node_graph_gdf = node_graph_gdf.to_crs(crs)
@@ -756,7 +807,9 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
 
 def sample_raster(G, tif_path, property_name="RasterValue"):
     """
-    Function for attaching raster values to corresponding graph nodes. Ensure any GeoDataFrames / graphs are in the same projection before using function, or pass a crs
+    Function for attaching raster values to corresponding graph nodes.
+
+    Ensure any GeoDataFrames / graphs are in the same projection before using function.
 
     Parameters
     ----------
@@ -781,7 +834,9 @@ def sample_raster(G, tif_path, property_name="RasterValue"):
     ):
         pass
     else:
-        raise ValueError("Expecting a graph or geodataframe for G!")
+        raise TypeError(
+            f"Expected a graph or geodataframe for G, input was a: {type(G)}"
+        )
 
     # generate dictionary of {node ID: point} pairs
     try:
@@ -859,11 +914,11 @@ def generate_isochrones(G, origins, thresh, weight=None, stacking=False):
             "Ensure isochrone centers (origins object) is a list containing at least one node ID!"
         )
 
-    ddict = list(G.nodes(data=True))[:1][0][1]
+    ddict = list(G.edges(data=True))[:1][0][-1]
 
     if weight is None:
         if "time" not in ddict.keys():
-            raise ValueError('need "time" key in edge value dictionary!')
+            raise ValueError('need "time" key in edges value dictionary!')
         else:
             weight = "time"
 
@@ -956,7 +1011,7 @@ def make_iso_polys(
         count = 0
         for _node_ in origins:
             subgraph = nx.ego_graph(G, _node_, radius=trip_time, distance=weight)
-            # subgraph = nx.ego_graph(G_service0002, _node_, radius = 3600, distance = 'length')
+
             node_points = [
                 Point((data["x"], data["y"]))
                 for node, data in subgraph.nodes(data=True)
@@ -1017,37 +1072,37 @@ def make_iso_polys(
             else:
                 pass
 
-        print("merge all edges and nodes")
+            print("merge all edges and nodes")
 
-        # drop duplicates
-        nodes_gdf.drop_duplicates(inplace=True, subset="coords")
-        edge_gdf.drop_duplicates(inplace=True, subset="coords")
+            # drop duplicates
+            nodes_gdf.drop_duplicates(inplace=True, subset="coords")
+            edge_gdf.drop_duplicates(inplace=True, subset="coords")
 
-        if (measure_crs is not None) and (nodes_gdf.crs != measure_crs):
-            nodes_gdf = nodes_gdf.to_crs(measure_crs)
-            edge_gdf = edge_gdf.to_crs(measure_crs)
+            if (measure_crs is not None) and (nodes_gdf.crs != measure_crs):
+                nodes_gdf = nodes_gdf.to_crs(measure_crs)
+                edge_gdf = edge_gdf.to_crs(measure_crs)
 
-        n = nodes_gdf.buffer(node_buff).geometry
-        e = edge_gdf.buffer(edge_buff).geometry
+            n = nodes_gdf.buffer(node_buff).geometry
+            e = edge_gdf.buffer(edge_buff).geometry
 
-        all_gs = list(n) + list(e)
+            all_gs = list(n) + list(e)
 
-        print("unary_union")
-        new_iso = gpd.GeoSeries(all_gs).unary_union
+            print("unary_union")
+            new_iso = gpd.GeoSeries(all_gs).unary_union
 
-        # If desired, try and "fill in" surrounded
-        # areas so that shapes will appear solid and blocks
-        # won't have white space inside of them
+            # If desired, try and "fill in" surrounded
+            # areas so that shapes will appear solid and blocks
+            # won't have white space inside of them
 
-        if infill:
-            new_iso = Polygon(new_iso.exterior)
+            if infill:
+                new_iso = Polygon(new_iso.exterior)
 
-        isochrone_polys.append(new_iso)
-        nodez.append(str(_node_))
-        tt.append(trip_time)
+            isochrone_polys.append(new_iso)
+            nodez.append(str(_node_))
+            tt.append(trip_time)
 
     gdf = gpd.GeoDataFrame(
-        {"geometry": isochrone_polys, "thresh": tt, "nodez": _node_},
+        {"geometry": isochrone_polys, "thresh": tt, "nodez": nodez},
         crs=measure_crs,
         geometry="geometry",
     )
@@ -1190,7 +1245,9 @@ def find_hwy_distances_by_class(G, distance_tag="length"):
     ):
         pass
     else:
-        raise ValueError("Expecting a graph or geodataframe for G!")
+        raise TypeError(
+            f"Expected a MultiDiGraph or DiGraph input for G, provided input was: {type(G)}"
+        )
 
     G_adj = G.copy()
 
@@ -1245,7 +1302,7 @@ def find_graph_avg_speed(G, distance_tag, time_tag):
     ):
         pass
     else:
-        raise ValueError("Expecting a graph or geodataframe for G!")
+        raise TypeError(f"Expected a graph or geodataframe for G, input was: {type(G)}")
 
     G_adj = G.copy()
 
@@ -1359,13 +1416,13 @@ def convert_network_to_time(
     ):
         pass
     else:
-        raise ValueError("Expecting a graph for G!")
+        raise TypeError(f"Expected a graph or geodataframe for G, input was: {type(G)}")
 
     try:
         # checks the first edge to see if the 'time' attribute already exists
         if list(G.edges(data=True))[0][2]["time"]:
             warnings.warn(
-                "Aree you sure you want to convert length to time? This graph already has a time attribute"
+                "Are you sure you want to convert length to time? This graph already has a time attribute"
             )
     except Exception:
         pass
@@ -1417,7 +1474,9 @@ def convert_network_to_time(
                     speed = default
 
         else:
-            raise ValueError('Expecting either a graph_type of "walk" or "drive"!')
+            raise ValueError(
+                f'Expecting either a graph_type of "walk" or "drive", value of graph_type was: {graph_type}'
+            )
 
         # perform conversion
         kmph = (orig_len / 1000) / speed
@@ -1428,6 +1487,27 @@ def convert_network_to_time(
         data["mode"] = graph_type
 
     return G_adj
+
+
+def first_val(x):
+    """
+    Get the first value of a list, or the value itself if it is not a list
+
+    Parameters
+    ----------
+    x : list or str
+        a list or string
+
+    Returns
+    -------
+    str
+        the first value of the list, or the string itself if it is not a list
+
+    """
+    if isinstance(x, list):
+        return x[0]
+    else:
+        return x
 
 
 def assign_traffic_times(
@@ -1478,12 +1558,6 @@ def assign_traffic_times(
     import urllib.request as url
 
     edges_all = edge_gdf_from_graph(G)
-
-    def first_val(x):
-        if isinstance(x, list):
-            return x[0]
-        else:
-            return x
 
     edges_all[road_col] = edges_all[road_col].apply(lambda x: first_val(x))
 
@@ -1746,8 +1820,11 @@ def randomly_disrupt_network(G, edge_frac, fail_value):
 
     Returns
     -------
-    nx.Graph
-        a modified graph with the edited 'time' attribute the list of edge IDs randomly chosen for destruction
+    tuple (nx.Graph, destroy_list)
+        nx.Graph
+            a modified graph with the edited 'time' attribute the list of edge IDs randomly chosen for destruction
+        destroy_list
+            list of the integers corresponding to the edge indices that were 'destroyed'
 
     """
     edgeid = []
@@ -1755,11 +1832,8 @@ def randomly_disrupt_network(G, edge_frac, fail_value):
     for u, v, data in G.edges(data=True):
         edgeid.append(data["edge_id"])
 
-    num_to_destroy = math.floor(len(edgeid) / 2 * (edge_frac / 100))
-
-    destroy_list = list(
-        np.random.randint(low=0, high=max(edgeid), size=[num_to_destroy])
-    )
+    num_to_destroy = math.floor(len(edgeid) * edge_frac / 100)
+    destroy_list = list(np.random.choice(edgeid, size=num_to_destroy))
 
     G_adj = G.copy()
 
@@ -1811,7 +1885,7 @@ def gravity_demand(
             else:
                 normalized_dist = shortest_time[o][d] / shortest_time.max()
                 demand[o][d] = (
-                    G.node[origins[o]][weight] * G.node[destinations[d]][weight]
+                    G.nodes[origins[o]][weight] * G.nodes[destinations[d]][weight]
                 ) * np.exp(-1 * dist_decay * normalized_dist)
 
     demand = (demand / demand.max()) * maxtrips
@@ -1947,54 +2021,6 @@ def add_missing_reflected_edges(G, one_way_tag=None, verbose=False):
     G2 = G.copy()
     G2.add_edges_from(missing_edges)
     print(f"completed processing {G2.number_of_edges()} edges")
-    return G2
-
-
-def add_missing_reflected_edges_old(G, one_way_tag=None):
-    """
-    to-do: delete this function, it is slower, creating a unique edge list slows things down with a big graph
-
-    function for adding any missing reflected edges - makes all edges bidirectional. This is essential for routing with simplified graphs
-
-    Parameters
-    ----------
-    G : nx.Graph
-        a graph object
-    one_way_tag : str
-        if exists, then values that are True are one-way and will not be
-
-    Returns
-    -------
-    nx.Graph
-        a modified graph with the edited 'time' attribute
-
-    """
-    unique_edges = []
-    missing_edges = []
-
-    for u, v in G.edges(data=False):
-        unique_edges.append((u, v))
-
-    for u, v, data in G.edges(data=True):
-        if one_way_tag:
-            # print("print one_way_tag")
-            # print(one_way_tag)
-            # print("print data")
-            # print(data)
-            # print("data[one_way_tag]")
-            # print(data[one_way_tag])
-            if data[one_way_tag] is False:
-                # print("2-way road")
-                if (v, u) not in unique_edges:
-                    # print("appending to missing_edges")
-                    missing_edges.append((v, u, data))
-        else:
-            if (v, u) not in unique_edges:
-                missing_edges.append((v, u, data))
-
-    G2 = G.copy()
-    G2.add_edges_from(missing_edges)
-    print(G2.number_of_edges())
     return G2
 
 
@@ -2234,6 +2260,178 @@ def simplify_junctions(G, measure_crs, in_crs="epsg:4326", thresh=25, verbose=Fa
     return G2
 
 
+def get_paths_to_simplify(G, strict=True):
+    """
+    Create a list of all the paths to be simplified between endpoint nodes.
+
+    The path is ordered from the first endpoint, through the interstitial nodes,
+    to the second endpoint. If your street network is in a rural area with many
+    interstitial nodes between true edge endpoints, you may want to increase
+    your system's recursion limit to avoid recursion errors.
+
+    Parameters
+    ----------
+    G : networkx multidigraph
+        networkx multidigraph
+    strict : bool
+        if False, allow nodes to be end points even if they fail all other rules
+        but have edges with different OSM IDs
+
+    Returns
+    -------
+    list
+        paths to be simplified
+
+    """
+    # first identify all the nodes that are endpoints
+    # start_time = time.time()
+    endpoints = set([node for node in G.nodes() if is_endpoint(G, node, strict=strict)])
+
+    # start_time = time.time()
+    paths_to_simplify = []
+
+    # for each endpoint node, look at each of its successor nodes
+    for node in endpoints:
+        for successor in G.successors(node):
+            if successor not in endpoints:
+                # if the successor is not an endpoint, build a path from the
+                # endpoint node to the next endpoint node
+                try:
+                    path = build_path(G, successor, endpoints, path=[node, successor])
+                    paths_to_simplify.append(path)
+                except RuntimeError:
+                    # recursion errors occur if some connected component is a
+                    # self-contained ring in which all nodes are not end points.
+                    # could also occur in extremely long street segments (eg, in
+                    # rural areas) with too many nodes between true endpoints.
+                    # handle it by just ignoring that component and letting its
+                    # topology remain intact (this should be a rare occurrence)
+                    # RuntimeError is what Python <3.5 will throw, Py3.5+ throws
+                    # RecursionError but it is a subtype of RuntimeError so it
+                    # still gets handled
+                    pass
+
+    return paths_to_simplify
+
+
+def is_endpoint(G, node, strict=True):
+    """
+    Return True if the node is a "real" endpoint of an edge in the network, \
+    otherwise False. OSM data includes lots of nodes that exist only as points \
+    to help streets bend around curves. An end point is a node that either: \
+    1) is its own neighbor, ie, it self-loops. \
+    2) or, has no incoming edges or no outgoing edges, ie, all its incident \
+        edges point inward or all its incident edges point outward. \
+    3) or, it does not have exactly two neighbors and degree of 2 or 4. \
+    4) or, if strict mode is false, if its edges have different OSM IDs. \
+
+    Parameters
+    ----------
+    G : networkx multidigraph
+        the input graph
+    node : int
+        the node to examine
+    strict : bool
+        if False, allow nodes to be end points even if they fail all other rules \
+        but have edges with different OSM IDs
+
+    Returns
+    -------
+    bool
+        whether the node is a real endpoint
+
+    """
+    neighbors = set(list(G.predecessors(node)) + list(G.successors(node)))
+    n = len(neighbors)
+    d = G.degree(node)
+
+    if node in neighbors:
+        # if the node appears in its list of neighbors, it self-loops. this is
+        # always an endpoint.
+        return "node in neighbours"
+
+    # if node has no incoming edges or no outgoing edges, it must be an endpoint
+    # elif G.out_degree(node)==0 or G.in_degree(node)==0:
+    # return 'no in or out'
+
+    elif not (n == 2 and (d == 2 or d == 4)):
+        # else, if it does NOT have 2 neighbors AND either 2 or 4 directed
+        # edges, it is an endpoint. either it has 1 or 3+ neighbors, in which
+        # case it is a dead-end or an intersection of multiple streets or it has
+        # 2 neighbors but 3 degree (indicating a change from oneway to twoway)
+        # or more than 4 degree (indicating a parallel edge) and thus is an
+        # endpoint
+        return "condition 3"
+
+    elif not strict:
+        # non-strict mode
+        osmids = []
+
+        # add all the edge OSM IDs for incoming edges
+        for u in G.predecessors(node):
+            for key in G[u][node]:
+                osmids.append(G.edges[u, node, key]["osmid"])
+
+        # add all the edge OSM IDs for outgoing edges
+        for v in G.successors(node):
+            for key in G[node][v]:
+                osmids.append(G.edges[node, v, key]["osmid"])
+
+        # if there is more than 1 OSM ID in the list of edge OSM IDs then it is
+        # an endpoint, if not, it isn't
+        return len(set(osmids)) > 1
+
+    else:
+        # if none of the preceding rules returned true, then it is not an endpoint
+        return False
+
+
+def build_path(G, node, endpoints, path):
+    """
+    Recursively build a path of nodes until you hit an endpoint node.
+
+    Parameters
+    ----------
+    G : networkx multidigraph
+        networkx multidigraph
+    node : int
+        the current node to start from
+    endpoints : set
+        the set of all nodes in the graph that are endpoints
+    path : list
+        the list of nodes in order in the path so far
+
+    Returns
+    -------
+    list
+        paths_to_simplify
+
+    """
+    # for each successor in the passed-in node
+    for successor in G.successors(node):
+        if successor not in path:
+            # if this successor is already in the path, ignore it, otherwise add
+            # it to the path
+            path.append(successor)
+            if successor not in endpoints:
+                # if this successor is not an endpoint, recursively call
+                # build_path until you find an endpoint
+                path = build_path(G, successor, endpoints, path)
+            else:
+                # if this successor is an endpoint, we've completed the path,
+                # so return it
+                return path
+
+    if (path[-1] not in endpoints) and (path[0] in G.successors(path[-1])):
+        # if the end of the path is not actually an endpoint and the path's
+        # first node is a successor of the path's final node, then this is
+        # actually a self loop, so add path's first node to end of path to
+        # close it
+        path.append(path[0])
+
+    return path
+
+
 def custom_simplify(G, strict=True):
     """
     Simplify a graph's topology by removing all nodes that are not intersections or dead-ends. Create an edge directly between the end points that encapsulate them, but retain the geometry of the original edges, saved as attribute in new edge.
@@ -2251,180 +2449,6 @@ def custom_simplify(G, strict=True):
         simplified networkx multidigraph
 
     """
-
-    def get_paths_to_simplify(G, strict=True):
-        """
-        Create a list of all the paths to be simplified between endpoint nodes.
-
-        The path is ordered from the first endpoint, through the interstitial nodes,
-        to the second endpoint. If your street network is in a rural area with many
-        interstitial nodes between true edge endpoints, you may want to increase
-        your system's recursion limit to avoid recursion errors.
-
-        Parameters
-        ----------
-        G : networkx multidigraph
-            networkx multidigraph
-        strict : bool
-            if False, allow nodes to be end points even if they fail all other rules
-            but have edges with different OSM IDs
-
-        Returns
-        -------
-        list
-            paths to be simplified
-
-        """
-        # first identify all the nodes that are endpoints
-        # start_time = time.time()
-        endpoints = set(
-            [node for node in G.nodes() if is_endpoint(G, node, strict=strict)]
-        )
-
-        # start_time = time.time()
-        paths_to_simplify = []
-
-        # for each endpoint node, look at each of its successor nodes
-        for node in endpoints:
-            for successor in G.successors(node):
-                if successor not in endpoints:
-                    # if the successor is not an endpoint, build a path from the
-                    # endpoint node to the next endpoint node
-                    try:
-                        path = build_path(
-                            G, successor, endpoints, path=[node, successor]
-                        )
-                        paths_to_simplify.append(path)
-                    except RuntimeError:
-                        # recursion errors occur if some connected component is a
-                        # self-contained ring in which all nodes are not end points.
-                        # could also occur in extremely long street segments (eg, in
-                        # rural areas) with too many nodes between true endpoints.
-                        # handle it by just ignoring that component and letting its
-                        # topology remain intact (this should be a rare occurrence)
-                        # RuntimeError is what Python <3.5 will throw, Py3.5+ throws
-                        # RecursionError but it is a subtype of RuntimeError so it
-                        # still gets handled
-                        pass
-
-        return paths_to_simplify
-
-    def is_endpoint(G, node, strict=True):
-        """
-        Return True if the node is a "real" endpoint of an edge in the network, \
-        otherwise False. OSM data includes lots of nodes that exist only as points \
-        to help streets bend around curves. An end point is a node that either: \
-        1) is its own neighbor, ie, it self-loops. \
-        2) or, has no incoming edges or no outgoing edges, ie, all its incident \
-            edges point inward or all its incident edges point outward. \
-        3) or, it does not have exactly two neighbors and degree of 2 or 4. \
-        4) or, if strict mode is false, if its edges have different OSM IDs. \
-
-        Parameters
-        ----------
-        G : networkx multidigraph
-            the input graph
-        node : int
-            the node to examine
-        strict : bool
-            if False, allow nodes to be end points even if they fail all other rules \
-            but have edges with different OSM IDs
-
-        Returns
-        -------
-        bool
-            whether the node is a real endpoint
-
-        """
-        neighbors = set(list(G.predecessors(node)) + list(G.successors(node)))
-        n = len(neighbors)
-        d = G.degree(node)
-
-        if node in neighbors:
-            # if the node appears in its list of neighbors, it self-loops. this is
-            # always an endpoint.
-            return "node in neighbours"
-
-        # if node has no incoming edges or no outgoing edges, it must be an endpoint
-        # elif G.out_degree(node)==0 or G.in_degree(node)==0:
-        # return 'no in or out'
-
-        elif not (n == 2 and (d == 2 or d == 4)):
-            # else, if it does NOT have 2 neighbors AND either 2 or 4 directed
-            # edges, it is an endpoint. either it has 1 or 3+ neighbors, in which
-            # case it is a dead-end or an intersection of multiple streets or it has
-            # 2 neighbors but 3 degree (indicating a change from oneway to twoway)
-            # or more than 4 degree (indicating a parallel edge) and thus is an
-            # endpoint
-            return "condition 3"
-
-        elif not strict:
-            # non-strict mode
-            osmids = []
-
-            # add all the edge OSM IDs for incoming edges
-            for u in G.predecessors(node):
-                for key in G[u][node]:
-                    osmids.append(G.edges[u, node, key]["osmid"])
-
-            # add all the edge OSM IDs for outgoing edges
-            for v in G.successors(node):
-                for key in G[node][v]:
-                    osmids.append(G.edges[node, v, key]["osmid"])
-
-            # if there is more than 1 OSM ID in the list of edge OSM IDs then it is
-            # an endpoint, if not, it isn't
-            return len(set(osmids)) > 1
-
-        else:
-            # if none of the preceding rules returned true, then it is not an endpoint
-            return False
-
-    def build_path(G, node, endpoints, path):
-        """
-        Recursively build a path of nodes until you hit an endpoint node.
-
-        Parameters
-        ----------
-        G : networkx multidigraph
-            networkx multidigraph
-        node : int
-            the current node to start from
-        endpoints : set
-            the set of all nodes in the graph that are endpoints
-        path : list
-            the list of nodes in order in the path so far
-
-        Returns
-        -------
-        list
-            paths_to_simplify
-
-        """
-        # for each successor in the passed-in node
-        for successor in G.successors(node):
-            if successor not in path:
-                # if this successor is already in the path, ignore it, otherwise add
-                # it to the path
-                path.append(successor)
-                if successor not in endpoints:
-                    # if this successor is not an endpoint, recursively call
-                    # build_path until you find an endpoint
-                    path = build_path(G, successor, endpoints, path)
-                else:
-                    # if this successor is an endpoint, we've completed the path,
-                    # so return it
-                    return path
-
-        if (path[-1] not in endpoints) and (path[0] in G.successors(path[-1])):
-            # if the end of the path is not actually an endpoint and the path's
-            # first node is a successor of the path's final node, then this is
-            # actually a self loop, so add path's first node to end of path to
-            # close it
-            path.append(path[0])
-
-        return path
-
     ## MAIN PROCESS FOR CUSTOM SIMPLIFY ##
 
     G = G.copy()
@@ -2500,6 +2524,40 @@ def custom_simplify(G, strict=True):
     return G
 
 
+def cut(line, distance):
+    """
+    Cuts a line in two at a distance from its starting point
+
+    Parameters
+    ----------
+    line : LineString
+        a shapely LineString object
+    distance : float
+        distance from start of line to cut
+
+    Returns
+    -------
+    list
+        list of two LineString objects
+
+    """
+    # Cuts a line in two at a distance from its starting point
+    if distance <= 0.0 or distance >= line.length:
+        return [LineString(line)]
+
+    coords = list(line.coords)
+    for i, p in enumerate(coords):
+        pd = line.project(Point(p))
+        if pd == distance:
+            return [LineString(coords[: i + 1]), LineString(coords[i:])]
+        if pd > distance:
+            cp = line.interpolate(distance)
+            return [
+                LineString(coords[:i] + [(cp.x, cp.y)]),
+                LineString([(cp.x, cp.y)] + coords[i:]),
+            ]
+
+
 def salt_long_lines(
     G, source, target, thresh=5000, factor=1, attr_list=None, geometry_tag="Wkt"
 ):
@@ -2527,40 +2585,6 @@ def salt_long_lines(
         a modified graph with the edited 'time' attribute
 
     """
-
-    def cut(line, distance):
-        """
-        Cuts a line in two at a distance from its starting point
-
-        Parameters
-        ----------
-        line : LineString
-            a shapely LineString object
-        distance : float
-            distance from start of line to cut
-
-        Returns
-        -------
-        list
-            list of two LineString objects
-
-        """
-        # Cuts a line in two at a distance from its starting point
-        if distance <= 0.0 or distance >= line.length:
-            return [LineString(line)]
-
-        coords = list(line.coords)
-        for i, p in enumerate(coords):
-            pd = line.project(Point(p))
-            if pd == distance:
-                return [LineString(coords[: i + 1]), LineString(coords[i:])]
-            if pd > distance:
-                cp = line.interpolate(distance)
-                return [
-                    LineString(coords[:i] + [(cp.x, cp.y)]),
-                    LineString([(cp.x, cp.y)] + coords[i:]),
-                ]
-
     G2 = G.copy()
     edges = edge_gdf_from_graph(G2, geometry_tag=geometry_tag)
     edges_projected = edges.to_crs(target)
@@ -2681,9 +2705,9 @@ def salt_long_lines(
                 new_nodes.append((new_node_ID, node_data))
 
             ## GENERATE NEW EDGES ##
-            result = None  # placeholder to define result tuple - will need to be debugged/fixed later
             # define geometry to be cutting (iterative)
             if i == 0:
+                result = None  # placeholder to define result tuple
                 geom_to_split = UTM_geom
 
             else:
@@ -2992,6 +3016,10 @@ def pandana_snap_to_many(
         return distance to nearest node in the units of the target_crs
     time_it : bool
         return time to complete function
+    k_nearest : int
+        k nearest neighbors to query for the nearest node
+    origin_id : str
+        key for the id in the points_gdf input, defaults to 'index'
 
     Returns
     -------
@@ -3111,8 +3139,8 @@ def pandana_snap_single_point(
 
     Returns
     -------
-    int
-        returns the id of the nearest node in the graph
+    object
+        returns the id of the nearest node in the graph, could be an integer, float, string, or really any object
 
     """
     node_gdf = node_gdf_from_graph(G)
@@ -3144,8 +3172,10 @@ def pandana_snap_points(
         a geodataframe of points
     target_gdf : gpd.GeoDataFrame
         a geodataframe of points, in the same source crs as the geometry of the source_gdfsg:32638'
-    target_crs : str
-        crs object in format 'epsg:32638'
+    source_crs : str, optional
+        crs object in format 'epsg:32638', by default 'epsg:4326'
+    target_crs : str, optional
+        crs object in format 'epsg:32638', by default 'epsg:4326'
     add_dist_to_node_col : bool
         return distance in metres to nearest node
 
@@ -3560,7 +3590,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
     gdf : geopandas.GeoDataFrame
         geopandas.GeoDataFrame the GeoDataFrame to be projected
     to_crs : str
-        string or pyproj.CRS if None, project to UTM zone in which gdf's centroid lies, otherwise project to this CRS
+        string or pyproj. CRS if None, project to UTM zone in which gdf's centroid lies, otherwise project to this CRS
     to_latlong : bool
         bool if True, project to settings.default_crs and ignore to_crs
 
@@ -3585,7 +3615,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
 
     # otherwise, automatically project the gdf to UTM
     else:
-        if ox.CRS.from_user_input(gdf.crs).is_projected:
+        if ox.projection.is_projected(gdf.crs):
             raise ValueError("Geometry must be unprojected to calculate UTM zone")
 
         # calculate longitude of centroid of union of all geometries in gdf
@@ -3653,51 +3683,6 @@ def gn_project_graph(G, to_crs=None):
     return G_proj
 
 
-def reproject_graph(input_net, source_crs, target_crs):
-    """
-    to-do: delete, is not working
-
-    Converts the node coordinates of a graph. Assumes that there are straight lines between the start and end nodes.
-
-    Parameters
-    ----------
-    input_net : nx.MultiDiGraph
-        a base network object (nx.MultiDiGraph)
-    source_crs : str
-        The projection of the input_net (epsg code)
-    target_crs : str
-        The projection input_net will be converted to (epsg code)
-
-    Returns
-    -------
-    nx.MultiDiGraph
-        returns a new network object that is the combination of the two input networks
-
-    """
-    # pyproj < 2.1
-    # project_WGS_UTM = partial(
-    #             pyproj.transform,
-    #             pyproj.Proj(init=source_crs),
-    #             pyproj.Proj(init=target_crs))
-
-    # pyproj >= 2.1.0
-    wgs84 = pyproj.CRS(source_crs)
-    utm = pyproj.CRS(target_crs)
-    project_WGS_UTM = pyproj.Transformer.from_crs(wgs84, utm, always_xy=True).transform
-
-    i = list(input_net.nodes(data=True))
-
-    for j in i:
-        # print(j[1])
-        # print(j[1]['x'])
-        # print(transform(project_WGS_UTM,j[1]['geom']))
-        j[1]["x"] = transform(project_WGS_UTM, j[1]["geom"]).x
-        j[1]["y"] = transform(project_WGS_UTM, j[1]["geom"]).y
-        # j[1]['geom'] = transform(project_WGS_UTM,j[1]['geom'])
-
-    return input_net
-
-
 def euclidean_distance(lat1, lon1, lat2, lon2):
     """
     Calculate the great circle distance between two points on the earth (specified in decimal degrees)
@@ -3757,6 +3742,358 @@ def utm_of_graph(G):
     utm_zone = math.floor((avg_lng + 180) / 6) + 1
     utm_crs = f"+proj=utm +zone={utm_zone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
     return utm_crs
+
+
+def find_kne(point, lines, near_idx):
+    """
+    Find the nearest edge (kne) to a given point from a set of lines.
+
+    Parameters
+    ----------
+    point : Point
+        The point for which to find the nearest edge.
+    lines : GeoDataFrame
+        The set of lines representing edges.
+    near_idx : array-like
+        The array-like object containing the indices of the nearest edges.
+
+    Returns
+    -------
+    kne_idx : int
+        The index of the nearest edge.
+    kne : Series
+        The geometry of the nearest edge.
+
+    """
+    # getting the distances between the point and the lines
+    dists = np.array(lines.distance(point))
+    kne_pos = dists.argsort()[0]
+    kne = lines.iloc[kne_pos]
+    kne_idx = near_idx[kne_pos]
+
+    # return the index of the nearest edge, and the geometry of the nearest edge
+    return kne_idx, kne
+
+
+def get_pp(point, line):
+    """Get the projected point (pp) of 'point' on 'line'.
+
+    Parameters
+    ----------
+    point : Point
+        The point to be projected.
+    line : LineString
+        The line on which the point is projected.
+
+    Returns
+    -------
+    Point
+        The projected point on the line.
+
+    """
+    # project new Point to be interpolated
+    pp = line.interpolate(line.project(point))  # PP as a Point
+
+    # reduce precision
+    # can't reduct it here because the split_function needs the point exactly on the line
+    # pp = loads(dumps(pp, rounding_precision=3))
+
+    return pp
+
+
+def split_line(line, pps):
+    """Split 'line' by all intersecting 'pps' (as multipoint).
+
+    Parameters
+    ----------
+    line : LineString
+        The line to be split.
+
+    pps : MultiPoint
+        The multipoint object containing all the points at which to split the line.
+
+    Returns
+    -------
+    list
+        a list of all line segments after the split
+
+    """
+    # IMPORTANT FIX for ensuring intersection between splitters and the line
+    # but no need for updating edges_meter manually because the old lines will be
+    # replaced anyway
+    # we want the tolerance to be really small, I changed it to a bigger tolerance of .5 meters and it caused
+    # the end of the line to snap to the PP therefore creating a gap
+    line = snap(line, pps, 1e-4)  # noqa
+
+    try:
+        # with Shapely ver 2, Geometry objects are not iterable, so you need to use the geoms property
+        new_lines = list(split(line, pps).geoms)  # noqa
+        return new_lines
+    except TypeError as e:
+        print("Error when splitting line: {}\n{}\n{}\n".format(e, line, pps))
+        return []
+
+
+def update_nodes(
+    nodes,
+    new_points,
+    ptype,
+    road_col,
+    node_key_col,
+    poi_key_col,
+    node_highway_pp,
+    node_highway_poi,
+    measure_crs="epsg:3857",
+    osmid_prefix=9990000000,
+):
+    """Update nodes with a list (pp) or a GeoDataFrame (poi) of new_points.
+
+    Parameters
+    ----------
+    nodes : GeoDataFrame
+        The original nodes GeoDataFrame.
+    new_points : GeoDataFrame or list
+        The new points to be added to the nodes.
+    ptype : str
+        type of Point list to append, 'pp' or 'poi'
+    measure_crs : str
+        the crs of the measure (epsg code)
+
+    Returns
+    -------
+    GeoDataFrame
+        The updated nodes GeoDataFrame.
+
+    """
+    ### NOTES
+    # node_highway_pp and node_highway_poi are not both needed, they are
+    # used conditionally depending on the ptype, so the parameters should be updated
+
+    # create gdf of new nodes (projected PAPs)
+    if ptype == "pp":
+        new_nodes = gpd.GeoDataFrame(new_points, columns=["geometry"], crs=measure_crs)
+        new_nodes[road_col] = node_highway_pp
+        n = len(new_nodes)
+        new_nodes[node_key_col] = [int(osmid_prefix + i) for i in range(n)]
+
+    # create gdf of new nodes (original POIs)
+    elif ptype == "poi":
+        new_nodes = new_points[["geometry", poi_key_col]]
+        new_nodes.columns = ["geometry", node_key_col]
+        new_nodes[road_col] = node_highway_poi
+
+    else:
+        print("Unknown ptype when updating nodes.")
+
+    # merge new nodes (it is safe to ignore the index for nodes)
+    gdfs = [nodes, new_nodes]
+    # nodespd = pd.concat(gdfs, ignore_index=True, sort=False)
+    nodes = gpd.GeoDataFrame(
+        pd.concat(gdfs, ignore_index=True, sort=False), crs=gdfs[0].crs
+    )
+    return nodes, new_nodes  # all nodes, newly added nodes only
+
+
+def update_edges(edges, new_lines, replace=True, nodes_meter=None, pois_meter=None):
+    """
+    Update edge info by adding new_lines; or,
+    replace existing ones with new_lines (n-split segments).
+
+    Parameters
+    ----------
+    edges : GeoDataFrame
+        The original edges GeoDataFrame.
+    new_lines : list
+        The new line segments to be added to the edges.
+    replace : bool
+        treat new_lines (flat list) as newly added edges if False,
+        else replace existing edges with new_lines (often a nested list)
+    nodes_meter : GeoDataFrame
+        The nodes GeoDataFrame.
+    pois_meter : GeoDataFrame
+        The POIs GeoDataFrame.
+
+    Returns
+    -------
+    GeoDataFrame
+        The updated edges GeoDataFrame.
+
+    Note:
+        kne_idx refers to 'fid in Rtree'/'label'/'loc', not positional iloc
+
+    """
+    ### NOTES
+    # line_pps_dict is never defined, where did it come from?
+    # same for 'itertools', 'measure_crs', 'pois', 'poi_key_col', 'oneway_tag',
+    # 'road_col', 'edge_highway', 'factor', 'u_tag', 'v_tag', 'nodes_id_dict',
+    # 'threshold', and maybe additional variables... DID THIS FUNCTION EVER WORK?
+
+    # for interpolation (split by pp): replicate old line
+    if replace:
+        # create a flattened gdf with all line segs and corresponding kne_idx
+        kne_idxs = list(line_pps_dict.keys())  # noqa
+        # print("print kne_idxs")
+        # print(kne_idxs)
+        # number of times each line is split
+        lens = [len(item) for item in new_lines]
+        # print("print lens")
+        # print(lens)
+        new_lines_gdf = gpd.GeoDataFrame(
+            {
+                "kne_idx": np.repeat(kne_idxs, lens),
+                "geometry": list(itertools.chain.from_iterable(new_lines)),  # noqa
+            },
+            crs=measure_crs,  # noqa
+        )
+        # merge to inherit the data of the replaced line
+        cols = list(edges.columns)
+        cols.remove("geometry")  # don't include the old geometry
+        new_edges = new_lines_gdf.merge(
+            edges[cols], how="left", left_on="kne_idx", right_index=True
+        )
+        new_edges.drop("kne_idx", axis=1, inplace=True)
+
+        # print('before')
+        # print(new_edges['geometry'])
+
+        # round nodes
+        new_edges["geometry"] = new_edges.apply(
+            lambda x: loads(dumps(x["geometry"], rounding_precision=3)), axis=1
+        )
+
+        print("after")
+        print(new_edges["geometry"])
+
+        new_lines = new_edges["geometry"]  # now a flatten list
+
+    # for connection (to external poi): append new lines
+    else:
+        new_edges = gpd.GeoDataFrame(
+            pois[[poi_key_col]],  # noqa
+            geometry=new_lines,
+            columns=[poi_key_col, "geometry"],  # noqa
+            crs=measure_crs,  # noqa
+        )
+        # round nodes
+        new_edges["geometry"] = new_edges.apply(
+            lambda x: loads(dumps(x["geometry"], rounding_precision=3)), axis=1
+        )
+        new_edges[oneway_tag] = True  # noqa
+        new_edges[road_col] = edge_highway  # noqa
+
+    # https://stackoverflow.com/questions/61955960/shapely-linestring-length-units
+    # update features (a bit slow)
+    # length is only calculated and added to new lines
+    new_edges["length"] = [line.length for line in new_lines]
+    if factor > 1:  # noqa
+        new_edges["length"] = [line.length / factor for line in new_lines]  # noqa
+    # try to apply below to just new lines?
+    if replace:
+        new_edges[u_tag] = new_edges["geometry"].map(  # noqa
+            lambda x: nodes_id_dict.get(list(x.coords)[0], None)  # noqa
+        )
+    else:
+        new_edges[u_tag] = new_edges[poi_key_col]  # noqa
+
+    new_edges[v_tag] = new_edges["geometry"].map(  # noqa
+        lambda x: nodes_id_dict.get(list(x.coords)[-1], None)  # noqa
+    )
+
+    print("debugging")
+    # debugging
+    for x in new_edges["geometry"]:
+        node_id_match = nodes_id_dict.get(list(x.coords)[0], None)  # noqa
+        if node_id_match is None:
+            print(f" node_id_match is None, coords are: {list(x.coords)[0]}")
+
+    # try:
+    #     # convert node_key_col to int if needed
+    #     new_edges[u_tag] = new_edges[u_tag].astype('int64')
+    # except:
+    #     print('error, to nodes of new edges need to be an int or convertible to an int')
+
+    # try:
+    #     # convert node_key_col to int if needed
+    #     new_edges[v_tag] = new_edges[v_tag].astype('int64')
+    # except:
+    #     print('error, from nodes of new edges need to be an int or convertible to an int')
+
+    new_edges[edge_key_col] = [  # noqa
+        "_".join(list(map(str, s)))
+        for s in zip(new_edges[v_tag], new_edges[u_tag])  # noqa
+    ]
+
+    # remember to reindex to prevent duplication when concat
+    start = edges.index[-1] + 1
+    stop = start + len(new_edges)
+    new_edges.index = range(start, stop)
+
+    # for interpolation: remove existing edges
+    if replace:
+        edges = edges.drop(kne_idxs, axis=0)
+    # for connection: filter invalid links
+    else:
+        unvalid_pos = np.where(new_edges["length"] > threshold)[0]  # noqa
+        # do not add new edges if they are longer than the threshold or if the length equals 0, if the length equals 0 that means the poi was overlaying an edge itself, therefore no extra edge needs to be created
+        # unvalid_pos = np.where((new_edges['length'] > threshold) | (new_edges['length'] == 0))[0]
+        unvalid_new_edges = new_edges.iloc[unvalid_pos]
+        # print("print invalid lines over threshold")
+        # print(unvalid_new_edges)
+
+        print(f"node count before: {nodes_meter.count()[0]}")
+        nodes_meter = nodes_meter[
+            ~nodes_meter[node_key_col].isin(unvalid_new_edges.stnode)  # noqa
+        ]
+        print(f"node count after: {nodes_meter.count()[0]}")
+
+        print(f"pois_meter count before: {pois_meter.count()[0]}")
+        pois_meter = pois_meter[~pois_meter[poi_key_col].isin(unvalid_new_edges.stnode)]  # noqa
+        print(f"pois_meter count after: {pois_meter.count()[0]}")
+
+        # valid_pos = np.where(new_edges['length'] <= threshold)[0]
+        valid_pos = np.where(
+            (new_edges["length"] <= threshold) & (new_edges["length"] > 0)  # noqa
+        )[0]
+        n = len(new_edges)
+        n_fault = n - len(valid_pos)
+        f_pct = n_fault / n * 100
+        print(
+            "Remove edge projections greater than threshold: {}/{} ({:.2f}%)".format(
+                n_fault, n, f_pct
+            )
+        )
+        new_edges = new_edges.iloc[valid_pos]  # use 'iloc' here
+
+    dfs = [edges, new_edges]
+    edges = gpd.GeoDataFrame(
+        pd.concat(dfs, ignore_index=False, sort=False), crs=dfs[0].crs
+    )
+
+    if nodes_meter is not None:
+        return edges, new_edges, nodes_meter, pois_meter
+    else:
+        # all edges, newly added edges only
+        return edges, new_edges
+
+
+def nearest_edge(row, Rtree, knn, edges_meter):
+    """
+    Finds the nearest edge(s) to a given point.
+
+    Parameters
+    ----------
+    row : pandas.Series
+        A row containing the point geometry.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the indices of the nearest edges and their corresponding geometries.
+
+    """
+    near_idx = list(Rtree.nearest(row["geometry"].bounds, knn))
+    near_lines = edges_meter["geometry"][near_idx]
+    return near_idx, near_lines
 
 
 def advanced_snap(
@@ -3822,8 +4159,6 @@ def advanced_snap(
 
     """
     import rtree
-    import itertools
-    from shapely.ops import snap, split
 
     pd.options.mode.chained_assignment = None
 
@@ -3856,7 +4191,7 @@ def advanced_snap(
     # set poi arguments
     node_highway_pp = "projected_pap"  # POI Access Point
     node_highway_poi = "poi"
-    edge_highway = "projected_footway"
+    # edge_highway = "projected_footway"
     osmid_prefix = 9990000000
 
     # convert CRS
@@ -3867,317 +4202,6 @@ def advanced_snap(
     # 0-1: helper functions
 
     # find nearest edge
-    def find_kne(point, lines, near_idx):
-        """
-        Find the nearest edge (kne) to a given point from a set of lines.
-
-        Parameters
-        ----------
-        point : Point
-            The point for which to find the nearest edge.
-        lines : GeoDataFrame
-            The set of lines representing edges.
-        near_idx : array-like
-            The array-like object containing the indices of the nearest edges.
-
-        Returns
-        -------
-        kne_idx : int
-            The index of the nearest edge.
-        kne : Series
-            The geometry of the nearest edge.
-
-        """
-        # getting the distances between the point and the lines
-        dists = np.array(list(map(lambda line: line.distance(point), lines)))
-        kne_pos = dists.argsort()[0]
-        kne = lines.iloc[kne_pos]
-        kne_idx = near_idx[kne_pos]
-
-        # return the index of the nearest edge, and the geometry of the nearest edge
-        return kne_idx, kne
-
-    def get_pp(point, line):
-        """Get the projected point (pp) of 'point' on 'line'.
-
-        Parameters
-        ----------
-        point : Point
-            The point to be projected.
-        line : LineString
-            The line on which the point is projected.
-
-        Returns
-        -------
-        Point
-            The projected point on the line.
-
-        """
-        # project new Point to be interpolated
-        pp = line.interpolate(line.project(point))  # PP as a Point
-
-        # reduce precision
-        # can't reduct it here because the split_function needs the point exactly on the line
-        # pp = loads(dumps(pp, rounding_precision=3))
-
-        return pp
-
-    def split_line(line, pps):
-        """Split 'line' by all intersecting 'pps' (as multipoint).
-
-        Parameters
-        ----------
-        line : LineString
-            The line to be split.
-
-        pps : MultiPoint
-            The multipoint object containing all the points at which to split the line.
-
-        Returns
-        -------
-        list
-            a list of all line segments after the split
-
-        """
-        # IMPORTANT FIX for ensuring intersection between splitters and the line
-        # but no need for updating edges_meter manually because the old lines will be
-        # replaced anyway
-        # we want the tolerance to be really small, I changed it to a bigger tolerance of .5 meters and it caused
-        # the end of the line to snap to the PP therefore creating a gap
-        line = snap(line, pps, 1e-4)  # slow?
-
-        try:
-            # with Shapely ver 2, Geometry objects are not iterable, so you need to use the geoms property
-            new_lines = list(split(line, pps).geoms)  # split into segments
-            return new_lines
-        except TypeError as e:
-            print("Error when splitting line: {}\n{}\n{}\n".format(e, line, pps))
-            return []
-
-    def update_nodes(nodes, new_points, ptype, measure_crs="epsg:3857"):
-        """Update nodes with a list (pp) or a GeoDataFrame (poi) of new_points.
-
-        Parameters
-        ----------
-        nodes : GeoDataFrame
-            The original nodes GeoDataFrame.
-        new_points : GeoDataFrame or list
-            The new points to be added to the nodes.
-        ptype : str
-            type of Point list to append, 'pp' or 'poi'
-        measure_crs : str
-            the crs of the measure (epsg code)
-
-        Returns
-        -------
-        GeoDataFrame
-            The updated nodes GeoDataFrame.
-
-        """
-        nonlocal osmid_prefix
-
-        # create gdf of new nodes (projected PAPs)
-        if ptype == "pp":
-            new_nodes = gpd.GeoDataFrame(
-                new_points, columns=["geometry"], crs=measure_crs
-            )
-            new_nodes[road_col] = node_highway_pp
-            n = len(new_nodes)
-            new_nodes[node_key_col] = [int(osmid_prefix + i) for i in range(n)]
-
-        # create gdf of new nodes (original POIs)
-        elif ptype == "poi":
-            new_nodes = new_points[["geometry", poi_key_col]]
-            new_nodes.columns = ["geometry", node_key_col]
-            new_nodes[road_col] = node_highway_poi
-
-        else:
-            print("Unknown ptype when updating nodes.")
-
-        # merge new nodes (it is safe to ignore the index for nodes)
-        gdfs = [nodes, new_nodes]
-        # nodespd = pd.concat(gdfs, ignore_index=True, sort=False)
-        nodes = gpd.GeoDataFrame(
-            pd.concat(gdfs, ignore_index=True, sort=False), crs=gdfs[0].crs
-        )
-        return nodes, new_nodes  # all nodes, newly added nodes only
-
-    def update_edges(edges, new_lines, replace=True, nodes_meter=None, pois_meter=None):
-        """
-        Update edge info by adding new_lines; or,
-        replace existing ones with new_lines (n-split segments).
-
-        Parameters
-        ----------
-        edges : GeoDataFrame
-            The original edges GeoDataFrame.
-        new_lines : list
-            The new line segments to be added to the edges.
-        replace : bool
-            treat new_lines (flat list) as newly added edges if False,
-            else replace existing edges with new_lines (often a nested list)
-        nodes_meter : GeoDataFrame
-            The nodes GeoDataFrame.
-        pois_meter : GeoDataFrame
-            The POIs GeoDataFrame.
-
-        Returns
-        -------
-        GeoDataFrame
-            The updated edges GeoDataFrame.
-
-        Note:
-            kne_idx refers to 'fid in Rtree'/'label'/'loc', not positional iloc
-
-        """
-        # for interpolation (split by pp): replicate old line
-        if replace:
-            # create a flattened gdf with all line segs and corresponding kne_idx
-            kne_idxs = list(line_pps_dict.keys())
-            # print("print kne_idxs")
-            # print(kne_idxs)
-            # number of times each line is split
-            lens = [len(item) for item in new_lines]
-            # print("print lens")
-            # print(lens)
-            new_lines_gdf = gpd.GeoDataFrame(
-                {
-                    "kne_idx": np.repeat(kne_idxs, lens),
-                    "geometry": list(itertools.chain.from_iterable(new_lines)),
-                },
-                crs=measure_crs,
-            )
-            # merge to inherit the data of the replaced line
-            cols = list(edges.columns)
-            cols.remove("geometry")  # don't include the old geometry
-            new_edges = new_lines_gdf.merge(
-                edges[cols], how="left", left_on="kne_idx", right_index=True
-            )
-            new_edges.drop("kne_idx", axis=1, inplace=True)
-
-            # print('before')
-            # print(new_edges['geometry'])
-
-            # round nodes
-            new_edges["geometry"] = new_edges.apply(
-                lambda x: loads(dumps(x["geometry"], rounding_precision=3)), axis=1
-            )
-
-            print("after")
-            print(new_edges["geometry"])
-
-            new_lines = new_edges["geometry"]  # now a flatten list
-
-        # for connection (to external poi): append new lines
-        else:
-            new_edges = gpd.GeoDataFrame(
-                pois[[poi_key_col]],
-                geometry=new_lines,
-                columns=[poi_key_col, "geometry"],
-                crs=measure_crs,
-            )
-            # round nodes
-            new_edges["geometry"] = new_edges.apply(
-                lambda x: loads(dumps(x["geometry"], rounding_precision=3)), axis=1
-            )
-            new_edges[oneway_tag] = True
-            new_edges[road_col] = edge_highway
-
-        # https://stackoverflow.com/questions/61955960/shapely-linestring-length-units
-        # update features (a bit slow)
-        # length is only calculated and added to new lines
-        new_edges["length"] = [line.length for line in new_lines]
-        if factor > 1:
-            new_edges["length"] = [line.length / factor for line in new_lines]
-        # try to apply below to just new lines?
-        if replace:
-            new_edges[u_tag] = new_edges["geometry"].map(
-                lambda x: nodes_id_dict.get(list(x.coords)[0], None)
-            )
-        else:
-            new_edges[u_tag] = new_edges[poi_key_col]
-
-        new_edges[v_tag] = new_edges["geometry"].map(
-            lambda x: nodes_id_dict.get(list(x.coords)[-1], None)
-        )
-
-        print("debugging")
-        # debugging
-        for x in new_edges["geometry"]:
-            node_id_match = nodes_id_dict.get(list(x.coords)[0], None)
-            if node_id_match is None:
-                print(f" node_id_match is None, coords are: {list(x.coords)[0]}")
-
-        # try:
-        #     # convert node_key_col to int if needed
-        #     new_edges[u_tag] = new_edges[u_tag].astype('int64')
-        # except:
-        #     print('error, to nodes of new edges need to be an int or convertible to an int')
-
-        # try:
-        #     # convert node_key_col to int if needed
-        #     new_edges[v_tag] = new_edges[v_tag].astype('int64')
-        # except:
-        #     print('error, from nodes of new edges need to be an int or convertible to an int')
-
-        new_edges[edge_key_col] = [
-            "_".join(list(map(str, s))) for s in zip(new_edges[v_tag], new_edges[u_tag])
-        ]
-
-        # remember to reindex to prevent duplication when concat
-        start = edges.index[-1] + 1
-        stop = start + len(new_edges)
-        new_edges.index = range(start, stop)
-
-        # for interpolation: remove existing edges
-        if replace:
-            edges = edges.drop(kne_idxs, axis=0)
-        # for connection: filter invalid links
-        else:
-            unvalid_pos = np.where(new_edges["length"] > threshold)[0]
-            # do not add new edges if they are longer than the threshold or if the length equals 0, if the length equals 0 that means the poi was overlaying an edge itself, therefore no extra edge needs to be created
-            # unvalid_pos = np.where((new_edges['length'] > threshold) | (new_edges['length'] == 0))[0]
-            unvalid_new_edges = new_edges.iloc[unvalid_pos]
-            # print("print invalid lines over threshold")
-            # print(unvalid_new_edges)
-
-            print(f"node count before: {nodes_meter.count()[0]}")
-            nodes_meter = nodes_meter[
-                ~nodes_meter[node_key_col].isin(unvalid_new_edges.stnode)
-            ]
-            print(f"node count after: {nodes_meter.count()[0]}")
-
-            print(f"pois_meter count before: {pois_meter.count()[0]}")
-            pois_meter = pois_meter[
-                ~pois_meter[poi_key_col].isin(unvalid_new_edges.stnode)
-            ]
-            print(f"pois_meter count after: {pois_meter.count()[0]}")
-
-            # valid_pos = np.where(new_edges['length'] <= threshold)[0]
-            valid_pos = np.where(
-                (new_edges["length"] <= threshold) & (new_edges["length"] > 0)
-            )[0]
-            n = len(new_edges)
-            n_fault = n - len(valid_pos)
-            f_pct = n_fault / n * 100
-            print(
-                "Remove edge projections greater than threshold: {}/{} ({:.2f}%)".format(
-                    n_fault, n, f_pct
-                )
-            )
-            new_edges = new_edges.iloc[valid_pos]  # use 'iloc' here
-
-        dfs = [edges, new_edges]
-        edges = gpd.GeoDataFrame(
-            pd.concat(dfs, ignore_index=False, sort=False), crs=dfs[0].crs
-        )
-
-        if nodes_meter is not None:
-            return edges, new_edges, nodes_meter, pois_meter
-        else:
-            # all edges, newly added edges only
-            return edges, new_edges
-
     print("print edges_meter")
     # print(edges_meter)
 
@@ -4199,7 +4223,16 @@ def advanced_snap(
 
     print("updating external nodes (pois)")
     nodes_meter, _ = update_nodes(
-        nodes_meter, pois_meter, ptype="poi", measure_crs=measure_crs
+        nodes_meter,
+        pois_meter,
+        ptype="poi",
+        road_col=road_col,
+        node_key_col=node_key_col,
+        poi_key_col=poi_key_col,
+        node_highway_pp=node_highway_pp,
+        node_highway_poi=node_highway_poi,
+        measure_crs=measure_crs,
+        osmid_prefix=osmid_prefix,
     )
 
     if verbose is True:
@@ -4217,25 +4250,6 @@ def advanced_snap(
 
     # pois_meter['near_lines'] = [edges_meter['geometry'][near_idx]
     # for near_idx in pois_meter['near_idx']]  # very slow
-
-    def nearest_edge(row):
-        """
-        Finds the nearest edge(s) to a given point.
-
-        Parameters
-        ----------
-        row : pandas.Series
-            A row containing the point geometry.
-
-        Returns
-        -------
-        tuple
-            A tuple containing the indices of the nearest edges and their corresponding geometries.
-
-        """
-        near_idx = list(Rtree.nearest(row["geometry"].bounds, knn))
-        near_lines = edges_meter["geometry"][near_idx]
-        return near_idx, near_lines
 
     # debug
     # return pois_meter, edges_meter
@@ -4309,7 +4323,16 @@ def advanced_snap(
     # update nodes
     print("Updating internal nodes...")
     nodes_meter, _new_nodes = update_nodes(
-        nodes_meter, list(pp_column), ptype="pp", measure_crs=measure_crs
+        nodes_meter,
+        list(pp_column),
+        ptype="pp",
+        road_col=road_col,
+        node_key_col=node_key_col,
+        poi_key_col=poi_key_col,
+        node_highway_pp=node_highway_pp,
+        node_highway_poi=node_highway_poi,
+        measure_crs=measure_crs,
+        osmid_prefix=osmid_prefix,
     )
 
     if verbose is True:
