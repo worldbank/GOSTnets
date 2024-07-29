@@ -644,10 +644,10 @@ Then we can look at the infrastructure types in the filtered roads DataFrame (si
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:647,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, autolim, **style_kwds)</span>
-<span class="g g-Whitespace">    </span><span class="mi">646</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">647</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="g g-Whitespace">    </span><span class="mi">648</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:673,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, **style_kwds)</span>
+<span class="g g-Whitespace">    </span><span class="mi">672</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">673</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="g g-Whitespace">    </span><span class="mi">674</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
 
 <span class="ne">ModuleNotFoundError</span>: No module named &#39;matplotlib&#39;
 
@@ -658,24 +658,24 @@ Then we can look at the infrastructure types in the filtered roads DataFrame (si
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># visualize the clip area</span>
 <span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">clip_shp</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:968,</span> in <span class="ni">GeoplotAccessor.__call__</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">966</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span> <span class="s2">&quot;geo&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">967</span> <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;geo&quot;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">968</span>     <span class="k">return</span> <span class="n">plot_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">969</span> <span class="k">if</span> <span class="n">kind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pandas_kinds</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">970</span>     <span class="c1"># Access pandas plots</span>
-<span class="g g-Whitespace">    </span><span class="mi">971</span>     <span class="k">return</span> <span class="n">PlotAccessor</span><span class="p">(</span><span class="n">data</span><span class="p">)(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:979,</span> in <span class="ni">GeoplotAccessor.__call__</span><span class="nt">(self, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">977</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span> <span class="s2">&quot;geo&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">978</span> <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;geo&quot;</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">979</span>     <span class="k">return</span> <span class="n">plot_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">980</span> <span class="k">if</span> <span class="n">kind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pandas_kinds</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">981</span>     <span class="c1"># Access pandas plots</span>
+<span class="g g-Whitespace">    </span><span class="mi">982</span>     <span class="k">return</span> <span class="n">PlotAccessor</span><span class="p">(</span><span class="n">data</span><span class="p">)(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:649,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, autolim, **style_kwds)</span>
-<span class="g g-Whitespace">    </span><span class="mi">647</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="g g-Whitespace">    </span><span class="mi">648</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">649</span>     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">650</span>         <span class="s2">&quot;The matplotlib package is required for plotting in geopandas. &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">651</span>         <span class="s2">&quot;You can install it using &#39;conda install -c conda-forge matplotlib&#39; or &quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">652</span>         <span class="s2">&quot;&#39;pip install matplotlib&#39;.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">653</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">655</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">656</span>     <span class="k">if</span> <span class="n">cax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/geopandas/plotting.py:675,</span> in <span class="ni">plot_dataframe</span><span class="nt">(df, column, cmap, color, ax, cax, categorical, legend, scheme, k, vmin, vmax, markersize, figsize, legend_kwds, categories, classification_kwds, missing_kwds, aspect, **style_kwds)</span>
+<span class="g g-Whitespace">    </span><span class="mi">673</span>     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="g g-Whitespace">    </span><span class="mi">674</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">675</span>     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">676</span>         <span class="s2">&quot;The matplotlib package is required for plotting in geopandas. &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">677</span>         <span class="s2">&quot;You can install it using &#39;conda install -c conda-forge matplotlib&#39; or &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">678</span>         <span class="s2">&quot;&#39;pip install matplotlib&#39;.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">679</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">681</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">682</span>     <span class="k">if</span> <span class="n">cax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
 <span class="ne">ImportError</span>: The matplotlib package is required for plotting in geopandas. You can install it using &#39;conda install -c conda-forge matplotlib&#39; or &#39;pip install matplotlib&#39;.
 </pre></div>

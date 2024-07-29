@@ -349,8 +349,6 @@ document.write(`
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/GOSTnets.html#GOSTnets.core.add_missing_reflected_edges_old">add_missing_reflected_edges_old() (in module GOSTnets.core)</a>
-</li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.advanced_snap">advanced_snap() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.assign_traffic_times">assign_traffic_times() (in module GOSTnets.core)</a>
@@ -362,6 +360,10 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/GOSTnets.html#GOSTnets.fetch_pois.OsmObject.bbox">bbox (GOSTnets.fetch_pois.OsmObject attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.build_path">build_path() (in module GOSTnets.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -377,6 +379,10 @@ document.write(`
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.calculate_od_raw.calculateOD_gdf">calculateOD_gdf() (in module GOSTnets.calculate_od_raw)</a>
 </li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.chck">chck() (in module GOSTnets.core)</a>
+</li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.check">check() (in module GOSTnets.core)</a>
+</li>
       <li><a href="api/GOSTnets.html#GOSTnets.network_clean.clean_network">clean_network() (in module GOSTnets.network_clean)</a>
 </li>
   </ul></td>
@@ -385,6 +391,8 @@ document.write(`
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.combo_csv_to_graph">combo_csv_to_graph() (in module GOSTnets.core)</a>
 </li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.convert">convert() (in module GOSTnets.core)</a>
+</li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.convert_network_to_time">convert_network_to_time() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.convert_to_MultiDiGraph">convert_to_MultiDiGraph() (in module GOSTnets.core)</a>
@@ -392,6 +400,8 @@ document.write(`
       <li><a href="api/GOSTnets.html#GOSTnets.fetch_od.CreateODMatrix">CreateODMatrix() (in module GOSTnets.fetch_od)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.custom_simplify">custom_simplify() (in module GOSTnets.core)</a>
+</li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.cut">cut() (in module GOSTnets.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -433,11 +443,17 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/GOSTnets.html#GOSTnets.osm_parser.fetch_roads_OSM">fetch_roads_OSM() (in module GOSTnets.osm_parser)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/GOSTnets.html#GOSTnets.core.find_graph_avg_speed">find_graph_avg_speed() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.find_hwy_distances_by_class">find_hwy_distances_by_class() (in module GOSTnets.core)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.find_kne">find_kne() (in module GOSTnets.core)</a>
+</li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.first_val">first_val() (in module GOSTnets.core)</a>
+</li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.flatten">flatten() (in module GOSTnets.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -448,6 +464,10 @@ document.write(`
       <li><a href="api/GOSTnets.html#GOSTnets.core.generate_isochrones">generate_isochrones() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.fetch_pois.OsmObject.GenerateOSMPOIs">GenerateOSMPOIs() (GOSTnets.fetch_pois.OsmObject method)</a>
+</li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.get_paths_to_simplify">get_paths_to_simplify() (in module GOSTnets.core)</a>
+</li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.get_pp">get_pp() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.gn_project_graph">gn_project_graph() (in module GOSTnets.core)</a>
 </li>
@@ -536,6 +556,10 @@ document.write(`
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.is_endpoint">is_endpoint() (in module GOSTnets.core)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="J">J</h2>
@@ -600,10 +624,12 @@ document.write(`
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.osm_parser.Way.nds">nds (GOSTnets.osm_parser.Way attribute)</a>
 </li>
-      <li><a href="api/GOSTnets.html#GOSTnets.core.new_edge_generator">new_edge_generator() (in module GOSTnets.core)</a>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.nearest_edge">nearest_edge() (in module GOSTnets.core)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.new_edge_generator">new_edge_generator() (in module GOSTnets.core)</a>
+</li>
       <li><a href="api/GOSTnets.html#GOSTnets.osm_parser.Node">Node (class in GOSTnets.osm_parser)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.node_gdf_from_graph">node_gdf_from_graph() (in module GOSTnets.core)</a>
@@ -660,17 +686,15 @@ document.write(`
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.osm_parser.read_osm">read_osm() (in module GOSTnets.osm_parser)</a>
 </li>
-      <li><a href="api/GOSTnets.html#GOSTnets.fetch_od.ReadMe">ReadMe() (in module GOSTnets.fetch_od)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/GOSTnets.html#GOSTnets.fetch_od.ReadMe">ReadMe() (in module GOSTnets.fetch_od)</a>
+</li>
       <li><a href="api/GOSTnets.html#GOSTnets.fetch_pois.OsmObject.RelationtoPoint">RelationtoPoint() (GOSTnets.fetch_pois.OsmObject method)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.remove_duplicate_edges">remove_duplicate_edges() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.fetch_pois.OsmObject.RemoveDupes">RemoveDupes() (GOSTnets.fetch_pois.OsmObject method)</a>
-</li>
-      <li><a href="api/GOSTnets.html#GOSTnets.core.reproject_graph">reproject_graph() (in module GOSTnets.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -684,13 +708,17 @@ document.write(`
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.fetch_pois.OsmObject.Save">Save() (GOSTnets.fetch_pois.OsmObject method)</a>
 </li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.save">save() (in module GOSTnets.core)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/GOSTnets.html#GOSTnets.core.save">save() (in module GOSTnets.core)</a>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.selector">selector() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.simplify_junctions">simplify_junctions() (in module GOSTnets.core)</a>
 </li>
       <li><a href="api/GOSTnets.html#GOSTnets.osm_parser.Way.split">split() (GOSTnets.osm_parser.Way method)</a>
+</li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.split_line">split_line() (in module GOSTnets.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -714,8 +742,12 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/GOSTnets.html#GOSTnets.core.unbundle_geometry">unbundle_geometry() (in module GOSTnets.core)</a>
 </li>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.update_edges">update_edges() (in module GOSTnets.core)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/GOSTnets.html#GOSTnets.core.update_nodes">update_nodes() (in module GOSTnets.core)</a>
+</li>
       <li><a href="api/GOSTnets.html#GOSTnets.core.utm_of_graph">utm_of_graph() (in module GOSTnets.core)</a>
 </li>
   </ul></td>
