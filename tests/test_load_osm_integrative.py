@@ -11,7 +11,6 @@ class TestOSMtoNetwork:
     osm_file = pooch.retrieve(
         url="http://download.geofabrik.de/europe/iceland-latest.osm.pbf",
         known_hash=None,
-        # known_hash="md5:d4cab811ec9a3ecad5e76d9838be3dec",
     )
 
     def test_OSM_to_network(self):
