@@ -126,3 +126,6 @@ docs/conf.py
 docs/api/GOSTnets.rst
 docs/api/modules.rst
 _build/
+
+# MyST build outputs
+_build

@@ -145,4 +145,4 @@ These docstrings have been written for every function, and should help new and o
 
 ## License
 
-This licensed under the [**MIT License**](https://opensource.org/license/mit). This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This licensed under the [**MIT License**](https://opensource.org/license/mit). This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.

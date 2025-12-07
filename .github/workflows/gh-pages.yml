@@ -1,4 +1,5 @@
 name: docs
+
 on:
   push:
   pull_request:
@@ -8,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -15,14 +18,10 @@ jobs:
           cache: "pip"
       - name: Dependencies
         run: |
-          if [ -f pyproject.toml ]; then pip install ".[docs]"; fi
-      - name: Clear notebooks and create conf.py file
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+      - name: Build Jupyter Book
         run: |
-          jupyter-book config sphinx docs/
-          jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --clear-output --inplace $(find . -type f -name '*.ipynb')
-      - name: Build Sphinx Documentation
-        run: |
-          sphinx-build docs _build/html -b html
+          jupyter-book build docs/
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main' && job.status == 'success'

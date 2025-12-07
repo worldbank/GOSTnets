@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "GOSTnets"
-dynamic = ["version"]
-description = "Networkx wrapper to simplify network analysis using geospatial data"
+dynamic = ["version", "dependencies", "optional-dependencies"]
+description = "Network wrapper to simplify network analysis using geospatial data"
 readme = { file = "README.md", content-type = "text/markdown" }
-license = { file = "LICENSE" }
+license = { file = "LICENSE.md" }
 authors = [{ name = "World Bank", email = "github@worldbank.org" }]
 maintainers = [
 	{ name = "Benjamin P. Stewart", email = "bstewart@worldbankgroup.org" },
@@ -20,41 +20,19 @@ classifiers = [
 	"Operating System :: OS Independent",
 ]
 requires-python = ">=3.8"
-dependencies = [
-	"geojson",
-	"geopandas",
-	"networkx",
-	"numpy",
-	"osmnx>=1.0.1",
-	"pandas>=0.23.5",
-	"pyproj>=2.4.2",
-	"rasterio",
-	"rtree>=0.9.3",
-	"scipy",
-	"shapely",
-	"boltons",
-	"geopy"
-]
-
-[project.optional-dependencies]
-dev = ["pre-commit", "pytest", "pytest-cov", "tomli", "coverage[toml]", "GOStnets[docs,osm,opt]", "pooch"]
-docs = [
-	"docutils==0.17.1",
-	"jupyter-book>=1,<2",
-	"sphinxcontrib-apidoc>=0.4.0,<1",
-	"jupyter-cache>=0.6.0",
-	"nbconvert",
-]
-osm = ["gdal"]
-opt = ["pulp"]
 
 [project.urls]
 "Homepage" = "https://github.com/worldbank/GOSTnets"
 "Bug Reports" = "https://github.com/worldbank/GOSTnets/issues"
 "Source" = "https://github.com/worldbank/GOSTnets"
 
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = { file = ["requirements-dev.txt"] }
+
 [tool.setuptools_scm]
-write_to = "src/GOSTnets/_version.py"
 
 [tool.codespell]
 skip = 'docs/_build,docs/references.bib,__pycache__,*.png,*.gz,*.whl'
@@ -72,6 +50,5 @@ omit = [
 	"tests/*",
 	"docs/*",
 	"Tutorials/*",
-	"src/GOSTnets/_version.py",
 	"src/GOSTnets/__init__.py",
 ]
