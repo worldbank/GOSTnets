@@ -18,6 +18,11 @@ jobs:
       OS: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Install GDAL system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin libgdal-dev
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: false
