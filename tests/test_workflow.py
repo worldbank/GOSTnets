@@ -2,7 +2,7 @@
 
 import pytest
 import geopandas as gpd
-import os
+from pathlib import Path
 import GOSTnets as gn
 from GOSTnets.load_osm import OSM_to_network
 import shapely
@@ -10,12 +10,14 @@ import networkx as nx
 
 
 def test_workflow():
-    pth = "Tutorials"  # change this path to your working folder
-    fil = r"iceland-latest.osm.pbf"  # download this file from geofabrik: http://download.geofabrik.de/europe/iceland.html.
+    pth = (
+        Path(__file__).resolve().parent.parent / "docs" / "tutorials"
+    )  # change this path to your working folder
+    fil = "iceland-latest.osm.pbf"  # download this file from geofabrik: http://download.geofabrik.de/europe/iceland.html.
 
     # be sure to place the .osm.pbf file in the 'tutorial data' folder.
 
-    f = os.path.join(pth, "tutorial_data", fil)
+    f = pth / "tutorial_data" / fil
 
     # convert the .osm.pbf file to a GOSTnets object
     iceland = OSM_to_network(f)
@@ -46,7 +48,7 @@ def test_workflow():
     assert og_counts.shape[0] > new_counts.shape[0]
 
     # read the shapefile for the clip area
-    clip_shp = gpd.read_file(os.path.join(pth, "tutorial_data", "rek2.shp"))
+    clip_shp = gpd.read_file(pth / "tutorial_data" / "rek2.shp")
     clip_shp = clip_shp.to_crs("epsg:4326")
     clip_shp_obj = clip_shp.geometry.iloc[0]
     assert isinstance(clip_shp, gpd.GeoDataFrame)
@@ -95,12 +97,12 @@ def test_workflow():
     )
     assert isinstance(G_time, nx.classes.multidigraph.MultiDiGraph)
 
-    rek = gpd.read_file(os.path.join(pth, "tutorial_data", "rek2.shp"))
+    rek = gpd.read_file(pth / "tutorial_data" / "rek2.shp")
     assert isinstance(rek, gpd.GeoDataFrame)
     rek = rek.to_crs("epsg:4326")
     poly = rek.geometry.iloc[0]
 
-    churches = gpd.read_file(os.path.join(pth, "tutorial_data", "churches.shp"))
+    churches = gpd.read_file(pth / "tutorial_data" / "churches.shp")
     assert isinstance(churches, gpd.GeoDataFrame)
     churches = churches.loc[churches.within(poly)]
 

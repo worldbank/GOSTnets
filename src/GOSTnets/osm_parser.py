@@ -475,8 +475,14 @@ def fetch_roads_OSM(
         A GeoDataFrame of OSM roads
 
     """
+    osm_path = Path(osm_path)
+    if not osm_path.exists():
+        raise FileNotFoundError(f"OSM file not found: {osm_path}")
+
     driver = ogr.GetDriverByName("OSM")
-    data = driver.Open(osm_path)
+    data = driver.Open(str(osm_path))
+    if data is None:
+        raise ValueError(f"OGR could not open OSM file: {osm_path}")
 
     sql_lyr = data.ExecuteSQL(
         "SELECT osm_id,highway FROM lines WHERE highway IS NOT NULL"

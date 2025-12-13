@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   ubuntu-build:
     runs-on: ubuntu-latest
@@ -22,8 +25,19 @@ jobs:
           channels: conda-forge
           channel-priority: strict
 
-      - name: Install dependencies then test
+      - name: Install system deps (conda) and run tests
         run: |
           conda install -y python=3.10 gdal pip
-          python -m pip install .[dev]
+
+          # Sanity-check that GDAL has the OSM driver and ogrinfo is available
+          ogrinfo --formats | grep -i "OSM"
+
+          # Ensure the test PBF exists (repo usually doesn't ship large files)
+          mkdir -p Tutorials/tutorial_data
+          curl -L -o Tutorials/tutorial_data/iceland-latest.osm.pbf \
+            https://download.geofabrik.de/europe/monaco-latest.osm.pbf
+
+          # Install from working tree so coverage measures your code (not site-packages wheel)
+          python -m pip install -e .[dev]
+
           python -m coverage run -m pytest
