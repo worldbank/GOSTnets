@@ -4,9 +4,7 @@ import numpy as np
 
 from scipy import interpolate
 from rasterio import features
-# from rasterio.mask import mask
-# from rasterio.features import rasterize
-# from rasterio.warp import reproject, Resampling
+
 
 
 def rasterize_od_results(inD, outFile, field, template=None):
