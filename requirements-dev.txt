@@ -11,5 +11,4 @@ jupyter-cache>=0.6.0
 nbconvert
 # optional extras
 pooch
-gdal
 pulp
