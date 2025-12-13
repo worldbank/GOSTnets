@@ -4,68 +4,83 @@
 
 Represents an object for fetching and processing OpenStreetMap Points of Interest (POIs).
 
-### `OsmObject.RelationtoPoint(string)`
+## `OsmObject.RelationtoPoint(string)`
 
-**Description**
+**Description:**
+
 Converts a relation geometry to a point geometry.
 
-**Parameters**
+**Parameters:**
+
 - `string` (shapely.geometry): The relation geometry to be converted.
 
-**Returns**
+**Returns:**
+
 - shapely.geometry.Point: The centroid of the relation geometry if it is a Polygon, otherwise the centroid of the MultiPolygon formed by the relation geometry's constituent geometries.
 
 ---
 
-### `OsmObject.GenerateOSMPOIs()`
+## `OsmObject.GenerateOSMPOIs()`
 
-**Description**
+**Description:**
+
 Generates OpenStreetMap Points of Interest (POIs) within a given bounding box.
 
-**Parameters**
+**Parameters:**
+
 - None
 
-**Returns**
+**Returns:**
+
 - pandas.DataFrame: A DataFrame containing the generated POIs.
 
 ---
 
-### `OsmObject.RemoveDupes(buf_width, crs='epsg:4326')`
+## `OsmObject.RemoveDupes(buf_width, crs='epsg:4326')`
 
-**Description**
+**Description:**
+
 Remove duplicate geometries from the GeoDataFrame.
 
-**Parameters**
+**Parameters:**
+
 - `buf_width` (float): The buffer width used for checking intersection.
 - `crs` (str, optional): The coordinate reference system. Defaults to "epsg:4326".
 
-**Returns**
+**Returns:**
+
 - pandas.DataFrame: The GeoDataFrame with duplicate geometries removed.
 
 ---
 
-### `OsmObject.prepForMA()`
+## `OsmObject.prepForMA()`
 
-**Description**
+**Description:**
+
 Prepare results data frame for use in the OSRM functions in OD.
 
-**Parameters**
+**Parameters:**
+
 - None
 
-**Returns**
+**Returns:**
+
 - pandas.DataFrame: The modified data frame with added fields and removed geometry fields.
 
 ---
 
-### `OsmObject.Save(outFolder)`
+## `OsmObject.Save(outFolder)`
 
-**Description**
+**Description:**
+
 Save the dataframe as a CSV file in the specified output folder.
 
-**Parameters**
+**Parameters:**
+
 - `outFolder` (str): The name of the output folder.
 
-**Returns**
+**Returns:**
+
 - None
 
 ---

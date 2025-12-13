@@ -1,11 +1,13 @@
 # fetch_od.py
 
-### `CreateODMatrix(infile, infile_2, lat_name='Lat', lon_name='Lon', UID='ID', Pop=None, call_type='OSRM', rescue=0, rescue_num=0, MB_Token='', sleepTime=5, osrmHeader='')`
+## `CreateODMatrix(infile, infile_2, lat_name='Lat', lon_name='Lon', UID='ID', Pop=None, call_type='OSRM', rescue=0, rescue_num=0, MB_Token='', sleepTime=5, osrmHeader='')`
 
-**Description**
+**Description:**
+
 Create an Origin-Destination matrix from a list of origins and destinations.
 
-**Parameters**
+**Parameters:**
+
 - `infile` (string or geodataframe): string for folder path containing input data of the origins. This can also be a geodataframe of the data instead.
 - `infile_2` (string or geodataframe): string for folder path containing input data of the destinations. This can also be a geodataframe of the data instead.
 - `lat_name` (string, optional): Latitude column name.
@@ -19,33 +21,37 @@ Create an Origin-Destination matrix from a list of origins and destinations.
 - `sleepTime` (int, optional): When making calls to OSRM, a sleep time is required to avoid DDoS
 - `osrmHeader` (string, optional): optional parameter to set OSRM source
 
-**Returns**
+**Returns:**
+
 - pandas.DataFrame: DataFrame containing the OD matrix.
 
 ---
 
-### `MarketAccess(new, lambder_list=[0.01, 0.005, 0.001, 0.0007701635, 0.0003850818, 0.0001925409, 9.62704e-05, 3.85082e-05, 1e-05])`
+## `MarketAccess(new, lambder_list=[0.01, 0.005, 0.001, 0.0007701635, 0.0003850818, 0.0001925409, 9.62704e-05, 3.85082e-05, 1e-05])`
 
-**Description**
+**Description:**
+
 Calculate Market Access for a given range of lambdas.
 
-**Parameters**
+**Parameters:**
+
 - `new` (pd.DataFrame): DataFrame containing the data for market access calculation.
 - `lambder_list` (list, optional): List of lambda values to be used for market access calculation.
 
-**Returns**
+**Returns:**
+
 - pd.DataFrame: DataFrame containing the market access values for each lambda.
 
 ---
 
-### `ReadMe(ffpath)`
+## `ReadMe(ffpath)`
 
-**Description**
+**Description:**
 
+Create a README file describing Market Access assumptions and inputs.
 
-**Parameters**
-- `ffpath`: 
+**Parameters:**
 
-**Returns**
+- `ffpath` (str): Directory path where the README file should be written.
 
 ---

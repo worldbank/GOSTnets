@@ -80,7 +80,7 @@ class OSM_to_network(object):
             Length of line in kilometers
 
         """
-        if type(in_df) != gpd.geodataframe.GeoDataFrame:
+        if not isinstance(in_df, gpd.geodataframe.GeoDataFrame):
             in_df = self.roads_raw
 
         # get all intersections

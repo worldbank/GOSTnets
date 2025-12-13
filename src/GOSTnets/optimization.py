@@ -56,7 +56,7 @@ def optimize_facility_locations(
         print("cpu count: %s" % num_procs)
     t1 = time.time()
 
-    if type(OD) != pandas.core.frame.DataFrame:
+    if not isinstance(OD, pandas.core.frame.DataFrame):
         raise ValueError("OD must be pandas Dataframe!")
 
     for f in facilities:

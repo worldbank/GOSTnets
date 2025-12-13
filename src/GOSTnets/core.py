@@ -708,7 +708,7 @@ def graph_nodes_intersecting_polygon(G, polygons, crs=None):
             f"Expected a graph or node geodataframe for G, input was a: {type(G)}"
         )
 
-    if type(polygons) != gpd.GeoDataFrame:
+    if not isinstance(polygons, gpd.GeoDataFrame):
         raise TypeError(
             f"Expected a geodataframe for polygon(s), input was a: {type(polygons)}"
         )
@@ -763,7 +763,7 @@ def graph_edges_intersecting_polygon(G, polygons, mode, crs=None, fast=True):
     else:
         raise TypeError(f"Expected a graph for G, input was a: {type(G)}")
 
-    if type(polygons) != gpd.GeoDataFrame:
+    if not isinstance(polygons, gpd.GeoDataFrame):
         raise TypeError(
             f"Expected a geodataframe for polygon(s), input was a {type(polygons)}"
         )
@@ -828,9 +828,8 @@ def sample_raster(G, tif_path, property_name="RasterValue"):
     """
     import rasterio
 
-    if (
-        type(G) == nx.classes.multidigraph.MultiDiGraph
-        or type(G) == nx.classes.digraph.DiGraph
+    if isinstance(
+        G, (nx.classes.multidigraph.MultiDiGraph, nx.classes.digraph.DiGraph)
     ):
         pass
     else:
@@ -1239,9 +1238,8 @@ def find_hwy_distances_by_class(G, distance_tag="length"):
         a dictionary that has each class and the total distance per class
 
     """
-    if (
-        type(G) == nx.classes.multidigraph.MultiDiGraph
-        or type(G) == nx.classes.digraph.DiGraph
+    if isinstance(
+        G, (nx.classes.multidigraph.MultiDiGraph, nx.classes.digraph.DiGraph)
     ):
         pass
     else:
@@ -1296,9 +1294,8 @@ def find_graph_avg_speed(G, distance_tag, time_tag):
         The average speed for the whole graph in km per hr
 
     """
-    if (
-        type(G) == nx.classes.multidigraph.MultiDiGraph
-        or type(G) == nx.classes.digraph.DiGraph
+    if isinstance(
+        G, (nx.classes.multidigraph.MultiDiGraph, nx.classes.digraph.DiGraph)
     ):
         pass
     else:
@@ -1410,9 +1407,8 @@ def convert_network_to_time(
     :returns: The original graph with a new data property for the edges called 'time'
     """
 
-    if (
-        type(G) == nx.classes.multidigraph.MultiDiGraph
-        or type(G) == nx.classes.digraph.DiGraph
+    if isinstance(
+        G, (nx.classes.multidigraph.MultiDiGraph, nx.classes.digraph.DiGraph)
     ):
         pass
     else:
@@ -1913,15 +1909,15 @@ def unbundle_geometry(c):
         for i in c:
             if isinstance(i, str):
                 J = loads(i)
-                if type(J) == LineString:
+                if isinstance(J, LineString):
                     objs.append(J)
-                if type(J) == MultiLineString:
+                if isinstance(J, MultiLineString):
                     for j in J:
                         objs.append(j)
-            elif type(i) == MultiLineString:
+            elif isinstance(i, MultiLineString):
                 for j in i:
                     objs.append(j)
-            elif type(i) == LineString:
+            elif isinstance(i, LineString):
                 objs.append(i)
             else:
                 pass
@@ -2189,7 +2185,7 @@ def simplify_junctions(G, measure_crs, in_crs="epsg:4326", thresh=25, verbose=Fa
             print("seconds elapsed: " + str(time.time() - start))
         count += 1
 
-        if type(data["Wkt"]) == LineString:
+        if isinstance(data["Wkt"], LineString):
             line = data["Wkt"]
         else:
             line = loads(data["Wkt"])
@@ -2453,7 +2449,7 @@ def custom_simplify(G, strict=True):
 
     G = G.copy()
 
-    if type(G) != nx.classes.multidigraph.MultiDiGraph:
+    if not isinstance(G, nx.classes.multidigraph.MultiDiGraph):
         G = nx.MultiDiGraph(G)
     # initial_node_count = len(list(G.nodes()))
     # initial_edge_count = len(list(G.edges()))
@@ -3327,14 +3323,14 @@ def clip(
     edges_to_add, nodes_to_add = [], []
     edges_to_remove, nodes_to_remove = [], []
 
-    if type(bound) == MultiPolygon or type(bound) == Polygon:
+    if isinstance(bound, (MultiPolygon, Polygon)):
         pass
     else:
         raise ValueError(
             "Bound input must be a Shapely Polygon or MultiPolygon object!"
         )
 
-    if type(G) != nx.classes.multidigraph.MultiDiGraph:
+    if not isinstance(G, nx.classes.multidigraph.MultiDiGraph):
         raise ValueError(
             "Graph object must be of type networkx.classes.multidigraph.MultiDiGraph!"
         )
@@ -3404,11 +3400,11 @@ def clip(
 
                 # identify the new line sections inside the boundary
                 new_geom = bound.intersection(geom)
-                if type(new_geom) == MultiLineString:
+                if isinstance(new_geom, MultiLineString):
                     new_geom = linemerge(new_geom)
 
                 # If there is only one:
-                if type(new_geom) == LineString:
+                if isinstance(new_geom, LineString):
                     (
                         new_nodes,
                         new_edges,
@@ -3426,7 +3422,7 @@ def clip(
                     nodes_to_add.append(new_nodes)
                     edges_to_add.append(new_edges)
 
-                elif type(new_geom) == MultiLineString:
+                elif isinstance(new_geom, MultiLineString):
                     for n in new_geom:
                         (
                             new_nodes,

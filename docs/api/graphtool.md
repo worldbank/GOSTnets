@@ -1,28 +1,34 @@
 # graphtool.py
 
-### `get_prop_type(value, key=None)`
+## `get_prop_type(value, key=None)`
 
-**Description**
+**Description:**
+
 Performs typing and value conversion for the graph_tool PropertyMap class.
 
-**Parameters**
+**Parameters:**
+
 - `value` (any): The value to be typed and converted
 - `key` (any, optional): The key to be typed and converted, if provided, defaults to None
 
-**Returns**
+**Returns:**
+
 - tuple: A tuple of the type name, value, and key
 
 ---
 
-### `nx2gt(nxG)`
+## `nx2gt(nxG)`
 
-**Description**
+**Description:**
+
 Converts a networkx graph to a graph-tool graph.
 
-**Parameters**
+**Parameters:**
+
 - `nxG` (networkx.Graph): The networkx graph to be converted.
 
-**Returns**
+**Returns:**
+
 - gtG: graph_tool.Graph The graph-tool graph converted from the networkx graph.
 
 ---

@@ -6,7 +6,6 @@ from scipy import interpolate
 from rasterio import features
 
 
-
 def rasterize_od_results(inD, outFile, field, template=None):
     """Convert gridded point data frame to raster of commensurate size and resolution
 
