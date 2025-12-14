@@ -1,0 +1,37 @@
+version: 1
+project:
+  title: GOSTnets
+  github: worldbank/GOSTnets
+  bibliography:
+    - references.bib
+  toc:
+    - file: README.md
+    - title: API Docs
+      children:
+        - file: api/calculate_od_raw.md
+        - file: api/conversion_utils.md
+        - file: api/core.md
+        - file: api/fetch_od.md
+        - file: api/fetch_pois.md
+        - file: api/graphtool.md
+        - file: api/load_osm.md
+        - file: api/network_clean.md
+        - file: api/optimization.md
+        - file: api/osm_parser.md
+    - title: Tutorials
+      children:
+        - file: tutorials/README.md
+        - file: tutorials/Step_1-Extract_From_OSM.ipynb
+        - file: tutorials/Step_2-Clean_Network.ipynb
+        - file: tutorials/Step_3-Using_your_Graph.ipynb
+        - file: tutorials/EXAMPLE_Finding_links_between_pairs.ipynb
+        - file: tutorials/EXAMPLE_Fixing_your_road_network.ipynb
+        - file: tutorials/EXAMPLE_Gravity_Calculations.ipynb
+
+site:
+  options:
+    favicon: images/favicon.ico
+    logo: images/logo.png
+    folders: true
+  parts:
+    primary_sidebar_footer: primary_sidebar_footer.md

@@ -88,7 +88,7 @@ class OsmObject:
         lats, lons = [], []
 
         # It is possible that a relation might be a Polygon instead of a MultiPolygon
-        if type(string) == shapely.geometry.polygon.Polygon:
+        if isinstance(string, shapely.geometry.polygon.Polygon):
             return string.centroid
 
         for i in string.geoms:

@@ -1,10 +1,12 @@
 import pytest  # noqa: F401
-from GOSTnets import osm_parser
 from unittest import mock
 import geopandas as gpd
 from shapely.geometry import LineString
 from shapely.geometry import MultiLineString
 import os
+from pathlib import Path
+
+from GOSTnets import osm_parser
 
 
 def test_haversine():
@@ -91,9 +93,15 @@ def test_way_split():
 
 def test_fetch_roads_OSM():
     """Test the fetch_roads_OSM function."""
-    data_path = "./Tutorials/tutorial_data/iceland-latest.osm.pbf"
+    data_path = (
+        Path(__file__).resolve().parent.parent
+        / "docs"
+        / "tutorials"
+        / "tutorial_data"
+        / "iceland-latest.osm.pbf"
+    )
     # run the function
-    result = osm_parser.fetch_roads_OSM(data_path)
+    result = osm_parser.fetch_roads_OSM(str(data_path))
     # check the result
     assert isinstance(result, gpd.GeoDataFrame)
     assert result.columns[0] == "osm_id"

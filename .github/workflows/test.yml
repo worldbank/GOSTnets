@@ -4,28 +4,40 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   ubuntu-build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-    env:
-      OS: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: false
           activate-environment: test-env
           auto-activate-base: false
-      - name: Install dependencies then test
+          channels: conda-forge
+          channel-priority: strict
+
+      - name: Install system deps (conda) and run tests
         run: |
-          conda install -c conda-forge gdal
-          conda install -c conda-forge pip
-          pip install .[dev]
-          coverage run -m pytest
+          conda install -y python=3.10 gdal pip
+
+          # Sanity-check that GDAL has the OSM driver and ogrinfo is available
+          ogrinfo --formats | grep -i "OSM"
+
+          # Ensure the test PBF exists (repo usually doesn't ship large files)
+          mkdir -p Tutorials/tutorial_data
+          curl -L -o Tutorials/tutorial_data/iceland-latest.osm.pbf \
+            https://download.geofabrik.de/europe/monaco-latest.osm.pbf
+
+          # Install from working tree so coverage measures your code (not site-packages wheel)
+          python -m pip install -e .[dev]
+
+          python -m coverage run -m pytest

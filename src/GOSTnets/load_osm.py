@@ -17,6 +17,7 @@ import networkx as nx
 from osgeo import ogr
 from rtree import index
 from shapely.geometry import LineString, MultiPoint
+from pathlib import Path
 
 # from geopy.distance import geodesic
 from geopy import distance
@@ -80,7 +81,7 @@ class OSM_to_network(object):
             Length of line in kilometers
 
         """
-        if type(in_df) != gpd.geodataframe.GeoDataFrame:
+        if not isinstance(in_df, gpd.geodataframe.GeoDataFrame):
             in_df = self.roads_raw
 
         # get all intersections
@@ -158,9 +159,14 @@ class OSM_to_network(object):
             a road GeoDataFrame
 
         """
-        if data_path.split(".")[-1] == "pbf":
+        path = Path(data_path)
+        if not path.exists():
+            raise FileNotFoundError(f"OSM file not found: {path}")
+        if path.suffix.lower() == ".pbf":
             driver = ogr.GetDriverByName("OSM")
-            data = driver.Open(data_path)
+            data = driver.Open(str(path))
+            if data is None:
+                raise ValueError(f"OGR could not open OSM file: {path}")
             sql_lyr = data.ExecuteSQL(
                 "SELECT osm_id, highway, other_tags FROM lines WHERE highway IS NOT NULL"
             )
@@ -211,8 +217,8 @@ class OSM_to_network(object):
                 )
                 return road_gdf
 
-        elif data_path.split(".")[-1] == "shp":
-            road_gdf = gpd.read_file(data_path)
+        elif path.suffix.lower() == ".shp":
+            road_gdf = gpd.read_file(path)
             return road_gdf
 
         else:
@@ -233,9 +239,14 @@ class OSM_to_network(object):
             a road GeoDataFrame
 
         """
-        if data_path.split(".")[-1] == "pbf":
+        path = Path(data_path)
+        if not path.exists():
+            raise FileNotFoundError(f"OSM file not found: {path}")
+        if path.suffix.lower() == ".pbf":
             driver = ogr.GetDriverByName("OSM")
-            data = driver.Open(data_path)
+            data = driver.Open(str(path))
+            if data is None:
+                raise ValueError(f"OGR could not open OSM file: {path}")
             sql_lyr = data.ExecuteSQL("SELECT * FROM lines")
 
             roads = []
@@ -272,7 +283,7 @@ class OSM_to_network(object):
                     highway = feature.GetField("highway")
                     roads.append([osm_id, highway, shapely_geo])
 
-            data = driver.Open(data_path)
+            data = driver.Open(str(path))
             sql_lyr_ferries = data.ExecuteSQL(
                 "SELECT * FROM multipolygons WHERE multipolygons.amenity = 'ferry_terminal'"
             )
@@ -295,8 +306,8 @@ class OSM_to_network(object):
                 )
                 return road_gdf
 
-        elif data_path.split(".")[-1] == "shp":
-            road_gdf = gpd.read_file(data_path)
+        elif path.suffix.lower() == ".shp":
+            road_gdf = gpd.read_file(path)
             return road_gdf
 
         else:
