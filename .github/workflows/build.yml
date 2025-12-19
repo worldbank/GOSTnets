@@ -1,10 +1,8 @@
-# Workflow to test installation of the GOSTnets package
+name: Test package build
 
-name: build-package
+env:
+  PACKAGE_NAME: ${{ github.event.repository.name }}
 
-# Controls when the action will run.
-# Triggers the workflow on push or pull request events as well as on
-# a monthly cron schedule. Also allows manual triggering.
 on:
   pull_request:
     branches:
@@ -12,11 +10,7 @@ on:
   push:
   workflow_dispatch:
 
-# Set up jobs to spin up a virtual machine and build the package on each of
-# the operating systems we want to test on. We use a matrix to run the same
-# job on multiple operating systems and Python versions. At this time our
-# 'test' is very simple and consists of installing the package and trying
-# to import it.
+# We use a matrix to run the same job on multiple operating systems and Python versions.
 jobs:
   test-os:
     runs-on: ${{ matrix.os }}
@@ -39,9 +33,9 @@ jobs:
       - name: Print Python Version
         run: |
           python -V
-      - name: Install GOSTnets
+      - name: Install ${{ env.PACKAGE_NAME }}
         run: |
           pip install .
-      - name: Test GOSTnets install
+      - name: Test ${{ env.PACKAGE_NAME }} install
         run: |
-          python -c "import GOSTnets"
+          python -c "import ${PACKAGE_NAME}"
