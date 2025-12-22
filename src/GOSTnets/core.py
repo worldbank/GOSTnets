@@ -1610,7 +1610,7 @@ def assign_traffic_times(
             # print('print elapsed_seconds: ' + str(elapsed_seconds))
             if verbose is True:
                 print(
-                    f"Did {numcalls+1} calls in {elapsed_seconds:.2f} seconds, now wait {60-elapsed_seconds:.2f}, {(300*loop_count)/len(edges):.2%} complete"
+                    f"Did {numcalls + 1} calls in {elapsed_seconds:.2f} seconds, now wait {60 - elapsed_seconds:.2f}, {(300 * loop_count) / len(edges):.2%} complete"
                 )
             time.sleep(60 - elapsed_seconds)
 
