@@ -2,7 +2,7 @@ geojson
 geopandas
 networkx
 numpy
-osmnx>=1.0.1,<2
+osmnx>=1.0.1
 pandas>=0.23.5
 pyproj>=2.4.2
 rasterio
@@ -11,3 +11,4 @@ scipy
 shapely
 boltons
 geopy
+pyarrow
