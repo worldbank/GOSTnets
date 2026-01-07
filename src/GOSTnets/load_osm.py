@@ -24,6 +24,8 @@ from geopy import distance
 from boltons.iterutils import pairwise
 from shapely.wkt import loads
 
+from . import conversion_utils as cu
+
 
 class OSM_to_network(object):
     """
@@ -85,9 +87,7 @@ class OSM_to_network(object):
             in_df = self.roads_raw
 
         # get all intersections
-        roads = self.get_all_intersections(
-            in_df, unique_id="osm_id", verboseness=verbose
-        )
+        roads = cu.get_all_intersections(in_df, unique_id="osm_id")
 
         # add new key column that has a unique id
         roads["key"] = ["edge_" + str(x + 1) for x in range(len(roads))]
@@ -361,114 +361,7 @@ class OSM_to_network(object):
             returns processed GeoDataFrame
 
         """
-        # Initialize Rtree
-        idx_inters = index.Index()
-        # Load data
-        # all_data = dict(zip(list(shape_input.osm_id),list(shape_input.geometry),list(shape_input.infra_type)))
-        ### TODO - it shouldn't be necessary to reference the geometry column specifically
-        #   ... but here we are
 
-        if idx_osm is None:
-            idx_osm = shape_input["geometry"].sindex
-
-        # Find all the intersecting lines to prepare for cutting
-        count = 0
-        tLength = shape_input.shape[0]
-        start = time.time()
-        inters_done = {}
-        new_lines = []
-        # allCounts = []
-
-        for idx, row in shape_input.iterrows():
-            # print(row)
-            key1 = row[f"{unique_id}"]
-            line = row.geometry
-            infra_type = row.infra_type
-            one_way = row.get("one_way")
-            if (count % 1000 == 0) and (verboseness is True):
-                print("Processing %s of %s" % (count, tLength))
-                print("seconds elapsed: " + str(time.time() - start))
-            count += 1
-            intersections = shape_input.iloc[list(idx_osm.intersection(line.bounds))]
-            intersections = dict(
-                zip(list(intersections[f"{unique_id}"]), list(intersections.geometry))
-            )
-            if key1 in intersections:
-                intersections.pop(key1)
-            # Find intersecting lines
-            for key2, line2 in intersections.items():
-                # Check that this intersection has not been recorded already
-                if (key1, key2) in inters_done or (key2, key1) in inters_done:
-                    continue
-                # Record that this intersection was saved
-                inters_done[(key1, key2)] = True
-                # Get intersection
-                if line.intersects(line2):
-                    # Get intersection
-                    inter = line.intersection(line2)
-                    # Save intersecting point
-                    # updating to be compatible with Shapely ver 2
-                    # if "Point" == inter.type:
-                    if "Point" == inter.geom_type:
-                        idx_inters.insert(0, inter.bounds, inter)
-                    elif "MultiPoint" == inter.geom_type:
-                        # updating to be compatible with Shapely ver 2
-                        # for pt in inter:
-                        for pt in inter.geoms:
-                            idx_inters.insert(0, pt.bounds, pt)
-
-            # cut lines where necessary and save all new linestrings to a list
-            hits = [
-                n.object for n in idx_inters.intersection(line.bounds, objects=True)
-            ]
-
-            if len(hits) != 0:
-                try:
-                    out = shapely.ops.split(line, MultiPoint(hits))
-                    new_lines.append(
-                        [
-                            {
-                                "geometry": LineString(x),
-                                "osm_id": key1,
-                                "infra_type": infra_type,
-                                "one_way": one_way,
-                            }
-                            for x in out.geoms
-                        ]
-                    )
-                except Exception:
-                    pass
-            else:
-                new_lines.append(
-                    [
-                        {
-                            "geometry": line,
-                            "osm_id": key1,
-                            "infra_type": infra_type,
-                            "one_way": one_way,
-                        }
-                    ]
-                )
-
-        # Create one big list and treat all the cut lines as unique lines
-        flat_list = []
-        all_data = {}
-
-        # item for sublist in new_lines for item in sublist
-        i = 1
-        for sublist in new_lines:
-            if sublist is not None:
-                for item in sublist:
-                    item["id"] = i
-                    flat_list.append(item)
-                    i += 1
-                    all_data[i] = item
-
-        # Transform into geodataframe and add coordinate system
-        full_gpd = gpd.GeoDataFrame(flat_list, geometry="geometry")
-        full_gpd.crs = "epsg:4326"
-
-        return full_gpd
 
     def initialReadIn(self, fpath=None, wktField="Wkt"):
         """
