@@ -8,7 +8,6 @@ import numpy as np
 import networkx as nx
 # import matplotlib.pyplot as plt
 
-from osgeo import ogr
 from rtree import index
 from shapely.geometry import LineString, MultiPoint
 from pathlib import Path

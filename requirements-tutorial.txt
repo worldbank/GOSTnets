@@ -1,3 +1,4 @@
 overturemaps
 jupyter
-
+ipywidgets
+ipyleaflet
