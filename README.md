@@ -1,13 +1,12 @@
 # GOSTnets: Build, process, and analyze networks
 
-[GOSTnets](https://github.com/worldbank/GOSTnets) is built on top of geopandas, networkx, osmnx, and rtree.
+GOSTNets is a Python library from the World Bank’s GOST team that streamlines geospatial network analysis, especially with OpenStreetMap data. It provides a convenience layer on top of networkx and integrates with geopandas, osmnx, and rtree to build, clean, and analyze spatial graphs, and to convert networkx graphs to GeoDataFrames for mapping and analysis. Typical uses include travel-time and accessibility studies (e.g., health facility access), urban and transport network analysis, and infrastructure planning workflows
 
 ## Installation
-
 ### From PyPI
 The first line includes conda install of several libraries; this is to support Windows users for whom gdal and geopandas do not install cleanly through pip.
 ```
-conda create --name gostnets geopandas gdal osmnx -c conda-forge
+conda create --name gostnets geopandas osmnx -c conda-forge
 conda activate gostnets
 pip install GOSTnets
 ```

@@ -26,6 +26,21 @@ from collections import Counter
 
 import math
 
+osm_speed_dict = {
+                    "residential": 20,  # kmph
+                    "primary": 40,  # kmph
+                    "primary_link": 35,
+                    "motorway": 50,
+                    "motorway_link": 45,
+                    "trunk": 40,
+                    "trunk_link": 35,
+                    "secondary": 30,
+                    "secondary_link": 25,
+                    "tertiary": 30,
+                    "tertiary_link": 25,
+                    "unclassified": 20,
+                    "projected_footway": 3.5,
+                }
 
 def convert(x, u_tag, v_tag, geometry_tag, attr_list):
     """
@@ -1440,22 +1455,8 @@ def convert_network_to_time(
 
         elif graph_type == "drive":
             if speed_dict is None:
-                speed_dict = {
-                    "residential": 20,  # kmph
-                    "primary": 40,  # kmph
-                    "primary_link": 35,
-                    "motorway": 50,
-                    "motorway_link": 45,
-                    "trunk": 40,
-                    "trunk_link": 35,
-                    "secondary": 30,
-                    "secondary_link": 25,
-                    "tertiary": 30,
-                    "tertiary_link": 25,
-                    "unclassified": 20,
-                    "projected_footway": 3.5,
-                }
-
+                speed_dict = osm_speed_dict.copy()
+                
             highwayclass = data[road_col]
 
             if isinstance(highwayclass, list):
