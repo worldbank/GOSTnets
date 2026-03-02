@@ -3674,7 +3674,9 @@ def gn_project_graph(G, to_crs=None):
 
     # STEP 3: REBUILD GRAPH
     # turn projected node/edge gdfs into a graph and update its CRS attribute
-    G_proj = ox.convert.graph_from_gdfs(gdf_nodes_proj, gdf_edges_proj, G.graph)
+    G_proj = ox.convert.graph_from_gdfs(
+        gdf_nodes_proj, gdf_edges_proj, graph_attrs=G.graph
+    )
     # G_proj.graph["crs"] = gdf_nodes_proj.crs
 
     # utils.log(f"Projected graph with {len(G)} nodes and {len(G.edges)} edges")
