@@ -3665,12 +3665,9 @@ def gn_project_graph(G, to_crs=None):
     gdf_nodes_proj = project_gdf(gdf_nodes, to_crs=to_crs)
     gdf_nodes_proj["x"] = gdf_nodes_proj["geometry"].x
     gdf_nodes_proj["y"] = gdf_nodes_proj["geometry"].y
-    gdf_nodes_proj = gdf_nodes_proj.drop(columns=["geometry"])
 
     # STEP 2: PROJECT THE EDGES
-    gdf_edges_proj = ox.convert.graph_to_gdfs(
-        G, nodes=False, fill_edge_geometry=False
-    ).drop(columns=["geometry"])
+    gdf_edges_proj = ox.convert.graph_to_gdfs(G, nodes=False, fill_edge_geometry=False)
 
     # STEP 3: REBUILD GRAPH
     # turn projected node/edge gdfs into a graph and update its CRS attribute
