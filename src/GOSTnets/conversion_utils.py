@@ -10,14 +10,13 @@ import networkx as nx
 
 from rtree import index
 from shapely.geometry import LineString, MultiPoint
-from pathlib import Path
 from scipy import interpolate
 from rasterio import features
 
 # from geopy.distance import geodesic
 from geopy import distance
 from boltons.iterutils import pairwise
-from shapely.wkt import loads
+
 
 def get_all_intersections(shape_input, unique_id, infra_field="infra_type"):
     """Get all intersections in a linestring geodataframe and cut lines at intersections
@@ -53,7 +52,7 @@ def get_all_intersections(shape_input, unique_id, infra_field="infra_type"):
         line = row.geometry
         infra_type = row[infra_field]
         one_way = row.get("one_way")
-        if (count % 1000 == 0):
+        if count % 1000 == 0:
             print("Processing %s of %s" % (count, tLength))
             print("seconds elapsed: " + str(time.time() - start))
         count += 1
@@ -86,9 +85,7 @@ def get_all_intersections(shape_input, unique_id, infra_field="infra_type"):
                         idx_inters.insert(0, pt.bounds, pt)
 
         # cut lines where necessary and save all new linestrings to a list
-        hits = [
-            n.object for n in idx_inters.intersection(line.bounds, objects=True)
-        ]
+        hits = [n.object for n in idx_inters.intersection(line.bounds, objects=True)]
 
         if len(hits) != 0:
             try:
@@ -136,6 +133,7 @@ def get_all_intersections(shape_input, unique_id, infra_field="infra_type"):
     full_gpd = gpd.GeoDataFrame(flat_list, geometry="geometry", crs=shape_input.crs)
     return full_gpd
 
+
 def line_length(line, ellipsoid="WGS-84"):
     """
     Returns length of a line in kilometers, given in geographic coordinates. Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
@@ -163,6 +161,7 @@ def line_length(line, ellipsoid="WGS-84"):
         for a, b in pairwise(line.coords)
     )
 
+
 def generateRoadsGDF(in_df, unq_id="osm_id", infra_field="infra_type"):
     """
     post-process roads GeoDataFrame adding additional attributes
@@ -171,7 +170,7 @@ def generateRoadsGDF(in_df, unq_id="osm_id", infra_field="infra_type"):
     ----------
     in_df : GeoDataFrame
         input GeoDataFrame
-    
+
     Returns
     -------
     float
@@ -189,7 +188,9 @@ def generateRoadsGDF(in_df, unq_id="osm_id", infra_field="infra_type"):
         return list(x.geometry.coords)[0], list(x.geometry.coords)[-1]
 
     # generate all of the nodes per edge and to and from node columns
-    nodes = gpd.GeoDataFrame(roads.apply(lambda x: get_nodes(x), axis=1).apply(pd.Series))
+    nodes = gpd.GeoDataFrame(
+        roads.apply(lambda x: get_nodes(x), axis=1).apply(pd.Series)
+    )
     nodes.columns = ["u", "v"]
 
     # compute the length per edge
@@ -198,7 +199,8 @@ def generateRoadsGDF(in_df, unq_id="osm_id", infra_field="infra_type"):
 
     roads = pd.concat([roads, nodes], axis=1)
 
-    return(roads)
+    return roads
+
 
 def convert_roads_to_nx(edges_1, unq_id="osm_id", infra_field="infra_type"):
     """Convert roads GeoDataFrame to NetworkX MultiDiGraph
@@ -225,8 +227,8 @@ def convert_roads_to_nx(edges_1, unq_id="osm_id", infra_field="infra_type"):
         u = x.u
         v = x.v
         data = {}
-        for col in ['infra_type', 'one_way', 'osm_id', 'key', 'length', 'Wkt']:
-            data[col] = x[col]        
+        for col in ["infra_type", "one_way", "osm_id", "key", "length", "Wkt"]:
+            data[col] = x[col]
         return (u, v, data)
 
     edge_bunch = edges.apply(lambda x: convert(x), axis=1).tolist()
@@ -244,6 +246,7 @@ def convert_roads_to_nx(edges_1, unq_id="osm_id", infra_field="infra_type"):
         data["y"] = q[1]
     G = nx.convert_node_labels_to_integers(G)
     return G
+
 
 def rasterize_od_results(inD, outFile, field, template=None):
     """Convert gridded point data frame to raster of commensurate size and resolution

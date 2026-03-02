@@ -1,30 +1,38 @@
 # GOSTnets: Build, process, and analyze networks
 
-GOSTNets is a Python library from the World Bank’s GOST team that streamlines geospatial network analysis, especially with OpenStreetMap data. It provides a convenience layer on top of networkx and integrates with geopandas, osmnx, and rtree to build, clean, and analyze spatial graphs, and to convert networkx graphs to GeoDataFrames for mapping and analysis. Typical uses include travel-time and accessibility studies (e.g., health facility access), urban and transport network analysis, and infrastructure planning workflows
+GOSTNets is a Python library from the World Bank's GOST team that streamlines geospatial network analysis, especially with OpenStreetMap data. It provides a convenience layer on top of networkx and integrates with geopandas, osmnx, and rtree to build, clean, and analyze spatial graphs, and to convert networkx graphs to GeoDataFrames for mapping and analysis. Typical uses include travel-time and accessibility studies (e.g., health facility access), urban and transport network analysis, and infrastructure planning workflows
 
 ## Installation
+
 ### From PyPI
+
 The first line includes conda install of several libraries; this is to support Windows users for whom gdal and geopandas do not install cleanly through pip.
-```
+
+```shell
 conda create --name gostnets geopandas osmnx -c conda-forge
 conda activate gostnets
 pip install GOSTnets
 ```
+
 Additionally, there are two extensions you may want to include.
+
 ```shell
 pip install GOSTnets[tutorials]
 ```
+
 ```shell
 pip install GOSTnets[dev]
 ```
 
 ### From Source
+
 1. Clone or download this repository to your local machine. Then, navigate to the root directory of the repository:
 
     ```shell
     git clone https://github.com/worldbank/GOSTnets.git
     cd GOSTnets
     ```
+
 2. Create a virtual environment (optional but recommended):
 
     ```shell
@@ -40,7 +48,6 @@ pip install GOSTnets[dev]
 
     The `-e` flag stands for "editable," meaning changes to the source code will immediately affect the installed package.
 
-
 ## Usage
 
 Every function contains a docstring which can be brought up in use to check the inputs for various functions. For example:
@@ -49,7 +56,9 @@ Every function contains a docstring which can be brought up in use to check the 
 import GOSTnets as gn
 gn.edge_gdf_from_graph?
 ```
+
 returns:
+
 ```python
 Signature: gn.edge_gdf_from_graph(G, crs={'init': 'epsg:4326'}, attr_list=None, geometry_tag='geometry', xCol='x', yCol='y')
 #### Function for generating a GeoDataFrame from a networkx Graph object ###
@@ -72,5 +81,7 @@ Signature: gn.edge_gdf_from_graph(G, crs={'init': 'epsg:4326'}, attr_list=None, 
  RETURNS: a GeoDataFrame object of the edges in the graph
 #-------------------------------------------------------------------------#
 ```
+
 ## License
+
 This licensed under the [**MIT License**](https://opensource.org/license/mit). This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
