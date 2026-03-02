@@ -7,17 +7,20 @@ These notebooks are designed to introduce the methodology of GOSTnets to novice 
 - Anaconda (for setup)
 - GIS/Geography
 
-# Installation
+## Installation
+
 Make sure you install GOSTnets using the tutorials extension to support Jupyter Notebooks
 
 The first line includes conda install of several libraries; this is to support Windows users for whom gdal and geopandas do not install cleanly through pip.
-```
+
+```shell
 conda create --name gostnets geopandas gdal osmnx -c conda-forge
 conda activate gostnets
 pip install GOSTnets[tutorials]
 ```
 
-# Outline
+## Outline
+
 There are several notebooks in the GOSTnets tutorial, choose the one that is right for you:
 
 | Name | Description |

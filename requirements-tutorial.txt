@@ -2,3 +2,4 @@ overturemaps
 jupyter
 ipywidgets
 ipyleaflet
+ipykernel

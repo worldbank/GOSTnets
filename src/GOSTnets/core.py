@@ -26,6 +26,22 @@ from collections import Counter
 
 import math
 
+osm_speed_dict = {
+    "residential": 20,  # kmph
+    "primary": 40,  # kmph
+    "primary_link": 35,
+    "motorway": 50,
+    "motorway_link": 45,
+    "trunk": 40,
+    "trunk_link": 35,
+    "secondary": 30,
+    "secondary_link": 25,
+    "tertiary": 30,
+    "tertiary_link": 25,
+    "unclassified": 20,
+    "projected_footway": 3.5,
+}
+
 
 def convert(x, u_tag, v_tag, geometry_tag, attr_list):
     """
@@ -1440,21 +1456,7 @@ def convert_network_to_time(
 
         elif graph_type == "drive":
             if speed_dict is None:
-                speed_dict = {
-                    "residential": 20,  # kmph
-                    "primary": 40,  # kmph
-                    "primary_link": 35,
-                    "motorway": 50,
-                    "motorway_link": 45,
-                    "trunk": 40,
-                    "trunk_link": 35,
-                    "secondary": 30,
-                    "secondary_link": 25,
-                    "tertiary": 30,
-                    "tertiary_link": 25,
-                    "unclassified": 20,
-                    "projected_footway": 3.5,
-                }
+                speed_dict = osm_speed_dict.copy()
 
             highwayclass = data[road_col]
 
@@ -3601,7 +3603,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
 
     # if to_latlong is True, project the gdf to latlong
     if to_latlong:
-        gdf_proj = gdf.to_crs(ox.settings.default_crs)
+        gdf_proj = gdf.to_crs("EPSG:4326")
         # utils.log(f"Projected GeoDataFrame to {settings.default_crs}")
 
     # else if to_crs was passed-in, project gdf to this CRS
@@ -3611,7 +3613,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
 
     # otherwise, automatically project the gdf to UTM
     else:
-        if ox.projection.is_projected(gdf.crs):
+        if pyproj.CRS(gdf.crs).is_projected:
             raise ValueError("Geometry must be unprojected to calculate UTM zone")
 
         # calculate longitude of centroid of union of all geometries in gdf
@@ -3651,7 +3653,7 @@ def gn_project_graph(G, to_crs=None):
 
     """
     # STEP 1: PROJECT THE NODES
-    gdf_nodes = ox.utils_graph.graph_to_gdfs(G, edges=False)
+    gdf_nodes = ox.convert.graph_to_gdfs(G, edges=False)
 
     # create new lat/lng columns to preserve lat/lng for later reference if
     # cols do not already exist (ie, don't overwrite in later re-projections)
@@ -3663,16 +3665,15 @@ def gn_project_graph(G, to_crs=None):
     gdf_nodes_proj = project_gdf(gdf_nodes, to_crs=to_crs)
     gdf_nodes_proj["x"] = gdf_nodes_proj["geometry"].x
     gdf_nodes_proj["y"] = gdf_nodes_proj["geometry"].y
-    gdf_nodes_proj = gdf_nodes_proj.drop(columns=["geometry"])
 
     # STEP 2: PROJECT THE EDGES
-    gdf_edges_proj = ox.utils_graph.graph_to_gdfs(
-        G, nodes=False, fill_edge_geometry=False
-    ).drop(columns=["geometry"])
+    gdf_edges_proj = ox.convert.graph_to_gdfs(G, nodes=False, fill_edge_geometry=False)
 
     # STEP 3: REBUILD GRAPH
     # turn projected node/edge gdfs into a graph and update its CRS attribute
-    G_proj = ox.utils_graph.graph_from_gdfs(gdf_nodes_proj, gdf_edges_proj, G.graph)
+    G_proj = ox.convert.graph_from_gdfs(
+        gdf_nodes_proj, gdf_edges_proj, graph_attrs=G.graph
+    )
     # G_proj.graph["crs"] = gdf_nodes_proj.crs
 
     # utils.log(f"Projected graph with {len(G)} nodes and {len(G.edges)} edges")

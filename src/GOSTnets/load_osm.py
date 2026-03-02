@@ -4,7 +4,6 @@
 # Purpose: take an input dataset as a OSM file and return a network object
 ####################################################################################################
 
-import time
 
 import shapely.ops
 
@@ -15,8 +14,6 @@ import networkx as nx
 # import matplotlib.pyplot as plt
 
 from osgeo import ogr
-from rtree import index
-from shapely.geometry import LineString, MultiPoint
 from pathlib import Path
 
 # from geopy.distance import geodesic
@@ -361,7 +358,6 @@ class OSM_to_network(object):
             returns processed GeoDataFrame
 
         """
-
 
     def initialReadIn(self, fpath=None, wktField="Wkt"):
         """
